@@ -30,7 +30,7 @@ public class IdentitySeeder : IDataSeeder
                 var adminUser = new User
                 {
                     UserName = "AdminTester",
-                    Email = "adminTester@jwtshowcase.com",
+                    Email = "adminTester@competitivetennis.com",
                     SecurityStamp = "RandomSecurityStamp",
                     FirstName = "Admin",
                     LastName = "Tester"

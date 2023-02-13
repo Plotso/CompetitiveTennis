@@ -5,10 +5,9 @@ using static Data.DataConstants;
 
 public class UserInputModel
 {
-    [EmailAddress]
     [Required]
-    [MinLength(MinEmailLength)]
-    [MaxLength(MaxEmailLength)]
+    [MinLength(MinNameLength)]
+    [MaxLength(MaxUsernameLength)]
     public string LoginInfo { get; set; }
 
     [Required]

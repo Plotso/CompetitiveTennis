@@ -1,6 +1,7 @@
 ﻿namespace CompetitiveTennis.Identity.Data;
 
 using System.Reflection;
+using Configurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Models;
@@ -16,5 +17,6 @@ public class IdentityDbContext : IdentityDbContext<User>
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         base.OnModelCreating(builder);
+        EntityIndexesConfiguration.Configure(builder);
     }
 }
