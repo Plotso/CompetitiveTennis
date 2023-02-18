@@ -1,25 +1,22 @@
+using CompetitiveTennis.Extensions;
+using CompetitiveTennis.Identity.Data;
+using CompetitiveTennis.Identity.Extensions;
+using CompetitiveTennis.Identity.Services;
+using CompetitiveTennis.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services
+    .AddWebService<IdentityDbContext>(builder.Configuration, builder.Environment, swaggerEnabled: true)
+    .AddUserStorage()
+    .AddTransient<IDataSeeder, IdentitySeeder>()
+    .AddTransient<IIdentityService, IdentityService>()
+    .AddTransient<ITokenGenerator, TokenGenerator>();
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+app
+    .UseWebService(app.Environment, swaggerEnabled: true)
+    .SeedData();
 
 app.Run();
