@@ -1,8 +1,8 @@
-﻿namespace CompetitiveTennis.Data.Models;
+﻿namespace CompetitiveTennis.Data.Models.CompositeKey;
 
 using Interfaces;
 
-public class BaseDeletableEntity<TKey> : BaseModel<TKey>, IDeletableEntity
+public class CompositeKeyDeletableEntity : CompositeKeyBaseModel, IDeletableEntity
 {
     public bool IsDeleted { get; set; }
     
