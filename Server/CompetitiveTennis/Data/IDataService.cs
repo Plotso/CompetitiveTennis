@@ -3,5 +3,5 @@
 public interface IDataService<in TEntity>
     where TEntity : class
 {
-    Task Save(TEntity entity);
+    Task SaveAsync(TEntity entity);
 }

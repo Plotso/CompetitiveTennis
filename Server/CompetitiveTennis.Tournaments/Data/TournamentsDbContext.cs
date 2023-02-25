@@ -2,10 +2,11 @@
 
 using CompetitiveTennis.Data.Extensions;
 using CompetitiveTennis.Data.Models.Interfaces;
+using Configurations;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Enums;
-using static Constants.CustomDbTypes;
+using static DataConstants.CustomDbTypes;
 
 public class TournamentsDbContext : DbContext
 {
@@ -14,7 +15,7 @@ public class TournamentsDbContext : DbContext
     {
     }
     
-    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Account> Accounts { get; set; }
     
     public DbSet<Avenue> Avenues { get; set; }
     
@@ -27,6 +28,7 @@ public class TournamentsDbContext : DbContext
     public DbSet<Match> Matches { get; set; }
     
     public DbSet<ParticipantMatch> ParticipantMatches { get; set; }
+    public DbSet<AccountParticipant> AccountParticipants { get; set; }
     
     public DbSet<Score> Scores { get; set; }
     
@@ -43,9 +45,11 @@ public class TournamentsDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasPostgresEnum<Surface>(name: SurfaceEnum);
         modelBuilder.HasPostgresEnum<TournamentType>(name: TournamentTypeEnum);
+        modelBuilder.HasPostgresEnum<TournamentStage>(name: TournamentStageEnum);
         modelBuilder.HasPostgresEnum<EventStatus>(name: EventStatusEnum);
         modelBuilder.HasPostgresEnum<MatchOutcome>(name: MatchOutcomeEnum);
         modelBuilder.ApplyGlobalDbConfigurationsForAssembly(GetType().Assembly);
+        EntityIndexesConfiguration.Configure(modelBuilder);
     }
 
     private void ApplyAuditInfoRules()

@@ -18,9 +18,9 @@ public class ParticipantMatchConfiguration : IEntityTypeConfiguration<Participan
             .OnDelete(DeleteBehavior.Restrict);
 
         builder
-            .HasOne(pm => pm.Participant)
-            .WithMany(p => p.Matches)
-            .HasForeignKey(pm => pm.ParticipantId)
+            .HasOne(pm => pm.Match)
+            .WithMany(m => m.Participants)
+            .HasForeignKey(pm => pm.MatchId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

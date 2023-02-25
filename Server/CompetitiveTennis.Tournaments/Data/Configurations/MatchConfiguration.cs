@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models;
 
-using static Constants;
+using static DataConstants;
 
 public class MatchConfiguration : IEntityTypeConfiguration<Match>
 {
@@ -18,6 +18,11 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
         builder
             .Property( m=> m.Outcome)
             .HasColumnType(CustomDbTypes.MatchOutcomeEnum)
+            .IsRequired();
+        
+        builder
+            .Property( m=> m.Stage)
+            .HasColumnType(CustomDbTypes.TournamentStageEnum)
             .IsRequired();
 
         builder

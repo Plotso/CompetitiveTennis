@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models;
 
-using static Constants;
+using static DataConstants;
 
 public class TeamConfiguration : IEntityTypeConfiguration<Team>
 {

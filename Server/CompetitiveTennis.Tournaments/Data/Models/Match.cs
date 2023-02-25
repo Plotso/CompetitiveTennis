@@ -15,7 +15,9 @@ public class Match : BaseDeletableEntity<int>
     public short? SetWonPoints { get; set; }
     public short? GameWonPoints { get; set; }
     
-    public string Stage { get; set; }
+    public TournamentStage Stage { get; set; }
+    
+    public string? Details { get; set; }
     
     public EventStatus Status { get; set; }
     public MatchOutcome Outcome { get; set; }

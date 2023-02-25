@@ -3,8 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models;
-
-using static Constants;
+using static DataConstants.Avenues;
 
 public class AvenueConfiguration : IEntityTypeConfiguration<Avenue>
 {
@@ -15,14 +14,19 @@ public class AvenueConfiguration : IEntityTypeConfiguration<Avenue>
 
         builder
             .Property(a => a.Name)
-            .HasMaxLength(MaxAvenueNameLength);
+            .HasMaxLength(MaxNameLength)
+            .IsRequired();
 
         builder
             .Property(a => a.Location)
-            .HasMaxLength(MaxAvenueLocationLength);
+            .HasMaxLength(MaxLocationLength)
+            .IsRequired();
         
         builder
             .Property(a => a.Details)
-            .HasMaxLength(MaxAvenueDetailsLength);
+            .HasMaxLength(MaxDetailsLength);
+        
+        builder.Property(a => a.Courts)
+            .HasColumnType("jsonb");
     }
 }

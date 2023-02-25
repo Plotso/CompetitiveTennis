@@ -11,7 +11,7 @@ public abstract class DataService<TEntity> : IDataService<TEntity>
 
     protected IQueryable<TEntity> All() => Data.Set<TEntity>();
 
-    public async Task Save(TEntity entity)
+    public async Task SaveAsync(TEntity entity)
     {
         Data.Update(entity);
 

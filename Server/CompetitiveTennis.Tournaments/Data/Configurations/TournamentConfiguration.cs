@@ -3,7 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models;
-using static Constants;
+using static DataConstants;
 
 public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
 {
@@ -15,12 +15,12 @@ public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
         builder
             .Property(t => t.Title)
             .IsRequired()
-            .HasMaxLength(MaxTournamentTitleLength);
+            .HasMaxLength(Tournaments.MaxTitleLength);
 
         builder
             .Property(t => t.Rules)
             .IsRequired()
-            .HasMaxLength(MaxTournamentRulesLength);
+            .HasMaxLength(Tournaments.MaxRulesLength);
 
         builder
             .Property(t => t.Description)
