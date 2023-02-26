@@ -81,5 +81,12 @@ public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
             .HasForeignKey(t => t.AvenueId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
+        
+        builder
+            .HasOne(t => t.Organiser)
+            .WithMany(a => a.OrganisedTournaments)
+            .HasForeignKey(t => t.OrganiserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired();
     }
 }

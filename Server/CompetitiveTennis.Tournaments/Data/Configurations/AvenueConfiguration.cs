@@ -21,6 +21,16 @@ public class AvenueConfiguration : IEntityTypeConfiguration<Avenue>
             .Property(a => a.Location)
             .HasMaxLength(MaxLocationLength)
             .IsRequired();
+
+        builder
+            .Property(a => a.City)
+            .HasMaxLength(MaxLocationLength)
+            .IsRequired();
+
+        builder
+            .Property(a => a.Country)
+            .HasMaxLength(MaxLocationLength)
+            .IsRequired();
         
         builder
             .Property(a => a.Details)
@@ -28,5 +38,14 @@ public class AvenueConfiguration : IEntityTypeConfiguration<Avenue>
         
         builder.Property(a => a.Courts)
             .HasColumnType("jsonb");
+
+        // Indexes
+        builder
+            .HasIndex(a => a.Name)
+            .IsUnique();
+        
+        builder
+            .HasIndex(a => new {a.Country, a.City, a.Location})
+            .IsUnique();
     }
 }

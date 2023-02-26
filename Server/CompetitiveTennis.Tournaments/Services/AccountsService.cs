@@ -2,8 +2,11 @@
 
 using CompetitiveTennis.Data;
 using Data.Models;
+using Exceptions;
 using Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Models.Account;
+using static ServiceConstants;
 
 public class AccountsService : DataService<Account>, IAccountsService
 {
@@ -15,7 +18,7 @@ public class AccountsService : DataService<Account>, IAccountsService
     /// Retrieve PlayerRating for given account if there is such for current user
     /// </summary>
     /// <param name="userId">current user id</param>
-    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     public async Task<int> GetPlayerRating(string userId)
     {
         try
@@ -27,7 +30,8 @@ public class AccountsService : DataService<Account>, IAccountsService
         }
         catch (Exception e)
         {
-            throw new InvalidOperationException($"Could not take player rating for UserId: {userId}. ErrorMsg: {e.Message}");
+            throw new InvalidOperationException(
+                $"Could not take player rating for UserId: {userId}. ErrorMsg: {e.Message}");
         }
     }
 
@@ -37,15 +41,36 @@ public class AccountsService : DataService<Account>, IAccountsService
         {
             var account = await All().SingleOrDefaultAsync(a => a.UserId == userId);
             if (account == null)
-                throw new ArgumentException($"Cannot update rating for non-existing account. UserId: {userId}");
+                throw new MissingEntryException($"Cannot update rating for non-existing account. UserId: {userId}");
 
             account.PlayerRating = newRating;
             await SaveAsync(account);
         }
-        catch (ArgumentException) { throw; }
+        catch (MissingEntryException)
+        {
+            throw;
+        }
         catch (Exception e)
         {
-            throw new InvalidOperationException($"An error occured during {nameof(UpdatePlayerRating)} execution for userId: {userId}. Error: {e.Message} ");
+            throw new InvalidOperationException(
+                $"An error occured during {nameof(UpdatePlayerRating)} execution for userId: {userId}. Error: {e.Message} ");
+        }
+    }
+
+    public async Task Create(AccountCreateInputModel createModel)
+    {
+        var existingAccount = await GetByUserId(createModel.UserId);
+        if (existingAccount == null)
+        {
+            var account = new Account
+            {
+                FirstName = createModel.Input.FirstName,
+                LastName = createModel.Input.LastName,
+                UserId = createModel.UserId,
+                Username = createModel.Username,
+                PlayerRating = DefaultPlayerRating
+            };
+            await SaveAsync(account);
         }
     }
 

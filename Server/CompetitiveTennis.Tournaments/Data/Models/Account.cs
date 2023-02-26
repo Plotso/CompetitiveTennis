@@ -15,5 +15,7 @@ public class Account : BaseDeletableEntity<int>
 
     public int PlayerRating { get; set; }
 
-    public Collection<AccountParticipant> Participations { get; set; } = new();
+    public ICollection<AccountParticipant> Participations { get; set; } = new List<AccountParticipant>();
+
+    public ICollection<Tournament> OrganisedTournaments { get; set; } = new List<Tournament>();
 }

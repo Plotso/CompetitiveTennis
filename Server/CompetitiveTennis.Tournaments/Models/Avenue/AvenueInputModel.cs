@@ -1,7 +1,7 @@
-﻿namespace CompetitiveTennis.Tournaments.Models;
+﻿namespace CompetitiveTennis.Tournaments.Models.Avenue;
 
-using static Data.DataConstants.Avenues;
 using System.ComponentModel.DataAnnotations;
+using static Data.DataConstants.Avenues;
 
 public record AvenueInputModel
 {
@@ -14,6 +14,16 @@ public record AvenueInputModel
     [MinLength(MinLocationLength)]
     [MaxLength(MaxLocationLength)]
     public string Location { get; set; }
+    
+    [Required]
+    [MinLength(MinCityCountryLength)]
+    [MaxLength(MaxLocationLength)]
+    public string City { get; set; }
+    
+    [Required]
+    [MinLength(MinCityCountryLength)]
+    [MaxLength(MaxLocationLength)]
+    public string Country { get; set; }
     
     [Required]
     [MaxLength(MaxDetailsLength)]

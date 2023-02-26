@@ -35,6 +35,10 @@ public class Tournament : BaseDeletableEntity<int>
     public int AvenueId { get; set; }
     
     public Avenue Avenue { get; set; }
+    
+    public int OrganiserId { get; set; }
+    
+    public Account Organiser { get; set; }
 
     public ICollection<Participant> Participants { get; set; } = new List<Participant>();
 }

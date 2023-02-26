@@ -1,6 +1,9 @@
 ﻿namespace CompetitiveTennis.Extensions;
 
+using System.Reflection;
 using System.Text;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +29,7 @@ public static class ServiceCollectionExtensions
             .AddApplicationSettings(configuration)
             .AddTokenAuthentication(configuration, env)
             .AddHealth(configuration)
+            .AddMapster(Assembly.GetCallingAssembly())
             .AddControllers();
 
         if (swaggerEnabled)
@@ -38,6 +42,16 @@ public static class ServiceCollectionExtensions
 
         return services;
         
+    }
+
+    public static IServiceCollection AddMapster(this IServiceCollection services, Assembly assembly)
+    {
+        var config = TypeAdapterConfig.GlobalSettings;
+        config.Scan(assembly);
+
+        return services
+            .AddSingleton(config)
+            .AddScoped<IMapper, ServiceMapper>();
     }
 
     public static IServiceCollection AddDatabase<TDbContext>(

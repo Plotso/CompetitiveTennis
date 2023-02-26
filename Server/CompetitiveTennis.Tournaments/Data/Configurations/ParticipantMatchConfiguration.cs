@@ -15,12 +15,14 @@ public class ParticipantMatchConfiguration : IEntityTypeConfiguration<Participan
             .HasOne(pm => pm.Participant)
             .WithMany(p => p.Matches)
             .HasForeignKey(pm => pm.ParticipantId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired();
 
         builder
             .HasOne(pm => pm.Match)
             .WithMany(m => m.Participants)
             .HasForeignKey(pm => pm.MatchId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired();
     }
 }

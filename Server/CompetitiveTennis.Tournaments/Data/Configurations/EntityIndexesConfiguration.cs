@@ -8,8 +8,8 @@ internal class EntityIndexesConfiguration
     public static void Configure(ModelBuilder modelBuilder)
     {
         // UniqueID indexes
-        var customerEntities = modelBuilder.Model.GetEntityTypes().Where(e => e.ClrType != null && typeof(Account).IsAssignableFrom(e.ClrType));
-        foreach (var entity in customerEntities)
+        var accountEntities = modelBuilder.Model.GetEntityTypes().Where(e => e.ClrType != null && typeof(Account).IsAssignableFrom(e.ClrType));
+        foreach (var entity in accountEntities)
         {
             modelBuilder
                 .Entity(entity.ClrType)

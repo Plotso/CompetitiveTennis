@@ -8,6 +8,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.Account;
 using Services.Interfaces;
 using static ServiceConstants;
 
@@ -30,19 +31,7 @@ public class AccountsController : ApiController
     {
         try
         {
-            var existingAccount = await _accounts.GetByUserId(_currentUser.UserId);
-            if (existingAccount == null)
-            {
-                var account = new Account
-                {
-                    FirstName = input.FirstName,
-                    LastName = input.LastName,
-                    UserId = _currentUser.UserId,
-                    Username = _currentUser.Username,
-                    PlayerRating = DefaultPlayerRating
-                };
-                await _accounts.SaveAsync(account);
-            }
+            await _accounts.Create(new AccountCreateInputModel(_currentUser.UserId, _currentUser.Username, input));
             return Ok(Result.Success);
         }
         catch (Exception e)

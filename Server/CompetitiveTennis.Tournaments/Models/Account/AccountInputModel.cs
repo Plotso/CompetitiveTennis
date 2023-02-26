@@ -1,7 +1,6 @@
-﻿namespace CompetitiveTennis.Tournaments.Models;
+﻿namespace CompetitiveTennis.Tournaments.Models.Account;
 
 using System.ComponentModel.DataAnnotations;
-
 using static Data.DataConstants.Accounts;
 
 public record AccountInputModel

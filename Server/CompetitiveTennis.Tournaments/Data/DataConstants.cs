@@ -20,6 +20,7 @@ public class DataConstants
         public const int MinLocationLength = 3;
         public const int MaxLocationLength = 250;
         public const int MaxDetailsLength = 1000;
+        public const int MinCityCountryLength = 2;
     }
 
     public class Accounts

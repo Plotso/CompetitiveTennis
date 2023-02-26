@@ -3,6 +3,7 @@
 using CompetitiveTennis.Services.Interfaces;
 using Models;
 using Services.Interfaces;
+using Tournaments.Models.Account;
 
 public class TournamentDataSeeder : IDataSeeder
 {
@@ -23,14 +24,9 @@ public class TournamentDataSeeder : IDataSeeder
             {
                 if (!_db.Accounts.Any(a => a.Username == Constants.SystemUser))
                 {
-                    await _accounts.SaveAsync(new Account
-                    {
-                        Username = Constants.SystemUser,
-                        UserId = Guid.NewGuid().ToString(),
-                        FirstName = "System",
-                        LastName = "User",
-                        PlayerRating = ServiceConstants.DefaultPlayerRating
-                    });
+                    var userId = Guid.NewGuid().ToString();
+                    var accountInputModel = new AccountInputModel {FirstName = "System", LastName = "User"};
+                    await _accounts.Create(new AccountCreateInputModel(userId, Constants.SystemUser, accountInputModel));
                     _logger.LogInformation("SysUser account seeded");
                 }
 
