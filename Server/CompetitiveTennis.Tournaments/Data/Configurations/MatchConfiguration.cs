@@ -39,5 +39,13 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
             .Property(m => m.GameWonPoints)
             .HasColumnType("smallint")
             .IsRequired(false);
+
+        builder
+            .HasOne(m => m.Tournament)
+            .WithMany(t => t.Matches)
+            .HasForeignKey(m => m.TournamentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(m => m.TournamentId);
     }
 }

@@ -42,5 +42,7 @@ public class ScoreConfiguration : IEntityTypeConfiguration<Score>
             .HasForeignKey(s => s.MatchId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
+            
+        builder.HasIndex(s => s.MatchId);
     }
 }

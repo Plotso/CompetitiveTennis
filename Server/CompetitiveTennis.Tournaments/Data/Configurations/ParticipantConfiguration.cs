@@ -26,6 +26,7 @@ public class ParticipantConfiguration : IEntityTypeConfiguration<Participant>
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired(false);
 
-
+        builder.HasIndex(p => p.TournamentId);
+        builder.HasIndex(p => p.TeamId);
     }
 }

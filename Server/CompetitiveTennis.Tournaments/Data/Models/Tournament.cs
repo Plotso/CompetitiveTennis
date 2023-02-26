@@ -41,4 +41,5 @@ public class Tournament : BaseDeletableEntity<int>
     public Account Organiser { get; set; }
 
     public ICollection<Participant> Participants { get; set; } = new List<Participant>();
+    public ICollection<Match> Matches { get; set; } = new List<Match>();
 }

@@ -88,5 +88,8 @@ public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
             .HasForeignKey(t => t.OrganiserId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
+
+        builder.HasIndex(t => t.AvenueId);
+        builder.HasIndex(t => t.OrganiserId);
     }
 }

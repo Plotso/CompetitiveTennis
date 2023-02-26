@@ -4,13 +4,10 @@ using System.Net;
 using CompetitiveTennis.Controllers;
 using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
-using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models;
 using Models.Account;
 using Services.Interfaces;
-using static ServiceConstants;
 
 public class AccountsController : ApiController
 {
