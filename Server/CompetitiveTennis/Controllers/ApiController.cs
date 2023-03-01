@@ -10,6 +10,8 @@ using Models;
 [Route("[controller]")]
 public abstract class ApiController : ControllerBase
 {
+    protected ApiController()
+    { }
     protected ApiController(ILogger<ApiController> logger)
     {
         Logger = logger;
