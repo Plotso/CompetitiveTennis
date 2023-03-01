@@ -14,6 +14,7 @@ using Models.Avenue;
 
 public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
 {
+    //ToDo: Add option for administrators to verify and mark as active/inactive avenues
     private readonly IMapper _mapper;
     private readonly ILogger<AvenuesService> _logger;
 
