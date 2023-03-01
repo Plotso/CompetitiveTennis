@@ -50,6 +50,8 @@ public class IdentityService : IIdentityService
         var roles = await _userManager.GetRolesAsync(user);
         var isAdministrator = roles.Any(r => r == Constants.AdministratorRoleName);
 
+        user.LastLogin = DateTime.UtcNow;
+        await _userManager.UpdateAsync(user);
         var token = _tokenGenerator.GenerateToken(user, roles);
 
         return new UserOutputModel(token, user.UserName ?? user.Email, isAdministrator);
