@@ -35,6 +35,11 @@ public class AccountsService : DataService<Account>, IAccountsService
         }
     }
 
+    /// <summary>
+    /// Updates the player rating for given user
+    /// </summary>
+    /// <exception cref="MissingEntryException">In case provided user cannot be located in the DB</exception>
+    /// <exception cref="InvalidOperationException">Internal service or infrastructure error</exception>
     public async Task UpdatePlayerRating(string userId, int newRating)
     {
         try

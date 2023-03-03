@@ -5,6 +5,7 @@ using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using Models.Avenue;
 using Services.Interfaces;
 
@@ -38,12 +39,12 @@ public class AvenuesController : ApiController
             msgOnError: $"An error occured during GET request with for avenue: {id}");
 
     [HttpGet]
-    public async Task<ActionResult<SearchAvenueOutputModel>> Search([FromQuery] AvenueQuery query)
+    public async Task<ActionResult<SearchOutputModel<AvenueOutputModel>>> Search([FromQuery] AvenueQuery query)
         => await SafeHandle(async () =>
             {
                 var avenues = await _avenues.Query(query);
                 var total = await _avenues.Total(query);
-                return Ok(new SearchAvenueOutputModel(avenues, query.Page, total));
+                return Ok(new SearchOutputModel<AvenueOutputModel>(avenues, query.Page, total));
             },
             msgOnError: $"An error occured during Search request with query: {query}");
 
@@ -52,7 +53,7 @@ public class AvenuesController : ApiController
     public async Task<ActionResult> Add(AvenueInputModel input)
         => await SafeHandle(async () =>
             {
-                await _avenues.Create(input);
+                await _avenues.Create(input, _currentUser.UserId);
                 return Ok(Result.Success);
             },
             msgOnError: $"Unexpected error during avenue creation. AvenueInput: {input}");
@@ -66,7 +67,7 @@ public class AvenuesController : ApiController
                 if (!_currentUser.IsAdministrator)
                     return BadRequest(Result.Failure("Only admins are allowed to update avenues!"));
 
-                var isSuccess = await _avenues.Update(id, input);
+                var isSuccess = await _avenues.Update(id, input, _currentUser.UserId);
                 return isSuccess ? Result.Success : Result.Failure($"Update for avenue {id} failed.");
             },
             msgOnError: $"Unexpected error during avenue update. AvenueInput: {input}. AvenueID: {id}",

@@ -12,6 +12,7 @@ builder.Services
     .AddWebService<TournamentsDbContext>(builder.Configuration, builder.Environment, swaggerEnabled: true)
     .AddTransient<IAccountsService, AccountsService>()
     .AddTransient<IAvenuesService, AvenuesService>()
+    .AddTransient<ITournamentsService, TournamentsService>()
     .AddTransient<IDataSeeder, TournamentDataSeeder>();
 
 var app = builder.Build();

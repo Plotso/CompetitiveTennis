@@ -11,6 +11,7 @@ public class DataConstants
         public const int MaxTitleLength = 100;
         public const int MinRulesLength = 45;
         public const int MaxRulesLength = 1500;
+        public const int MinDescriptionLength = 10;
     }
 
     public class Avenues

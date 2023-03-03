@@ -47,5 +47,9 @@ public class AvenueConfiguration : IEntityTypeConfiguration<Avenue>
         builder
             .HasIndex(a => new {a.Country, a.City, a.Location})
             .IsUnique();
+
+        builder
+            .Property(a => a.CreatedBy)
+            .IsRequired();
     }
 }

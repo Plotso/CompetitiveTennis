@@ -41,7 +41,7 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
     public async Task<AvenueOutputModel> Get(int id) 
         => await All().Where(a => a.Id == id).ProjectToType<AvenueOutputModel>().SingleOrDefaultAsync();
 
-    public async Task<int> Create(AvenueInputModel input)
+    public async Task<int> Create(AvenueInputModel input, string userId)
     {
         var unifiedCourtsInfo = input.Courts.UnifyCourtsInfo();
         // var avenue = new Avenue
@@ -55,6 +55,7 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
         var avenue = _mapper.Map<Avenue>(input);
         avenue.IsActive = true;
         avenue.IsVerified = false;
+        avenue.CreatedBy = userId;
         avenue.Courts = JsonSerializer.Serialize(unifiedCourtsInfo, SerializerOptions.StringEnumOptions());
 
         await SaveAsync(avenue);
@@ -68,7 +69,7 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
         throw new NotImplementedException();
     }
 
-    public async Task<bool> Update(int id, AvenueInputModel input)
+    public async Task<bool> Update(int id, AvenueInputModel input, string userId)
     {
         var avenue = await Data.FindAsync<Avenue>(id);
         if (avenue == null)
@@ -80,6 +81,7 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
         avenue.City = input.City;
         avenue.Country = input.Country;
         avenue.Details = input.Details;
+        avenue.UpdatedBy = userId;
         var unifiedCourtsInfo = input.Courts.UnifyCourtsInfo();
         avenue.Courts = JsonSerializer.Serialize(unifiedCourtsInfo, SerializerOptions.StringEnumOptions());
 
@@ -164,16 +166,8 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
                 a.Country.ToLowerInvariant().Contains(query.Keyword));
         }
 
-        dataQuery = SortQuery(dataQuery, query.SortOptions);
+        dataQuery = dataQuery.SortQuery(query.SortOptions);
 
         return dataQuery;
     }
-
-    private IQueryable<Avenue> SortQuery(IQueryable<Avenue> query, SortOptions options) => options switch
-    {
-        SortOptions.CreatedDescending => query.OrderByDescending( a=> a.CreatedOn),
-        SortOptions.UpdatedAscending => query.OrderBy(a => a.ModifiedOn),
-        SortOptions.UpdatedDescending => query.OrderByDescending(a => a.ModifiedOn),
-        _ => query // CreatedAscending, default ordering
-    };
 }
