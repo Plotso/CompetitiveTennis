@@ -1,5 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces;
 
+using System.Collections;
 using CompetitiveTennis.Data;
 using Data.Models;
 using Exceptions;
@@ -8,7 +9,9 @@ using Models.Account;
 
 public interface IAccountsService : IDataService<Account>
 {
+    Task<IEnumerable<Account>> GetMultiple(IEnumerable<int> ids);
     Task<Account?> GetByUserId(string userId);
+    Task<Account?> GetInternal(int id);
     Task<Account?> GetSystemUser();
     Task<int> GetPlayerRating(string userId);
     /// <summary>

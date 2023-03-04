@@ -20,7 +20,22 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         _mapper = mapper;
         _logger = logger;
     }
-    
+
+    public async Task<bool> RemoveParticipant(int id, Participant participant)
+    {
+        var tournament = await Data.FindAsync<Tournament>(id);
+        if (tournament == null)
+            return false;
+        //ToDo: Verify all flows are handled without errors and with expected behaviour
+        if (tournament.Participants.Any(p => p.Id == participant.Id))
+        {
+            tournament.Participants.Remove(participant);
+            await SaveAsync(tournament);
+        }
+
+        return true;
+    }
+
     public async Task<IEnumerable<TournamentOutputModel>> GetAll()
         => await All()
             //.Include(t => t.Participants) ToDo: Verify if Include is needed
@@ -41,6 +56,9 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
     public async Task<Tournament> GetInternal(int id)
         => await All().Where(a => a.Id == id).SingleOrDefaultAsync();
 
+    public async Task<string> GetOrganiserUserId(int id)
+        => await All().Where(a => a.Id == id).Select(t => t.Organiser.UserId).SingleOrDefaultAsync();
+
     public async Task<IEnumerable<TournamentOutputModel>> Query(TournamentQuery query)
         => (await GetAvenuesQuery(query)
                 .ProjectToType<TournamentOutputModel>()
@@ -49,16 +67,8 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
 
     public async ValueTask<int> Total(TournamentQuery query) => await GetAvenuesQuery(query).CountAsync();
 
-    /// <summary>
-    /// Creates new tournament based on the input
-    /// </summary>
-    /// <exception cref="MissingEntryException">When provided avenueId is missing from DB.</exception>
-    public async Task<int> Create(TournamentInputModel input, Account organiser)
+    public async Task<int> Create(TournamentInputModel input, Account organiser, Avenue avenue)
     {
-        var avenue = await Data.Set<Avenue>().FindAsync(input.AvenueId);
-        if (avenue == null)
-            throw new MissingEntryException($"Could not create tournament because avenue with id {input.AvenueId} could not be found");
-        
         var tournament = _mapper.Map<Tournament>(input);
         tournament.Avenue = avenue;
         tournament.Organiser = organiser;

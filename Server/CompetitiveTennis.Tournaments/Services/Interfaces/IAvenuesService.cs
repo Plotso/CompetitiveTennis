@@ -14,6 +14,8 @@ public interface IAvenuesService : IDataService<Avenue>
 
     Task<AvenueOutputModel> Get(int id);
 
+    Task<Avenue> GetInternal(int id);
+
     Task<int> Create(AvenueInputModel input, string userId);
 
     Task<bool> Update(int id, AvenueInputModel input, string userId);

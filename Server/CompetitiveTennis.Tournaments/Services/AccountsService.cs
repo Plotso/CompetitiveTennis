@@ -79,9 +79,17 @@ public class AccountsService : DataService<Account>, IAccountsService
         }
     }
 
+    public async Task<IEnumerable<Account>> GetMultiple(IEnumerable<int> ids)
+        => await All().Where(a => ids.Contains(a.Id)).ToListAsync();
+
     public async Task<Account?> GetByUserId(string userId)
         => await All()
             .Where(a => a.UserId == userId)
+            .SingleOrDefaultAsync();
+
+    public async Task<Account?> GetInternal(int id)
+        => await All()
+            .Where(a => a.Id == id)
             .SingleOrDefaultAsync();
 
     public async Task<Account?> GetSystemUser()

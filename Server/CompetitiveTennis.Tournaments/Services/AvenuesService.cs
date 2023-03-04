@@ -51,6 +51,9 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
             .ProjectToType<AvenueOutputModel>()
             .SingleOrDefaultAsync();
 
+    public async Task<Avenue> GetInternal(int id)
+        => await All().Where(a => a.Id == id).SingleOrDefaultAsync();
+
     public async Task<int> Create(AvenueInputModel input, string userId)
     {
         var unifiedCourtsInfo = input.Courts.UnifyCourtsInfo();

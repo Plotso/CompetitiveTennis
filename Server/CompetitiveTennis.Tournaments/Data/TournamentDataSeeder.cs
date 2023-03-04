@@ -60,7 +60,9 @@ public class TournamentDataSeeder : IDataSeeder
                 if (!_db.Tournaments.Any())
                 {
                     var avenues = await _avenues.GetAll();
-                    var avenue = avenues.First();
+                    var avenueId = avenues.First().Id;
+                    var avenue = await _avenues.GetInternal(avenueId);
+                    
                     var tournament = new TournamentInputModel
                     {
                         //ToDo: Seed tournament
@@ -76,9 +78,9 @@ public class TournamentDataSeeder : IDataSeeder
                         EndDate = new DateTime(2023, 4, 16, 12,0,0),
                         IsIndoor = false,
                         IsLeague = false,
-                        AvenueId = avenue.Id
+                        AvenueId = avenueId
                     };
-                    await _tournaments.Create(tournament, sysAccount);
+                    await _tournaments.Create(tournament, sysAccount, avenue);
                     _logger.LogInformation("BK-Test tournament seeded");
                 }
                 

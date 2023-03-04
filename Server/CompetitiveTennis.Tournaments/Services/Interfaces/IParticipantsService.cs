@@ -2,12 +2,17 @@
 
 using CompetitiveTennis.Data;
 using Data.Models;
+using Models.Participant;
 
 public interface IParticipantsService : IDataService<Participant>
 {
-    Task<int> Create(string? name, int? points, Tournament tournament, Team team, bool isGuest);
+    Task<Participant?> GetInternal(int id);
+    
+    Task<int> Create(ParticipantInputModel input, Tournament tournament, Team? team);
 
     Task<bool> AddUsersToParticipant(int id, IEnumerable<Account> users);
+
+    Task<bool> RemoveUsersFromParticipant(int id, IEnumerable<Account> users);
 
     Task<bool> Update(int id, string name);
 

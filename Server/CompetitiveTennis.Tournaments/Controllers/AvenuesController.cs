@@ -33,10 +33,10 @@ public class AvenuesController : ApiController
     public async Task<ActionResult<IEnumerable<AvenueOutputModel>>> ById(int id)
         => await SafeHandle(async () =>
             {
-                var avenues = await _avenues.Get(id);
-                return Ok(avenues);
+                var avenue = await _avenues.Get(id);
+                return Ok(avenue);
             },
-            msgOnError: $"An error occured during GET request with for avenue: {id}");
+            msgOnError: $"An error occured during GET request for avenue: {id}");
 
     [HttpGet]
     public async Task<ActionResult<SearchOutputModel<AvenueOutputModel>>> Search([FromQuery] AvenueQuery query)
@@ -50,7 +50,7 @@ public class AvenuesController : ApiController
 
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult> Add(AvenueInputModel input)
+    public async Task<ActionResult<int>> Add(AvenueInputModel input)
         => await SafeHandle(async () =>
             {
                 await _avenues.Create(input, _currentUser.UserId);

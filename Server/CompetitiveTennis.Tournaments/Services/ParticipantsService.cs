@@ -4,6 +4,7 @@ using CompetitiveTennis.Data;
 using Data.Models;
 using Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Models.Participant;
 
 public class ParticipantsService : DeletableDataService<Participant>, IParticipantsService
 {
@@ -14,12 +15,15 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
         _logger = logger;
     }
 
-    public async Task<int> Create(string? name, int? points, Tournament tournament, Team team, bool isGuest)
+    public async Task<Participant?> GetInternal(int id)
+        => await All().FirstOrDefaultAsync(p => p.Id == id);
+
+    public async Task<int> Create(ParticipantInputModel input, Tournament tournament, Team? team)
     {
         var participant = new Participant
         {
-            Name = name,
-            IsGuest = isGuest,
+            Name = input.Name,
+            IsGuest = input.IsGuest,
             Tournament = tournament,
             Team = team,
             Points = tournament.IsLeague ? 0 : null
@@ -46,6 +50,33 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
         }
 
         await Data.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> RemoveUsersFromParticipant(int id, IEnumerable<Account> users)
+    {
+        var participant = await All().Include(p => p.Players).SingleOrDefaultAsync(p => p.Id == id);
+        if (participant == null)
+            return false;
+
+        foreach (var user in users)
+        {
+            var itemToRemove = participant.Players.FirstOrDefault(p => p.AccountId == user.Id);
+            if (itemToRemove == null)
+                continue;
+            participant.Players.Remove(itemToRemove);
+        }
+
+        await Data.SaveChangesAsync();
+        //ToDo: Verify if foreach below is required
+        foreach (var accountId in users.Select(u => u.Id))
+        {
+            var mappingEntity = await Data.Set<AccountParticipant>().Where(ap => ap.AccountId == accountId).FirstOrDefaultAsync();
+            if (mappingEntity == null)
+                continue;
+
+            Data.Set<AccountParticipant>().Remove(mappingEntity);
+        }
         return true;
     }
 
