@@ -27,10 +27,17 @@ public class TeamsService : DeletableDataService<Team>, ITeamsService
         => await All().Where(a => a.Id == id).SingleOrDefaultAsync();
 
     public async Task<IEnumerable<TeamOutputModel>> GetAll()
-        => await All().ProjectToType<TeamOutputModel>().ToListAsync();
+        => await All()
+            //.Include(t => t.Participants)  ToDo: Verify if Include is needed
+            .ProjectToType<TeamOutputModel>()
+            .ToListAsync();
 
     public async Task<TeamOutputModel> Get(int id)
-        => await All().Where(a => a.Id == id).ProjectToType<TeamOutputModel>().SingleOrDefaultAsync();
+        => await All()
+            //.Include(t => t.Participants)  ToDo: Verify if Include is needed
+            .Where(a => a.Id == id)
+            .ProjectToType<TeamOutputModel>()
+            .SingleOrDefaultAsync();
 
     public async Task<bool> Update(int id, string name)
     {

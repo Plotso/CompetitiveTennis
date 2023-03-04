@@ -22,10 +22,21 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
     }
     
     public async Task<IEnumerable<TournamentOutputModel>> GetAll()
-        => await All().ProjectToType<TournamentOutputModel>().ToListAsync();
+        => await All()
+            //.Include(t => t.Participants) ToDo: Verify if Include is needed
+            //.ThenInclude(p => p.Matches)
+            .ProjectToType<TournamentOutputModel>()
+            .ToListAsync();
 
     public async Task<TournamentOutputModel> Get(int id)
-        => await All().Where(a => a.Id == id).ProjectToType<TournamentOutputModel>().SingleOrDefaultAsync();
+        => await All()
+            .Where(a => a.Id == id)
+            //.Include(t => t.Participants) ToDo: Verify if Include is needed
+            //.ThenInclude(p => p.Matches)
+            //.Include(t => t.Matches)
+            //.ThenInclude(m => m.Scores)
+            .ProjectToType<TournamentOutputModel>()
+            .SingleOrDefaultAsync();
 
     public async Task<Tournament> GetInternal(int id)
         => await All().Where(a => a.Id == id).SingleOrDefaultAsync();

@@ -25,12 +25,18 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
     }
 
     public async Task<IEnumerable<AvenueOutputModel>> GetAll()
-        => await All().ProjectToType<AvenueOutputModel>().ToListAsync();
+        => await All()
+            //.Include(a => a.Tournaments) ToDo: Verify if Include is needed
+            .ProjectToType<AvenueOutputModel>()
+            .ToListAsync();
 
     public async Task<IEnumerable<AvenueOutputModel>> Query(AvenueQuery query)
         => (query.Surface == null && query.CourtType == null ?
-            await GetAvenuesQuery(query).ProjectToType<AvenueOutputModel>().ToListAsync() :
-            FilterAvenuesByCourtInfo(GetAvenuesQuery(query), query)
+            await GetAvenuesQuery(query)
+                //.Include(a => a.Tournaments) ToDo: Verify if Include is needed
+                .ProjectToType<AvenueOutputModel>()
+                .ToListAsync() :
+            FilterAvenuesByCourtInfo(GetAvenuesQuery(query).Include(a => a.Tournaments), query)
             ).PageFilterResult(query) ;
 
     public async ValueTask<int> Total(AvenueQuery query) 
@@ -39,7 +45,11 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
             FilterAvenuesByCourtInfo(GetAvenuesQuery(query), query).Count();
 
     public async Task<AvenueOutputModel> Get(int id) 
-        => await All().Where(a => a.Id == id).ProjectToType<AvenueOutputModel>().SingleOrDefaultAsync();
+        => await All()
+            .Where(a => a.Id == id)
+            .Include(a => a.Tournaments)
+            .ProjectToType<AvenueOutputModel>()
+            .SingleOrDefaultAsync();
 
     public async Task<int> Create(AvenueInputModel input, string userId)
     {

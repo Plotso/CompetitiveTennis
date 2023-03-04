@@ -2,6 +2,7 @@
 
 public enum MatchOutcome
 {
+    NoOutcome,
     ParticipantOne,
     ParticipantTwo
 }

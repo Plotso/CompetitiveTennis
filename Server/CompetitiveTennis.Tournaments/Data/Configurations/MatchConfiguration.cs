@@ -18,7 +18,7 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
         builder
             .Property( m=> m.Outcome)
             .HasColumnType(CustomDbTypes.MatchOutcomeEnum)
-            .IsRequired();
+            .IsRequired(false);
         
         builder
             .Property( m=> m.Stage)

@@ -1,0 +1,30 @@
+﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces;
+
+using CompetitiveTennis.Data;
+using Data.Models;
+using Data.Models.Enums;
+using Models.Match;
+
+public interface IMatchesService : IDataService<Match>
+{
+    Task<IEnumerable<MatchOutputModel>> GetAll();
+    
+    Task<MatchOutputModel> Get(int id);
+    
+    Task<Match> GetInternal(int id);
+    
+    Task<int> Create(MatchInputModel input, Tournament tournament, Participant participant1, Participant participant2);
+
+    Task<bool> UpdateParticipants(int id, Participant participant1, Participant participant2);
+
+    Task<bool> UpdateStatus(int id, EventStatus status);
+
+    Task<bool> UpdateOutcome(int id, MatchOutcome? outcome);
+
+    Task<bool> Update(int id, MatchInputModel inputModel);
+
+    Task<bool> Delete(int id, string userid);
+
+    Task<bool> DeletePermanently(int id, string userid);
+    
+}

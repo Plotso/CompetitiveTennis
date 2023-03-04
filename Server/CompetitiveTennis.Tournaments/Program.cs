@@ -15,6 +15,8 @@ builder.Services
     .AddTransient<ITournamentsService, TournamentsService>()
     .AddTransient<IParticipantsService, ParticipantsService>()
     .AddTransient<ITeamsService, TeamsService>()
+    .AddTransient<IMatchesService, MatchesService>()
+    .AddTransient<IScoresService, ScoresService>()
     .AddTransient<IDataSeeder, TournamentDataSeeder>();
 
 var app = builder.Build();
