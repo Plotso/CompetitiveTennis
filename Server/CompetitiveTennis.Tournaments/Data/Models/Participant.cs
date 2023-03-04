@@ -17,6 +17,6 @@ public class Participant : BaseDeletableEntity<int>
     public Team? Team { get; set; }
 
     public ICollection<AccountParticipant> Players { get; set; } = new List<AccountParticipant>();
-    
-    public ICollection<ParticipantMatch> Matches { get; set; }
+
+    public ICollection<ParticipantMatch> Matches { get; set; } = new List<ParticipantMatch>();
 }

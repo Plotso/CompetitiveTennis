@@ -3,6 +3,8 @@
 using Account;
 using Avenue;
 using Data.Models.Enums;
+using Match;
+using Participant;
 
 public record TournamentOutputModel(
     int Id,
@@ -24,4 +26,6 @@ public record TournamentOutputModel(
     DateTime CreatedOn,
     DateTime ModifiedOn,
     AvenueShortOutputModel Avenue,
-    AccountOutputModel Organiser);
+    AccountOutputModel Organiser,
+    IEnumerable<ParticipantShortOutputModel> Participants,
+    IEnumerable<MatchOutputModel> Matches);

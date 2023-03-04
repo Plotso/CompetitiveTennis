@@ -11,6 +11,7 @@ public class AvenueMappingConfig : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Avenue, AvenueOutputModel>()
-            .Map(dest => dest.Courts, src => JsonSerializer.Deserialize<List<CourtsInfo>>(src.Courts, SerializerOptions.StringEnumOptions()));
+            .Map(dest => dest.Courts,
+                src => JsonSerializer.Deserialize<List<CourtsInfo>>(src.Courts, SerializerOptions.StringEnumOptions()));
     }
 }

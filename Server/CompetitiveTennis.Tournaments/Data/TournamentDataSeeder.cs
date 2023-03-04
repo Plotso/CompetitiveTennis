@@ -75,6 +75,7 @@ public class TournamentDataSeeder : IDataSeeder
                         StartDate = new DateTime(2023, 4, 15, 10,0,0),
                         EndDate = new DateTime(2023, 4, 16, 12,0,0),
                         IsIndoor = false,
+                        IsLeague = false,
                         AvenueId = avenue.Id
                     };
                     await _tournaments.Create(tournament, sysAccount);

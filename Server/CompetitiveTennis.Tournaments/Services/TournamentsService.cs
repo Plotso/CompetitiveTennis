@@ -27,6 +27,9 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
     public async Task<TournamentOutputModel> Get(int id)
         => await All().Where(a => a.Id == id).ProjectToType<TournamentOutputModel>().SingleOrDefaultAsync();
 
+    public async Task<Tournament> GetInternal(int id)
+        => await All().Where(a => a.Id == id).SingleOrDefaultAsync();
+
     public async Task<IEnumerable<TournamentOutputModel>> Query(TournamentQuery query)
         => (await GetAvenuesQuery(query)
                 .ProjectToType<TournamentOutputModel>()
@@ -58,6 +61,23 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         var tournament = await Data.FindAsync<Tournament>(id);
         if (tournament == null)
             return false;
+        tournament.Title = input.Title;
+        tournament.Rules = input.Rules;
+        tournament.Description = input.Description;
+        tournament.Type = input.Type;
+        tournament.Surface = input.Surface;
+        tournament.EntryFee = input.EntryFee;
+        tournament.Prize = input.Prize;
+        tournament.CourtsAvailable = input.CourtsAvailable;
+        tournament.MinParticipants = input.MinParticipants;
+        tournament.MaxParticipants = input.MaxParticipants;
+        tournament.MatchWonPoints = input.MatchWonPoints;
+        tournament.SetWonPoints = input.SetWonPoints;
+        tournament.GameWonPoints = input.GameWonPoints;
+        tournament.IsIndoor = input.IsIndoor;
+        tournament.IsLeague = input.IsLeague;
+        tournament.StartDate = input.StartDate;
+        tournament.EndDate = input.EndDate;
         
         await SaveAsync(tournament);
         return true;

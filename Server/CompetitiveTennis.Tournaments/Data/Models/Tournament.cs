@@ -30,6 +30,8 @@ public class Tournament : BaseDeletableEntity<int>
     
     public bool IsIndoor { get; set; }
     
+    public bool IsLeague { get; set; }
+    
     public DateTime StartDate { get; set; }
     
     public DateTime EndDate { get; set; }

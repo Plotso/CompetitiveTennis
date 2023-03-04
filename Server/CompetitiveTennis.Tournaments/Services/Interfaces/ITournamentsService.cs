@@ -11,6 +11,8 @@ public interface ITournamentsService : IDataService<Tournament>
     
     Task<TournamentOutputModel> Get(int id);
     
+    Task<Tournament> GetInternal(int id);
+    
     Task<IEnumerable<TournamentOutputModel>> Query(TournamentQuery query);
     
     ValueTask<int> Total(TournamentQuery query);

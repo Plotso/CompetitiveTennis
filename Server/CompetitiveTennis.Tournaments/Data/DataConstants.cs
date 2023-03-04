@@ -3,7 +3,7 @@
 public class DataConstants
 {
     public const int MaxTeamNameLength = 75;
-    public const int MaxScorePointsValueLength = 2;
+    public const int MaxScorePointsValueLength = 3;
 
     public class Tournaments
     {

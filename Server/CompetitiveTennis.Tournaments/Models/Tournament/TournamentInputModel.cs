@@ -50,6 +50,9 @@ public record TournamentInputModel
     public bool IsIndoor { get; set; }
     
     [Required]
+    public bool IsLeague { get; set; }
+    
+    [Required]
     public DateTime StartDate { get; set; }
     
     [Required]
