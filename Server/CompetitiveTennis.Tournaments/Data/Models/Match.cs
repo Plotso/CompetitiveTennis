@@ -22,6 +22,8 @@ public class Match : BaseDeletableEntity<int>
     public EventStatus Status { get; set; }
     public MatchOutcome? Outcome { get; set; }
     
+    public int? NextMatchId { get; set; }
+    
     public int TournamentId { get; set; }
     
     public Tournament Tournament { get; set; }

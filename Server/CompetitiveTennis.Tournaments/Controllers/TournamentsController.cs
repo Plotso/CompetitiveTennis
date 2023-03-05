@@ -233,7 +233,11 @@ public class TournamentsController : ApiController
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
                     return BadRequest(
                         Result.Failure("Only admins and tournament organiser are allowed to add accounts to existing participants!"));
-
+                if (await _participants.IsParticipantFull(participantId))
+                    return BadRequest(
+                        Result.Failure($"No more players can be added to participant {participantId} since it has reached max cap for tournament type"));
+                
+                
                 var account = await _accounts.GetInternal(accountId);
                 if (account == null)
                     return BadRequest($"Account {accountId} could not be found in internal system");

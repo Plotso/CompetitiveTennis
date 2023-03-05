@@ -34,4 +34,6 @@ public record MatchInputModel
     [Required]
     [Range(1, int.MaxValue)]
     public int TournamentId { get; set; }
+    
+    public int? NextMatchId { get; set; }
 };

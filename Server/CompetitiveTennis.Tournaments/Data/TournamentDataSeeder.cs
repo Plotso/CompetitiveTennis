@@ -6,6 +6,7 @@ using Models.Enums;
 using Services.Interfaces;
 using Tournaments.Models.Account;
 using Tournaments.Models.Avenue;
+using Tournaments.Models.Participant;
 using Tournaments.Models.Tournament;
 
 public class TournamentDataSeeder : IDataSeeder
@@ -13,6 +14,7 @@ public class TournamentDataSeeder : IDataSeeder
     private readonly IAccountsService _accounts;
     private readonly IAvenuesService _avenues;
     private readonly ITournamentsService _tournaments;
+    private readonly IParticipantsService _participants;
     private readonly TournamentsDbContext _db;
     private readonly ILogger<TournamentDataSeeder> _logger;
 
@@ -20,12 +22,14 @@ public class TournamentDataSeeder : IDataSeeder
         IAccountsService accounts,
         IAvenuesService avenues,
         ITournamentsService tournaments,
+        IParticipantsService participants,
         TournamentsDbContext db,
         ILogger<TournamentDataSeeder> logger)
     {
         _accounts = accounts;
         _avenues = avenues;
         _tournaments = tournaments;
+        _participants = participants;
         _db = db;
         _logger = logger;
     }
@@ -84,7 +88,21 @@ public class TournamentDataSeeder : IDataSeeder
                     _logger.LogInformation("BK-Test tournament seeded");
                 }
                 
-                //ToDo: Seed participants (sysUser & guest)
+                if (!_db.Participants.Any())
+                {
+                    var tournaments = await _tournaments.Query(new TournamentQuery(Keyword: "BK-Tournament"));
+                    var dummyTournament = tournaments.FirstOrDefault();
+                    if (dummyTournament != null)
+                    {
+                        var internalTournament = await _tournaments.GetInternal(dummyTournament.Id);
+                        var guestParticipantInput = new ParticipantInputModel
+                            {IsGuest = true, Name = "Guest", TournamentId = internalTournament.Id};
+                        var sysUserParticipantInput = new ParticipantInputModel {TournamentId = internalTournament.Id};
+                        _ = await _participants.Create(guestParticipantInput, internalTournament, team: null);
+                        var sysUserParticipantId = await _participants.Create(sysUserParticipantInput, internalTournament, team: null);
+                        await _participants.AddUsersToParticipant(sysUserParticipantId, new[] {sysAccount});
+                    }
+                }
                 //ToDo: Seed match (Use TournamentStage enum for stage)
                 //ToDo: Seed scores 
             })

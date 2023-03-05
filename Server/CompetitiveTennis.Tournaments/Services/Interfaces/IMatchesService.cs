@@ -12,6 +12,11 @@ public interface IMatchesService : IDataService<Match>
     Task<MatchOutputModel> Get(int id);
     
     Task<Match> GetInternal(int id);
+
+    /// <summary>
+    /// Create empty match without competitors with the goal for them to be populated on later stage
+    /// </summary>
+    Task<int> CreateEmptyMatch(MatchInputModel input, Tournament tournament);
     
     Task<int> Create(MatchInputModel input, Tournament tournament, Participant participant1, Participant participant2);
 

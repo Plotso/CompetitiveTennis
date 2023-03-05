@@ -36,6 +36,15 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
     public async Task<Match> GetInternal(int id)
         => await All().Where(m => m.Id == id).SingleOrDefaultAsync();
 
+    public async Task<int> CreateEmptyMatch(MatchInputModel input, Tournament tournament)
+    {
+        var match = _mapper.Map<Match>(input);
+        match.Tournament = tournament;
+
+        await SaveAsync(match);
+        return match.Id;
+    }
+
     public async Task<int> Create(MatchInputModel input, Tournament tournament, Participant participant1, Participant participant2)
     {
         var match = _mapper.Map<Match>(input);
@@ -129,6 +138,7 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         match.GameWonPoints = inputModel.GameWonPoints;
         match.Stage = inputModel.Stage;
         match.Details = inputModel.Details;
+        match.NextMatchId = inputModel.NextMatchId;
 
         await SaveAsync(match);
         return true;

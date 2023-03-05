@@ -2,6 +2,8 @@
 
 using CompetitiveTennis.Data;
 using Data.Models;
+using Data.Models.Enums;
+using Exceptions;
 using Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Models.Participant;
@@ -18,8 +20,20 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
     public async Task<Participant?> GetInternal(int id)
         => await All().FirstOrDefaultAsync(p => p.Id == id);
 
+    public async Task<bool> IsParticipantFull(int id)
+    {
+        var participant = await All().Include(p => p.Players).SingleOrDefaultAsync(p => p.Id == id);
+        if (participant == null)
+            return false;
+
+        return IsParticipantFull(participant.Tournament.Type, participant);
+    }
+
     public async Task<int> Create(ParticipantInputModel input, Tournament tournament, Team? team)
     {
+        if (input.IsGuest && string.IsNullOrWhiteSpace(input.Name))
+            throw new InvalidInputDataException("Name is mandatory for guest participants");
+        
         var participant = new Participant
         {
             Name = input.Name,
@@ -38,6 +52,10 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
         var participant = await All().Include(p => p.Players).SingleOrDefaultAsync(p => p.Id == id);
         if (participant == null)
             return false;
+
+        if (IsParticipantFull(participant.Tournament.Type, participant))
+            throw new InvalidInputDataException(
+                $"No more players can be added to participant {id} since it has reached max cap for tournament type");
 
         foreach (var user in users)
         {
@@ -118,4 +136,12 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
         await Data.SaveChangesAsync();
         return true;
     }
+
+    private bool IsParticipantFull(TournamentType tournamentType, Participant participant) 
+        => tournamentType switch
+        {
+            TournamentType.Singles => participant.IsGuest || participant.Players.Count > 0,
+            TournamentType.Doubles => participant.Players.Count > 1 || participant is {IsGuest: true, Players.Count: > 0},
+            _ => false
+        };
 }

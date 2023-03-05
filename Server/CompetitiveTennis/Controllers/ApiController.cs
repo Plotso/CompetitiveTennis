@@ -20,6 +20,8 @@ public abstract class ApiController : ControllerBase
     public const string Id = "{id}";
     
     protected const int UnexpectedErrorCode = -666;
+    protected const int InvalidInputErrorCode = -777;
+    protected const int ProvidedDataNotFound = -888;
     protected ILogger<ApiController> Logger { get; }
 
     protected async Task<ActionResult> SafeHandle(
@@ -43,7 +45,12 @@ public abstract class ApiController : ControllerBase
         catch (MissingEntryException exception)
         {
             Logger.LogError(exception, msgOnNotFound);
-            return NotFound();
+            return NotFound(Result.Failure($"ErrorCode: {ProvidedDataNotFound}"));
+        }
+        catch (InvalidInputDataException ex)
+        {
+            Logger.LogError(ex, ex.Message);
+            return BadRequest(Result.Failure($"ErrorCode: {InvalidInputErrorCode}, ErrorMessage: {ex.Message}"));
         }
         catch (Exception ex)
         {
