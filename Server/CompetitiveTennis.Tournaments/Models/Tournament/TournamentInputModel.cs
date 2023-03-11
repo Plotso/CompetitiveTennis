@@ -1,7 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Models.Tournament;
 
 using System.ComponentModel.DataAnnotations;
-using Data.Models.Enums;
+using CompetitiveTennis.Data.Models.Enums;
 using static Data.DataConstants.Tournaments;
 
 public record TournamentInputModel

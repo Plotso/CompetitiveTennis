@@ -1,6 +1,5 @@
 ﻿namespace CompetitiveTennis.Tournaments.Controllers;
 
-using System.Net;
 using CompetitiveTennis.Controllers;
 using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
@@ -20,8 +19,29 @@ public class AccountsController : ApiController
         _currentUser = currentUser;
     }
 
+    [HttpGet]
+    [Route(nameof(All))]
+    public async Task<ActionResult<IEnumerable<AccountOutputModel>>> All()
+        => await SafeHandle(async () =>
+            {
+                var account = await _accounts.GetAll();
+                return Ok(account);
+            },
+            msgOnError: "An error occured during GET request for all accounts");
+    
+    [HttpGet]
+    [Route(Id)]
+    public async Task<ActionResult<AccountOutputModel>> ById(int id) 
+        => await SafeHandle(async () =>
+            {
+                var account = await _accounts.GetById(id);
+                if (account == null)
+                    return NotFound($"Account {id} is missing");
+                return Ok(account);
+            },
+            msgOnError: $"An error occured during GET request for account: {id}");
+
     [HttpPost]
-    [Route(nameof(Add))]
     [Authorize]
     public async Task<ActionResult> Add(AccountInputModel input)
         => await SafeHandle(async () =>
@@ -31,15 +51,18 @@ public class AccountsController : ApiController
             },
             msgOnError: $"Unexpected error during internal account creation. UserID: {_currentUser.UserId}");
 
-    [HttpPost]
-    [Route(nameof(ChangeNames))]
+    [HttpPut]
+    [Route($"{nameof(ChangeNames)}/{Id}")]
     [Authorize]
-    public async Task<ActionResult> ChangeNames(AccountInputModel input)
+    public async Task<ActionResult> ChangeNames(int id, AccountInputModel input)
         => await SafeHandle(async () =>
             {
                 var account = await _accounts.GetByUserId(_currentUser.UserId);
                 if (account == null)
                     return NotFound(Result.Failure($"User {_currentUser.Username} has no account inside the system"));
+                if (!_currentUser.IsAdministrator && account.Id != id)
+                    return BadRequest(Result.Failure("Current user doesn't have rights to change names for provided account."));
+                
                 account.FirstName = input.FirstName;
                 account.LastName = input.LastName;
                 await _accounts.SaveAsync(account);

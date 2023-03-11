@@ -31,8 +31,8 @@ public class AvenuesController : ApiController
             msgOnError: "An error occured during GET request for all avenues");
 
     [HttpGet]
-    [Route(nameof(ById))]
-    public async Task<ActionResult<IEnumerable<AvenueOutputModel>>> ById(int id)
+    [Route(Id)]
+    public async Task<ActionResult<AvenueOutputModel>> ById(int id)
         => await SafeHandle(async () =>
             {
                 var avenue = await _avenues.Get(id);
@@ -54,7 +54,6 @@ public class AvenuesController : ApiController
             msgOnError: $"An error occured during Search request with query: {query}");
 
     [HttpPost]
-    [Route(nameof(Add))]
     [Authorize]
     public async Task<ActionResult<int>> Add(AvenueInputModel input)
         => await SafeHandle(async () =>
@@ -65,7 +64,7 @@ public class AvenuesController : ApiController
             msgOnError: $"Unexpected error during avenue creation. AvenueInput: {input}");
 
     [HttpPut]
-    [Route(nameof(Edit))]
+    [Route(Id)]
     [Authorize(Roles = Constants.AdministratorRoleName)]
     public async Task<ActionResult> Edit(int id, AvenueInputModel input)
         => await SafeHandle(async () =>
@@ -80,7 +79,7 @@ public class AvenuesController : ApiController
             msgOnNotFound: NotFoundMsg(id, "update"));
 
     [HttpDelete]
-    [Route(nameof(Delete))]
+    [Route(Id)]
     [Authorize(Roles = Constants.AdministratorRoleName)]
     public async Task<ActionResult> Delete(int id)
         => await SafeHandle(async () =>

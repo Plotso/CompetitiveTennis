@@ -2,12 +2,12 @@
 
 using System.Data.Common;
 using System.Reflection;
+using CompetitiveTennis.Data.Models.Enums;
 using CompetitiveTennis.Data.Models.Interfaces;
 using Configurations;
 using Extensions;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using Models.Enums;
 using Npgsql;
 using static DataConstants.CustomDbTypes;
 

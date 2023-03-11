@@ -1,4 +1,4 @@
-﻿namespace CompetitiveTennis.Tournaments.Data.Models.Enums;
+﻿namespace CompetitiveTennis.Data.Models.Enums;
 
 public enum Surface
 {

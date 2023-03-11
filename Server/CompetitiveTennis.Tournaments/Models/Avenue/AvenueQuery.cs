@@ -1,7 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Models.Avenue;
 
+using CompetitiveTennis.Data.Models.Enums;
 using CompetitiveTennis.Models;
-using Data.Models.Enums;
 using Enums;
 
 public record AvenueQuery(

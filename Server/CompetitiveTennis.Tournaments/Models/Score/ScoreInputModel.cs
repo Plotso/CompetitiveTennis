@@ -1,8 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Models.Score;
 
 using System.ComponentModel.DataAnnotations;
-using Data.Models.Enums;
-
+using CompetitiveTennis.Data.Models.Enums;
 using static Data.DataConstants;
 
 public record ScoreInputModel

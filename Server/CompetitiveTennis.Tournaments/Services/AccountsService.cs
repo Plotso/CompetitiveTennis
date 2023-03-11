@@ -4,15 +4,35 @@ using CompetitiveTennis.Data;
 using Data.Models;
 using Exceptions;
 using Interfaces;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Models.Account;
+using Models.Avenue;
 using static ServiceConstants;
 
 public class AccountsService : DataService<Account>, IAccountsService
 {
-    public AccountsService(DbContext db) : base(db)
+    private readonly IMapper _mapper;
+
+    public AccountsService(IMapper mapper, DbContext db) : base(db)
     {
+        _mapper = mapper;
     }
+
+    public async Task<IEnumerable<AccountOutputModel>> GetAll()
+        => await All()
+            .ProjectToType<AccountOutputModel>()
+            .ToListAsync();
+
+    public async Task<AccountOutputModel> GetById(int id)
+        => await All()
+            .Where(a => a.Id == id)
+            .Include(a => a.Participations)
+            .ThenInclude(p => p.Participant)
+            .Include(a => a.OrganisedTournaments)
+            .ProjectToType<AccountOutputModel>()
+            .SingleOrDefaultAsync();
 
     /// <summary>
     /// Retrieve PlayerRating for given account if there is such for current user

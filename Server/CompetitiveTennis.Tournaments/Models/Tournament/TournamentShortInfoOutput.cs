@@ -1,6 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Models.Tournament;
 
-using Data.Models.Enums;
+using CompetitiveTennis.Data.Models.Enums;
 
 public record TournamentShortInfoOutput(
     int Id,

@@ -1,8 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services;
 
 using CompetitiveTennis.Data;
+using CompetitiveTennis.Data.Models.Enums;
 using Data.Models;
-using Data.Models.Enums;
 using Exceptions;
 using Interfaces;
 using Microsoft.EntityFrameworkCore;

@@ -1,6 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Models;
 
-using CompetitiveTennis.Tournaments.Data.Models.Enums;
+using CompetitiveTennis.Data.Models.Enums;
 using Enums;
 
 public class CourtsInfo

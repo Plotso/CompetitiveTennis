@@ -1,7 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Models.Match;
 
 using System.Collections;
-using Data.Models.Enums;
+using CompetitiveTennis.Data.Models.Enums;
 using Participant;
 using Score;
 

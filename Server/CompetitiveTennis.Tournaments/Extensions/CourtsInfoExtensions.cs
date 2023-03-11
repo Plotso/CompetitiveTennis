@@ -1,6 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Extensions;
 
-using Data.Models.Enums;
+using CompetitiveTennis.Data.Models.Enums;
 using Models;
 using Models.Enums;
 

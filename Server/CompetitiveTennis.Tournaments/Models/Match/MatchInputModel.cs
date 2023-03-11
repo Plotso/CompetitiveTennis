@@ -1,7 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Models.Match;
 
 using System.ComponentModel.DataAnnotations;
-using Data.Models.Enums;
+using CompetitiveTennis.Data.Models.Enums;
 
 public record MatchInputModel
 {

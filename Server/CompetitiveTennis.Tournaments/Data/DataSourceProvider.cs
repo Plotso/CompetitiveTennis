@@ -1,7 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Data;
 
 using System.Data.Common;
-using Models.Enums;
+using CompetitiveTennis.Data.Models.Enums;
 using Npgsql;
 
 using static DataConstants.CustomDbTypes;

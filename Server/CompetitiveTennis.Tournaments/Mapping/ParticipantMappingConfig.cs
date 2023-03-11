@@ -17,6 +17,6 @@ public class ParticipantMappingConfig : IRegister
                 src => src.Players.Select(p => p.Account.Adapt<AccountOutputModel>()));
         config.NewConfig<Participant, ParticipantShortOutputModel>()
             .Map(dest => dest.Players, 
-                src => src.Players.Select(p => p.Account.Adapt<AccountOutputModel>()));
+                src => src.Players.Select(p => p.Account.Adapt<AccountShortOutputModel>()));
     }
 }

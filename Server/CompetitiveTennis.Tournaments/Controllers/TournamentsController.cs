@@ -1,10 +1,10 @@
 ﻿namespace CompetitiveTennis.Tournaments.Controllers;
 
 using CompetitiveTennis.Controllers;
+using CompetitiveTennis.Data.Models.Enums;
 using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
 using Data.Models;
-using Data.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -49,7 +49,7 @@ public class TournamentsController : ApiController
             msgOnError: "An error occured during GET request for all tournaments");
 
     [HttpGet]
-    [Route(nameof(ById))]
+    [Route(Id)]
     public async Task<ActionResult<IEnumerable<TournamentOutputModel>>> ById(int id)
         => await SafeHandle(async () =>
             {
@@ -95,7 +95,7 @@ public class TournamentsController : ApiController
             msgOnError: $"Unexpected error during tournament creation. TournamentInput: {input}");
 
     [HttpPut]
-    [Route(nameof(Edit))]
+    [Route($"{nameof(Edit)}/{Id}")]
     [Authorize]
     public async Task<ActionResult> Edit(int id, TournamentInputModel input)
         => await SafeHandle(async () =>
@@ -128,7 +128,7 @@ public class TournamentsController : ApiController
             msgOnNotFound: $"{nameof(ChangeAvenue)} failed due to missing avenue with id {newAvenueId}");
 
     [HttpDelete]
-    [Route(nameof(Delete))]
+    [Route(Id)]
     [Authorize]
     public async Task<ActionResult> Delete(int id)
         => await SafeHandle(async () =>

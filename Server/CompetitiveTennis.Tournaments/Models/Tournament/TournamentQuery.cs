@@ -1,7 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Models.Tournament;
 
+using CompetitiveTennis.Data.Models.Enums;
 using CompetitiveTennis.Models;
-using Data.Models.Enums;
 
 public record TournamentQuery(
     string Keyword = "", bool? HasEntryFee = null, bool? HasPrize = null,

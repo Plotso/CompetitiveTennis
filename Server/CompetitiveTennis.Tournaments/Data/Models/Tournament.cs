@@ -1,7 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Data.Models;
 
 using CompetitiveTennis.Data.Models;
-using Enums;
+using CompetitiveTennis.Data.Models.Enums;
 
 public class Tournament : BaseDeletableEntity<int>
 {
