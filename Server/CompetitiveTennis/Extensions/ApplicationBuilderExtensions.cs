@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Middlewares;
+using Npgsql;
 using Services.Interfaces;
 
 public static class ApplicationBuilderExtensions
@@ -58,6 +59,10 @@ public static class ApplicationBuilderExtensions
 
         var db = serviceProvider.GetRequiredService<DbContext>();
         db.Database.Migrate();
+
+        using var connection = (NpgsqlConnection) db.Database.GetDbConnection();
+        connection.Open();
+        connection.ReloadTypes();
 
         var seeders = serviceProvider.GetServices<IDataSeeder>();
 

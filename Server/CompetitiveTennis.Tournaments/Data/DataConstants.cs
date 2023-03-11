@@ -31,10 +31,10 @@ public class DataConstants
     }
     public class CustomDbTypes
     {
-        public const string TournamentTypeEnum = "tournament-type";
-        public const string TournamentStageEnum = "tournament-stage";
+        public const string TournamentTypeEnum = "tournament_type";
+        public const string TournamentStageEnum = "tournament_stage";
         public const string SurfaceEnum = "surface";
-        public const string EventStatusEnum = "event-status";
-        public const string MatchOutcomeEnum = "match-outcome";
+        public const string EventStatusEnum = "event_status";
+        public const string MatchOutcomeEnum = "match_outcome";
     }
 }

@@ -21,6 +21,7 @@ public class AccountsController : ApiController
     }
 
     [HttpPost]
+    [Route(nameof(Add))]
     [Authorize]
     public async Task<ActionResult> Add(AccountInputModel input)
         => await SafeHandle(async () =>
@@ -31,6 +32,7 @@ public class AccountsController : ApiController
             msgOnError: $"Unexpected error during internal account creation. UserID: {_currentUser.UserId}");
 
     [HttpPost]
+    [Route(nameof(ChangeNames))]
     [Authorize]
     public async Task<ActionResult> ChangeNames(AccountInputModel input)
         => await SafeHandle(async () =>

@@ -34,10 +34,12 @@ public class AvenueConfiguration : IEntityTypeConfiguration<Avenue>
         
         builder
             .Property(a => a.Details)
-            .HasMaxLength(MaxDetailsLength);
+            .HasMaxLength(MaxDetailsLength)
+            .IsRequired(false);
         
         builder.Property(a => a.Courts)
-            .HasColumnType("jsonb");
+            .HasColumnType("jsonb")
+            .IsRequired(false);
 
         // Indexes
         builder
@@ -51,5 +53,20 @@ public class AvenueConfiguration : IEntityTypeConfiguration<Avenue>
         builder
             .Property(a => a.CreatedBy)
             .IsRequired();
+
+        builder
+            .Property(t => t.CreatedOn)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.ModifiedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
+
+        builder
+            .Property(t => t.DeletedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
     }
 }

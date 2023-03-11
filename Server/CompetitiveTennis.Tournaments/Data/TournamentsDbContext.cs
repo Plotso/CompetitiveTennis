@@ -1,11 +1,14 @@
 ﻿namespace CompetitiveTennis.Tournaments.Data;
 
-using CompetitiveTennis.Data.Extensions;
+using System.Data.Common;
+using System.Reflection;
 using CompetitiveTennis.Data.Models.Interfaces;
 using Configurations;
+using Extensions;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.Enums;
+using Npgsql;
 using static DataConstants.CustomDbTypes;
 
 public class TournamentsDbContext : DbContext
@@ -40,6 +43,25 @@ public class TournamentsDbContext : DbContext
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) 
+        => SaveChangesAsync(true, cancellationToken);
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        ApplyAuditInfoRules();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<Surface>(SurfaceEnum);
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<TournamentType>(TournamentTypeEnum);
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<TournamentStage>(TournamentStageEnum);
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<EventStatus>(EventStatusEnum);
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<MatchOutcome>(MatchOutcomeEnum);
+        base.OnConfiguring(optionsBuilder);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -48,7 +70,7 @@ public class TournamentsDbContext : DbContext
         modelBuilder.HasPostgresEnum<TournamentStage>(name: TournamentStageEnum);
         modelBuilder.HasPostgresEnum<EventStatus>(name: EventStatusEnum);
         modelBuilder.HasPostgresEnum<MatchOutcome>(name: MatchOutcomeEnum);
-        modelBuilder.ApplyGlobalDbConfigurationsForAssembly(GetType().Assembly);
+        modelBuilder.ApplyGlobalDbConfigurationsForAssembly(GetType().Assembly, SetIsDeletedQueryFilterMethod, SetIsTestQueryFilterMethod);
         EntityIndexesConfiguration.Configure(modelBuilder);
     }
 
@@ -73,4 +95,22 @@ public class TournamentsDbContext : DbContext
             }
         }
     }
+    
+    private static readonly MethodInfo SetIsDeletedQueryFilterMethod =
+        typeof(TournamentsDbContext).GetMethod(
+            nameof(SetIsDeletedQueryFilter),
+            BindingFlags.NonPublic | BindingFlags.Static);
+    
+    private static readonly MethodInfo SetIsTestQueryFilterMethod =
+        typeof(TournamentsDbContext).GetMethod(
+            nameof(SetIsTestQueryFilter),
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+    private static void SetIsDeletedQueryFilter<T>(ModelBuilder builder)
+        where T : class, IDeletableEntity 
+        => builder.Entity<T>().HasQueryFilter(e => !e.IsDeleted);
+
+    private static void SetIsTestQueryFilter<T>(ModelBuilder builder)
+        where T : class, ITestEntity 
+        => builder.Entity<T>().HasQueryFilter(e => !e.IsTest);
 }

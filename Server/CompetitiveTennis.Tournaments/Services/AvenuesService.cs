@@ -2,7 +2,6 @@
 
 using System.Text.Json;
 using CompetitiveTennis.Data;
-using CompetitiveTennis.Models;
 using Data.Models;
 using Exceptions;
 using Extensions;
@@ -11,29 +10,30 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Models.Avenue;
+using SerializerOptions;
 
 public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
 {
     //ToDo: Add option for administrators to verify and mark as active/inactive avenues
     private readonly IMapper _mapper;
     private readonly ILogger<AvenuesService> _logger;
+    private readonly ISerializerOptions _serializerOptions;
 
-    public AvenuesService(DbContext db, IMapper mapper, ILogger<AvenuesService> logger) : base(db)
+    public AvenuesService(DbContext db, IMapper mapper, ILogger<AvenuesService> logger, ISerializerOptions serializerOptions) : base(db)
     {
         _mapper = mapper;
         _logger = logger;
+        _serializerOptions = serializerOptions;
     }
 
     public async Task<IEnumerable<AvenueOutputModel>> GetAll()
         => await All()
-            //.Include(a => a.Tournaments) ToDo: Verify if Include is needed
             .ProjectToType<AvenueOutputModel>()
             .ToListAsync();
 
     public async Task<IEnumerable<AvenueOutputModel>> Query(AvenueQuery query)
         => (query.Surface == null && query.CourtType == null ?
             await GetAvenuesQuery(query)
-                //.Include(a => a.Tournaments) ToDo: Verify if Include is needed
                 .ProjectToType<AvenueOutputModel>()
                 .ToListAsync() :
             FilterAvenuesByCourtInfo(GetAvenuesQuery(query).Include(a => a.Tournaments), query)
@@ -57,19 +57,11 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
     public async Task<int> Create(AvenueInputModel input, string userId)
     {
         var unifiedCourtsInfo = input.Courts.UnifyCourtsInfo();
-        // var avenue = new Avenue
-        // {
-        //     Name = input.Name,
-        //     Location = input.Location,
-        //     City = input.City,
-        //     Country = input.Country,
-        //     Details = input.Details
-        // }
         var avenue = _mapper.Map<Avenue>(input);
         avenue.IsActive = true;
         avenue.IsVerified = false;
         avenue.CreatedBy = userId;
-        avenue.Courts = JsonSerializer.Serialize(unifiedCourtsInfo, SerializerOptions.StringEnumOptions());
+        avenue.Courts = JsonSerializer.Serialize(unifiedCourtsInfo, _serializerOptions.GetSerializerOptions());
 
         await SaveAsync(avenue);
         return avenue.Id;
@@ -96,7 +88,7 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
         avenue.Details = input.Details;
         avenue.UpdatedBy = userId;
         var unifiedCourtsInfo = input.Courts.UnifyCourtsInfo();
-        avenue.Courts = JsonSerializer.Serialize(unifiedCourtsInfo, SerializerOptions.StringEnumOptions());
+        avenue.Courts = JsonSerializer.Serialize(unifiedCourtsInfo, _serializerOptions.GetSerializerOptions());
 
         await SaveAsync(avenue);
         return true;
@@ -173,10 +165,10 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
         if (!string.IsNullOrWhiteSpace(query.Keyword))
         {
             dataQuery = dataQuery.Where(a => 
-                a.Name.ToLowerInvariant().Contains(query.Keyword) ||
-                a.Location.ToLowerInvariant().Contains(query.Keyword) ||
-                a.City.ToLowerInvariant().Contains(query.Keyword) ||
-                a.Country.ToLowerInvariant().Contains(query.Keyword));
+                a.Name.Contains(query.Keyword) ||
+                a.Location.Contains(query.Keyword) ||
+                a.City.Contains(query.Keyword) ||
+                a.Country.Contains(query.Keyword));
         }
 
         dataQuery = dataQuery.SortQuery(query.SortOptions);

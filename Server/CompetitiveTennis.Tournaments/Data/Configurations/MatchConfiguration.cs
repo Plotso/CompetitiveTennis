@@ -41,6 +41,31 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
             .IsRequired(false);
 
         builder
+            .Property(t => t.StartDate)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.EndDate)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.CreatedOn)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.ModifiedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
+
+        builder
+            .Property(t => t.DeletedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
+
+        builder
             .HasOne(m => m.Tournament)
             .WithMany(t => t.Matches)
             .HasForeignKey(m => m.TournamentId)

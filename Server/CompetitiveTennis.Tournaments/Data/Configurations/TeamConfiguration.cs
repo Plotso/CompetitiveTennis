@@ -14,5 +14,20 @@ public class TeamConfiguration : IEntityTypeConfiguration<Team>
             .Property(t => t.Name)
             .IsRequired()
             .HasMaxLength(MaxTeamNameLength);
+
+        builder
+            .Property(t => t.CreatedOn)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.ModifiedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
+
+        builder
+            .Property(t => t.DeletedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
     }
 }

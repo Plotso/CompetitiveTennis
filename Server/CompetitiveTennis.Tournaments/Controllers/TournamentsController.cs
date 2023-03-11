@@ -39,6 +39,7 @@ public class TournamentsController : ApiController
     }
 
     [HttpGet]
+    [Route(nameof(All))]
     public async Task<ActionResult<IEnumerable<TournamentOutputModel>>> All()
         => await SafeHandle(async () =>
             {
@@ -48,15 +49,19 @@ public class TournamentsController : ApiController
             msgOnError: "An error occured during GET request for all tournaments");
 
     [HttpGet]
+    [Route(nameof(ById))]
     public async Task<ActionResult<IEnumerable<TournamentOutputModel>>> ById(int id)
         => await SafeHandle(async () =>
             {
                 var tournament = await _tournaments.Get(id);
+                if (tournament == null)
+                    return NotFound($"Tournament {id} does not exist");
                 return Ok(tournament);
             },
             msgOnError: $"An error occured during GET request for tournament: {id}");
 
     [HttpGet]
+    [Route(nameof(Search))]
     public async Task<ActionResult<SearchOutputModel<TournamentOutputModel>>> Search([FromQuery] TournamentQuery query)
         => await SafeHandle(async () =>
             {
@@ -67,6 +72,7 @@ public class TournamentsController : ApiController
             msgOnError: $"An error occured during Search request with query: {query}");
 
     [HttpPost]
+    [Route(nameof(Add))]
     [Authorize]
     public async Task<ActionResult<int>> Add(TournamentInputModel input)
         => await SafeHandle(async () =>
@@ -89,8 +95,8 @@ public class TournamentsController : ApiController
             msgOnError: $"Unexpected error during tournament creation. TournamentInput: {input}");
 
     [HttpPut]
+    [Route(nameof(Edit))]
     [Authorize]
-    [Route(Id)]
     public async Task<ActionResult> Edit(int id, TournamentInputModel input)
         => await SafeHandle(async () =>
             {
@@ -105,8 +111,8 @@ public class TournamentsController : ApiController
             msgOnError: $"Unexpected error during tournament update. TournamentInput: {input}. TournamentId: {id}");
 
     [HttpPut]
+    [Route(nameof(ChangeAvenue))]
     [Authorize]
-    [Route(Id)]
     public async Task<ActionResult> ChangeAvenue(int tournamentId, int newAvenueId)
         => await SafeHandle(async () =>
             {
@@ -122,8 +128,8 @@ public class TournamentsController : ApiController
             msgOnNotFound: $"{nameof(ChangeAvenue)} failed due to missing avenue with id {newAvenueId}");
 
     [HttpDelete]
+    [Route(nameof(Delete))]
     [Authorize]
-    [Route(Id)]
     public async Task<ActionResult> Delete(int id)
         => await SafeHandle(async () =>
             {
@@ -138,6 +144,7 @@ public class TournamentsController : ApiController
             msgOnError: $"Unexpected error during tournament delete. TournamentId: {id}");
 
     [HttpPost]
+    [Route(nameof(AddGuest))]
     [Authorize]
     public async Task<ActionResult<int>> AddGuest(ParticipantInputModel input)
         => await SafeHandle(async () =>
@@ -161,6 +168,7 @@ public class TournamentsController : ApiController
 
 
     [HttpPost]
+    [Route(nameof(ParticipateSingle))]
     [Authorize]
     public async Task<ActionResult> ParticipateSingle(ParticipantInputModel input)
         => await SafeHandle(async () =>
@@ -182,6 +190,7 @@ public class TournamentsController : ApiController
 
 
     [HttpPost]
+    [Route(nameof(ParticipateDoubles))]
     [Authorize]
     public async Task<ActionResult> ParticipateDoubles(MultiParticipantInputModel input)
         => await SafeHandle(async () =>
@@ -225,6 +234,7 @@ public class TournamentsController : ApiController
             msgOnError: $"Unexpected error during guest participant creation. ParticipantInput: {input}");
     
     [HttpPost]
+    [Route(nameof(AddAccountToParticipant))]
     [Authorize]
     public async Task<ActionResult<bool>> AddAccountToParticipant(int tournamentId, int participantId, int accountId)
         => await SafeHandle(async () =>
@@ -248,6 +258,7 @@ public class TournamentsController : ApiController
             msgOnError: $"Unexpected error during account addition to participant. ParticipantId: {participantId}. AccountId: {accountId}");
     
     [HttpPost]
+    [Route(nameof(RemoveAccountFromParticipant))]
     [Authorize]
     public async Task<ActionResult<bool>> RemoveAccountFromParticipant(int tournamentId, int participantId, int accountId)
         => await SafeHandle(async () =>
@@ -268,6 +279,7 @@ public class TournamentsController : ApiController
     
     
     [HttpPost]
+    [Route(nameof(RemoveParticipantFromTournament))]
     [Authorize]
     public async Task<ActionResult<bool>> RemoveParticipantFromTournament(int tournamentId, int participantId)
         => await SafeHandle(async () =>

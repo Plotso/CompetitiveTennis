@@ -7,7 +7,7 @@ using CompetitiveTennis.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-    .AddWebService<IdentityDbContext>(builder.Configuration, builder.Environment, swaggerEnabled: true)
+    .AddWebService<IdentityDbContext>(builder.Configuration, builder.Environment, swaggerEnabled: true, enableLegacyTimestampBehaviour: false)
     .AddUserStorage()
     .AddTransient<IDataSeeder, IdentitySeeder>()
     .AddTransient<IIdentityService, IdentityService>()

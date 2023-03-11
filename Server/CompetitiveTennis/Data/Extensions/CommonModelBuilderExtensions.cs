@@ -5,9 +5,11 @@ using Configuration;
 using Microsoft.EntityFrameworkCore;
 using Models.Interfaces;
 
-public static class ModelBuilderExtensions
+public static class CommonModelBuilderExtensions
 {
-    public static void ApplyGlobalDbConfigurationsForAssembly(this ModelBuilder modelBuilder, Assembly assembly)
+    public static void ApplyGlobalDbConfigurationsForAssembly(
+        this ModelBuilder modelBuilder,
+        Assembly assembly)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(assembly);
         
@@ -44,12 +46,12 @@ public static class ModelBuilderExtensions
     }
     
     private static readonly MethodInfo SetIsDeletedQueryFilterMethod =
-        typeof(BaseDbContext).GetMethod(
+        typeof(DbContext).GetMethod(
             nameof(SetIsDeletedQueryFilter),
             BindingFlags.NonPublic | BindingFlags.Static);
     
     private static readonly MethodInfo SetIsTestQueryFilterMethod =
-        typeof(BaseDbContext).GetMethod(
+        typeof(DbContext).GetMethod(
             nameof(SetIsTestQueryFilter),
             BindingFlags.NonPublic | BindingFlags.Static);
 

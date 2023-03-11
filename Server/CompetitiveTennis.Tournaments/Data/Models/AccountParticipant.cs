@@ -2,7 +2,7 @@
 
 using CompetitiveTennis.Data.Models.CompositeKey;
 
-public class AccountParticipant : CompositeKeyBaseModel
+public class AccountParticipant : CompositeKeyDeletableEntity
 {
     public int AccountId { get; set; }
     public Account Account { get; set; }

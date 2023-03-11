@@ -4,8 +4,10 @@ using CompetitiveTennis.Services.Interfaces;
 using Models;
 using Models.Enums;
 using Services.Interfaces;
+using Tournaments.Models;
 using Tournaments.Models.Account;
 using Tournaments.Models.Avenue;
+using Tournaments.Models.Enums;
 using Tournaments.Models.Participant;
 using Tournaments.Models.Tournament;
 
@@ -55,7 +57,18 @@ public class TournamentDataSeeder : IDataSeeder
                         Name = "Barocco",
                         Location = "ул. 8-ми Декември №2",
                         City = "Sofia",
-                        Country = "Bulgaria"
+                        Country = "Bulgaria",
+                        Courts = new List<CourtsInfo>
+                        {
+                            new() { Surface = Surface.Hard, AvailableCourtsByType = new Dictionary<CourtType, int>
+                                {
+                                    {CourtType.Outdoor, 5}
+                                }},
+                            new() { Surface = Surface.ArtificialGrass, AvailableCourtsByType = new Dictionary<CourtType, int>
+                            {
+                                {CourtType.Outdoor, 2}
+                            }}
+                        }
                     };
                     await _avenues.Create(avenue, sysAccount.UserId);
                     _logger.LogInformation("Barocco avenue seeded");
@@ -78,8 +91,8 @@ public class TournamentDataSeeder : IDataSeeder
                         CourtsAvailable = 2,
                         MinParticipants = 4,
                         MaxParticipants = 32,
-                        StartDate = new DateTime(2023, 4, 15, 10,0,0),
-                        EndDate = new DateTime(2023, 4, 16, 12,0,0),
+                        StartDate = DateTime.Now.AddMonths(1),
+                        EndDate = DateTime.Now.AddMonths(1).AddDays(1),
                         IsIndoor = false,
                         IsLeague = false,
                         AvenueId = avenueId

@@ -22,5 +22,20 @@ public class AccountParticipantConfiguration : IEntityTypeConfiguration<AccountP
             .WithMany(p => p.Players)
             .HasForeignKey(ap => ap.ParticipantId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder
+            .Property(t => t.CreatedOn)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.ModifiedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
+
+        builder
+            .Property(t => t.DeletedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
     }
 }

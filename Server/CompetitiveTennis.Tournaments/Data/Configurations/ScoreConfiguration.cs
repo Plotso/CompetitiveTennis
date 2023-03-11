@@ -42,6 +42,21 @@ public class ScoreConfiguration : IEntityTypeConfiguration<Score>
             .HasForeignKey(s => s.MatchId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
+
+        builder
+            .Property(t => t.CreatedOn)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.ModifiedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
+
+        builder
+            .Property(t => t.DeletedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
             
         builder.HasIndex(s => s.MatchId);
     }

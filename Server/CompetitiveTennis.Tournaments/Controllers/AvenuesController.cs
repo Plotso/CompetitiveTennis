@@ -21,6 +21,7 @@ public class AvenuesController : ApiController
     }
 
     [HttpGet]
+    [Route(nameof(All))]
     public async Task<ActionResult<IEnumerable<AvenueOutputModel>>> All()
         => await SafeHandle(async () =>
             {
@@ -30,15 +31,19 @@ public class AvenuesController : ApiController
             msgOnError: "An error occured during GET request for all avenues");
 
     [HttpGet]
+    [Route(nameof(ById))]
     public async Task<ActionResult<IEnumerable<AvenueOutputModel>>> ById(int id)
         => await SafeHandle(async () =>
             {
                 var avenue = await _avenues.Get(id);
+                if (avenue == null)
+                    return NotFound($"Avenue {id} is missing");
                 return Ok(avenue);
             },
             msgOnError: $"An error occured during GET request for avenue: {id}");
 
     [HttpGet]
+    [Route(nameof(Search))]
     public async Task<ActionResult<SearchOutputModel<AvenueOutputModel>>> Search([FromQuery] AvenueQuery query)
         => await SafeHandle(async () =>
             {
@@ -49,6 +54,7 @@ public class AvenuesController : ApiController
             msgOnError: $"An error occured during Search request with query: {query}");
 
     [HttpPost]
+    [Route(nameof(Add))]
     [Authorize]
     public async Task<ActionResult<int>> Add(AvenueInputModel input)
         => await SafeHandle(async () =>
@@ -59,8 +65,8 @@ public class AvenuesController : ApiController
             msgOnError: $"Unexpected error during avenue creation. AvenueInput: {input}");
 
     [HttpPut]
+    [Route(nameof(Edit))]
     [Authorize(Roles = Constants.AdministratorRoleName)]
-    [Route(Id)]
     public async Task<ActionResult> Edit(int id, AvenueInputModel input)
         => await SafeHandle(async () =>
             {
@@ -74,8 +80,8 @@ public class AvenuesController : ApiController
             msgOnNotFound: NotFoundMsg(id, "update"));
 
     [HttpDelete]
+    [Route(nameof(Delete))]
     [Authorize(Roles = Constants.AdministratorRoleName)]
-    [Route(Id)]
     public async Task<ActionResult> Delete(int id)
         => await SafeHandle(async () =>
             {

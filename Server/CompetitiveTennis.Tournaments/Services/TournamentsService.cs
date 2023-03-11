@@ -1,6 +1,7 @@
 namespace CompetitiveTennis.Tournaments.Services;
 
 using CompetitiveTennis.Data;
+using Data;
 using Data.Models;
 using Exceptions;
 using Extensions;
@@ -37,21 +38,14 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
     }
 
     public async Task<IEnumerable<TournamentOutputModel>> GetAll()
-        => await All()
-            //.Include(t => t.Participants) ToDo: Verify if Include is needed
-            //.ThenInclude(p => p.Matches)
-            .ProjectToType<TournamentOutputModel>()
-            .ToListAsync();
+        => _mapper.Map<IEnumerable<TournamentOutputModel>>(await All()
+            .ToListAsync());
 
     public async Task<TournamentOutputModel> Get(int id)
-        => await All()
+        => _mapper.Map<TournamentOutputModel>(await All()
             .Where(a => a.Id == id)
-            //.Include(t => t.Participants) ToDo: Verify if Include is needed
-            //.ThenInclude(p => p.Matches)
-            //.Include(t => t.Matches)
-            //.ThenInclude(m => m.Scores)
-            .ProjectToType<TournamentOutputModel>()
-            .SingleOrDefaultAsync();
+            .EnrichTournamentQueryData()
+            .SingleOrDefaultAsync());
 
     public async Task<Tournament> GetInternal(int id)
         => await All().Where(a => a.Id == id).SingleOrDefaultAsync();
@@ -60,12 +54,11 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         => await All().Where(a => a.Id == id).Select(t => t.Organiser.UserId).SingleOrDefaultAsync();
 
     public async Task<IEnumerable<TournamentOutputModel>> Query(TournamentQuery query)
-        => (await GetAvenuesQuery(query)
-                .ProjectToType<TournamentOutputModel>()
+        => _mapper.Map<IEnumerable<TournamentOutputModel>>(await GetTournamentsQuery(query)
                 .ToListAsync())
             .PageFilterResult(query);
 
-    public async ValueTask<int> Total(TournamentQuery query) => await GetAvenuesQuery(query).CountAsync();
+    public async ValueTask<int> Total(TournamentQuery query) => await GetTournamentsQuery(query).CountAsync();
 
     public async Task<int> Create(TournamentInputModel input, Account organiser, Avenue avenue)
     {
@@ -151,7 +144,10 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         return true;
     }
 
-    private IQueryable<Tournament> GetAvenuesQuery(TournamentQuery query, int? tournamentId = null)
+    private async Task<IEnumerable<Tournament>> QueryableToList(IQueryable<Tournament> queryable)
+        => await queryable.Include(t => t.Avenue).Include(t => t.Organiser).ToListAsync();
+
+    private IQueryable<Tournament> GetTournamentsQuery(TournamentQuery query, int? tournamentId = null)
     {
         var dataQuery = All();
 
@@ -179,13 +175,13 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         if (!string.IsNullOrWhiteSpace(query.Keyword))
         {
             dataQuery = dataQuery.Where(t => 
-                t.Title.ToLowerInvariant().Contains(query.Keyword) ||
-                t.Rules.ToLowerInvariant().Contains(query.Keyword) ||
-                t.Description.ToLowerInvariant().Contains(query.Keyword));
+                t.Title.Contains(query.Keyword) ||
+                t.Rules.Contains(query.Keyword) ||
+                t.Description.Contains(query.Keyword));
         }
 
         dataQuery = dataQuery.SortQuery(query.SortOptions);
 
-        return dataQuery;
+        return dataQuery.EnrichTournamentQueryData();
     }
 }

@@ -8,6 +8,9 @@ public static class CourtsInfoExtensions
 {
     public static List<CourtsInfo> UnifyCourtsInfo(this List<CourtsInfo> courtsInfos)
     {
+        if (courtsInfos == null || !courtsInfos.Any())
+            return new List<CourtsInfo>();
+        
         var itemsBySurface = courtsInfos
             .GroupBy(c => c.Surface)
             .ToDictionary(g => g.Key, g => g.Count());

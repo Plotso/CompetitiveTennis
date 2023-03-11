@@ -24,5 +24,20 @@ public class ParticipantMatchConfiguration : IEntityTypeConfiguration<Participan
             .HasForeignKey(pm => pm.MatchId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
+
+        builder
+            .Property(t => t.CreatedOn)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.ModifiedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
+
+        builder
+            .Property(t => t.DeletedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
     }
 }

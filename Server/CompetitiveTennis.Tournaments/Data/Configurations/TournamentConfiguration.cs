@@ -76,6 +76,31 @@ public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
             .IsRequired(false);
 
         builder
+            .Property(t => t.StartDate)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.EndDate)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.CreatedOn)
+            .HasColumnType("timestamp")
+            .IsRequired();
+
+        builder
+            .Property(t => t.ModifiedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
+
+        builder
+            .Property(t => t.DeletedOn)
+            .HasColumnType("timestamp")
+            .IsRequired(false);
+
+        builder
             .HasOne(t => t.Avenue)
             .WithMany(a => a.Tournaments)
             .HasForeignKey(t => t.AvenueId)
