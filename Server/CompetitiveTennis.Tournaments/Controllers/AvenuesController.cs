@@ -55,11 +55,11 @@ public class AvenuesController : ApiController
 
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<int>> Add(AvenueInputModel input)
+    public async Task<ActionResult<Result<int>>> Add(AvenueInputModel input)
         => await SafeHandle(async () =>
             {
-                await _avenues.Create(input, _currentUser.UserId);
-                return Ok(Result.Success);
+                var avenueId = await _avenues.Create(input, _currentUser.UserId);
+                return Ok(Result<int>.SuccessWith(avenueId));
             },
             msgOnError: $"Unexpected error during avenue creation. AvenueInput: {input}");
 

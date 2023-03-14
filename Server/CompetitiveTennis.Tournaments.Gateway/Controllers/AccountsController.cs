@@ -34,8 +34,8 @@ public class AccountsController : BaseGatewayController
         => await SafeProcessRefitRequest(
             async () =>
             {
-                var accounts = await _accounts.ById(id);
-                return Ok(accounts);
+                var account = await _accounts.ById(id);
+                return Ok(account);
             }, $"An error occured during GET request for account: {id}");
 
     [HttpPost]

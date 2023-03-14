@@ -1,5 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Services.Tournaments;
 
+using CompetitiveTennis.Models;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Avenue;
@@ -17,7 +18,7 @@ public interface IAvenuesService
     Task<ActionResult<SearchOutputModel<AvenueOutputModel>>> Search([FromQuery] AvenueQuery query);
     
     [Post("/Avenues")]
-    Task<ActionResult<int>> Create(AvenueInputModel input);
+    Task<ActionResult<Result<int>>> Create(AvenueInputModel input);
     
     [Put("/Avenues/{id}")]
     Task<ActionResult> Edit(int id, AvenueInputModel input);
