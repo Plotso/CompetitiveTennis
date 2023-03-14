@@ -1,5 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Services.Tournaments;
 
+using CompetitiveTennis.Models;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Participant;
@@ -15,10 +16,10 @@ public interface ITournamentsService
     Task<ActionResult<TournamentOutputModel>> ById(int id);
 
     [Get("/Tournaments/Search")]
-    Task<ActionResult<SearchOutputModel<TournamentOutputModel>>> Search([FromQuery] TournamentQuery query);
+    Task<ActionResult<SearchOutputModel<TournamentOutputModel>>> Search([Query] TournamentQuery query);
     
     [Post("/Tournaments/Add")]
-    Task<ActionResult<int>> Create(TournamentInputModel input);
+    Task<ActionResult<Result<int>>> Create(TournamentInputModel input);
     
     [Put("/Tournaments/Edit/{id}")]
     Task<ActionResult> Edit(int id, TournamentInputModel input);
@@ -30,7 +31,7 @@ public interface ITournamentsService
     Task<ActionResult> Delete(int id);
     
     [Post("/Tournaments/AddGuest")]
-    Task<ActionResult<int>> AddGuest(ParticipantInputModel input);
+    Task<ActionResult<Result<int>>> AddGuest(ParticipantInputModel input);
 
     [Post("/Tournaments/ParticipateSingle")]
     Task<ActionResult> ParticipateSingle(ParticipantInputModel input);

@@ -15,7 +15,7 @@ public interface IAvenuesService
     Task<ActionResult<AvenueOutputModel>> ById(int id);
 
     [Get("/Avenues/Search")]
-    Task<ActionResult<SearchOutputModel<AvenueOutputModel>>> Search([FromQuery] AvenueQuery query);
+    Task<ActionResult<SearchOutputModel<AvenueOutputModel>>> Search([Query] AvenueQuery query);
     
     [Post("/Avenues")]
     Task<ActionResult<Result<int>>> Create(AvenueInputModel input);

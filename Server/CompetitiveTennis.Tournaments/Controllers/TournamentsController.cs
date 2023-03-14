@@ -74,7 +74,7 @@ public class TournamentsController : ApiController
     [HttpPost]
     [Route(nameof(Add))]
     [Authorize]
-    public async Task<ActionResult<int>> Add(TournamentInputModel input)
+    public async Task<ActionResult<Result<int>>> Add(TournamentInputModel input)
         => await SafeHandle(async () =>
             {
                 var organiser = await _accounts.GetByUserId(_currentUser.UserId);
@@ -90,7 +90,7 @@ public class TournamentsController : ApiController
                     return BadRequest(Result.Failure("Provided avenue could not be found in internal system."));
 
                 var tournamentId = await _tournaments.Create(input, organiser, avenue);
-                return Ok(tournamentId);
+                return Ok(Result<int>.SuccessWith(tournamentId));
             },
             msgOnError: $"Unexpected error during tournament creation. TournamentInput: {input}");
 
@@ -146,7 +146,7 @@ public class TournamentsController : ApiController
     [HttpPost]
     [Route(nameof(AddGuest))]
     [Authorize]
-    public async Task<ActionResult<int>> AddGuest(ParticipantInputModel input)
+    public async Task<ActionResult<Result<int>>> AddGuest(ParticipantInputModel input)
         => await SafeHandle(async () =>
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(input.TournamentId) != _currentUser.UserId;
@@ -162,7 +162,7 @@ public class TournamentsController : ApiController
                     return BadRequest(Result.Failure($"Tournament {input.TournamentId} could not be found!"));
                 
                 var participantId = await _participants.Create(input, tournament, team);
-                return Ok(participantId);
+                return Ok(Result<int>.SuccessWith(participantId));
             },
             msgOnError: $"Unexpected error during guest participant creation. ParticipantInput: {input}");
 
