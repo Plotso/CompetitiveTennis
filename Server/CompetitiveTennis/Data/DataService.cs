@@ -10,8 +10,13 @@ public abstract class DataService<TEntity> : IDataService<TEntity>
     protected DbContext Data { get; }
 
     protected IQueryable<TEntity> All() => Data.Set<TEntity>();
+    protected IQueryable<TEntity> AllAsNoTracking() => Data.Set<TEntity>().AsNoTracking();
 
-    public async Task Save(TEntity entity)
+    protected IQueryable<TEntity> AllIgnoreQueryFilters() => All().IgnoreQueryFilters();
+
+    protected IQueryable<TEntity> AllAsNoTrackingIgnoreQueryFilters() => AllAsNoTracking().IgnoreQueryFilters();
+
+    public async Task SaveAsync(TEntity entity)
     {
         Data.Update(entity);
 
