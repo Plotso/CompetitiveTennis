@@ -157,9 +157,9 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             return dataQuery;
         }
 
-        if (query.HasPrize.HasValue)
+        if (query.HasPrize ?? false)
             dataQuery = dataQuery.Where(t => t.Prize.HasValue);
-        if (query.HasEntryFee.HasValue)
+        if (query.HasEntryFee ?? false)
             dataQuery = dataQuery.Where(t => t.EntryFee.HasValue);
         if (query.Surface.HasValue)
             dataQuery = dataQuery.Where(t => t.Surface == query.Surface);
@@ -170,7 +170,7 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         if (query.DateRangeFrom.HasValue)
             dataQuery = dataQuery.Where(t => t.StartDate >= query.DateRangeFrom);
         if (query.DateRangeUntil.HasValue)
-            dataQuery = dataQuery.Where(t => t.StartDate <= query.DateRangeUntil);
+            dataQuery = dataQuery.Where(t => t.EndDate <= query.DateRangeUntil);
 
         if (!string.IsNullOrWhiteSpace(query.Keyword))
         {

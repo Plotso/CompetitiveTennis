@@ -22,11 +22,11 @@ public class AvenuesController : ApiController
 
     [HttpGet]
     [Route(nameof(All))]
-    public async Task<ActionResult<IEnumerable<AvenueOutputModel>>> All()
+    public async Task<ActionResult<Result<IEnumerable<AvenueOutputModel>>>> All()
         => await SafeHandle(async () =>
             {
                 var avenues = await _avenues.GetAll();
-                return Ok(avenues);
+                return Ok(Result<IEnumerable<AvenueOutputModel>>.SuccessWith(avenues));
             },
             msgOnError: "An error occured during GET request for all avenues");
 
@@ -37,19 +37,20 @@ public class AvenuesController : ApiController
             {
                 var avenue = await _avenues.Get(id);
                 if (avenue == null)
-                    return NotFound($"Avenue {id} is missing");
-                return Ok(avenue);
+                    return NotFound(Result<AvenueOutputModel>.Failure($"Avenue {id} is missing"));
+                return Ok(Result<AvenueOutputModel>.SuccessWith(avenue));
             },
             msgOnError: $"An error occured during GET request for avenue: {id}");
 
     [HttpGet]
     [Route(nameof(Search))]
-    public async Task<ActionResult<SearchOutputModel<AvenueOutputModel>>> Search([FromQuery] AvenueQuery query)
+    public async Task<ActionResult<Result<SearchOutputModel<AvenueOutputModel>>>> Search([FromQuery] AvenueQuery query)
         => await SafeHandle(async () =>
             {
                 var avenues = await _avenues.Query(query);
                 var total = await _avenues.Total(query);
-                return Ok(new SearchOutputModel<AvenueOutputModel>(avenues, query.Page, total));
+                return Ok(Result<SearchOutputModel<AvenueOutputModel>>.SuccessWith(
+                    new SearchOutputModel<AvenueOutputModel>(avenues, query.Page, total)));
             },
             msgOnError: $"An error occured during Search request with query: {query}");
 

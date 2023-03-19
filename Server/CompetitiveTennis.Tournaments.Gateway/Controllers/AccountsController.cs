@@ -1,5 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Controllers;
 
+using CompetitiveTennis.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Account;
@@ -47,7 +48,7 @@ public class AccountsController : BaseGatewayController
             async () =>
             {
                 var result = await _accounts.Add(input);
-                return result;
+                return new ObjectResult(result);
             }, $"An error occurred while trying to create account with data {input}");
 
     [HttpPut]
@@ -62,6 +63,6 @@ public class AccountsController : BaseGatewayController
             async () =>
             {
                 var result = await _accounts.ChangeNames(id, input);
-                return result;
+                return new ObjectResult(result);
             }, $"An error occurred while trying to ChangeNames for account with data {input}");
 }

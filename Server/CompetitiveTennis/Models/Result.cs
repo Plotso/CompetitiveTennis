@@ -6,7 +6,7 @@ public class Result
 {
     private readonly List<string> _errors;
     
-    internal Result(bool isSuccess, List<string> errors)
+    public Result(bool isSuccess, List<string> errors)
     {
         IsSuccess = isSuccess;
         _errors = errors;
@@ -45,7 +45,7 @@ public class Result<TData> : Result
 {
     private readonly TData _data;
 
-    private Result(bool isSuccess, TData data, List<string> errors)
+    public Result(bool isSuccess, TData data, List<string> errors)
         : base(isSuccess, errors)
         => _data = data;
 
@@ -57,7 +57,7 @@ public class Result<TData> : Result
 
     public static Result<TData> SuccessWith(TData data) 
         => new(true, data, new List<string>());
-
+    
     public new static Result<TData> Failure(IEnumerable<string> errors) 
         => new(false, default!, errors.ToList());
 

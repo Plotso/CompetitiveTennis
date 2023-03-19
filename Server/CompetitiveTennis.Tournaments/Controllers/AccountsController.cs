@@ -21,23 +21,23 @@ public class AccountsController : ApiController
 
     [HttpGet]
     [Route(nameof(All))]
-    public async Task<ActionResult<IEnumerable<AccountOutputModel>>> All()
+    public async Task<ActionResult<Result<IEnumerable<AccountOutputModel>>>> All()
         => await SafeHandle(async () =>
             {
-                var account = await _accounts.GetAll();
-                return Ok(account);
+                var accounts = await _accounts.GetAll();
+                return Ok(Result<IEnumerable<AccountOutputModel>>.SuccessWith(accounts));
             },
             msgOnError: "An error occured during GET request for all accounts");
     
     [HttpGet]
     [Route(Id)]
-    public async Task<ActionResult<AccountOutputModel>> ById(int id) 
+    public async Task<ActionResult<Result<AccountOutputModel>>> ById(int id) 
         => await SafeHandle(async () =>
             {
                 var account = await _accounts.GetById(id);
                 if (account == null)
-                    return NotFound($"Account {id} is missing");
-                return Ok(account);
+                    return NotFound(Result<AccountOutputModel>.Failure($"Account {id} is missing"));
+                return Ok(Result<AccountOutputModel>.SuccessWith(account));
             },
             msgOnError: $"An error occured during GET request for account: {id}");
 

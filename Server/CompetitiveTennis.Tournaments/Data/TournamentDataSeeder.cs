@@ -82,7 +82,6 @@ public class TournamentDataSeeder : IDataSeeder
                     
                     var tournament = new TournamentInputModel
                     {
-                        //ToDo: Seed tournament
                         Title = "BK-Tournament",
                         Rules = "Best of 2 sets. Each set is won by the first player to win six games with a lead of at least two games. n all sets but the final set if the score reaches a 6 – 6 tie (rather than the highest possible 7 – 5 win) it triggers a tie-break. The final set is played until 2 games difference appears.",
                         Description = "Friendly tournament for non-professional players. If the weather is problematic, the start date may be changed",

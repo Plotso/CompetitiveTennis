@@ -34,9 +34,9 @@ public static class HttpClientBuilderExtensions
                 var authorizationHeader = new AuthenticationHeaderValue(AuthorizationHeaderValuePrefix, currentToken);
                 client.DefaultRequestHeaders.Authorization = authorizationHeader;
             })
-            .AddTransientHttpErrorPolicy(policy => policy
-                .OrResult(result => result.StatusCode == HttpStatusCode.NotFound)
-                .WaitAndRetryAsync(5, retry => TimeSpan.FromSeconds(Math.Pow(2, retry))))
+            // .AddTransientHttpErrorPolicy(policy => policy
+            //     .OrResult(result => result.StatusCode == HttpStatusCode.NotFound) //ToDo: Retrying 10 seconds on not found is not sufficient enough
+            //     .WaitAndRetryAsync(5, retry => TimeSpan.FromSeconds(Math.Pow(2, retry))))
             .AddTransientHttpErrorPolicy(policy => policy
                 .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 }

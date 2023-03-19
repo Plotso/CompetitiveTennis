@@ -23,7 +23,6 @@ var serviceEndpoints = builder.Configuration
     .GetSection(nameof(ServiceEndpoints))
     .Get<ServiceEndpoints>(config => config.BindNonPublicProperties = true);
 
-
 builder.Services.AddRefitClient<IAccountsService>().WithConfiguration(serviceEndpoints.Tournaments);
 builder.Services.AddRefitClient<IAvenuesService>().WithConfiguration(serviceEndpoints.Tournaments);
 builder.Services.AddRefitClient<ITournamentsService>().WithConfiguration(serviceEndpoints.Tournaments);

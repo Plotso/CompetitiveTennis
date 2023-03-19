@@ -11,7 +11,7 @@ public class TournamentsController : BaseGatewayController
 {
     private readonly ITournamentsService _tournaments;
 
-    public TournamentsController(ITournamentsService tournaments, ILogger logger) 
+    public TournamentsController(ITournamentsService tournaments, ILogger<TournamentsController> logger) 
         : base(logger) 
         => _tournaments = tournaments;
 

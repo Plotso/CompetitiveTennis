@@ -40,34 +40,35 @@ public class TournamentsController : ApiController
 
     [HttpGet]
     [Route(nameof(All))]
-    public async Task<ActionResult<IEnumerable<TournamentOutputModel>>> All()
+    public async Task<ActionResult<Result<IEnumerable<TournamentOutputModel>>>> All()
         => await SafeHandle(async () =>
             {
                 var tournaments = await _tournaments.GetAll();
-                return Ok(tournaments);
+                return Ok(Result<IEnumerable<TournamentOutputModel>>.SuccessWith(tournaments));
             },
             msgOnError: "An error occured during GET request for all tournaments");
 
     [HttpGet]
     [Route(Id)]
-    public async Task<ActionResult<IEnumerable<TournamentOutputModel>>> ById(int id)
+    public async Task<ActionResult<TournamentOutputModel>> ById(int id)
         => await SafeHandle(async () =>
             {
                 var tournament = await _tournaments.Get(id);
                 if (tournament == null)
-                    return NotFound($"Tournament {id} does not exist");
-                return Ok(tournament);
+                    return NotFound(Result<TournamentOutputModel>.Failure($"Tournament {id} does not exist"));
+                return Ok(Result<TournamentOutputModel>.SuccessWith(tournament));
             },
             msgOnError: $"An error occured during GET request for tournament: {id}");
 
     [HttpGet]
     [Route(nameof(Search))]
-    public async Task<ActionResult<SearchOutputModel<TournamentOutputModel>>> Search([FromQuery] TournamentQuery query)
+    public async Task<ActionResult<Result<SearchOutputModel<TournamentOutputModel>>>> Search([FromQuery] TournamentQuery query)
         => await SafeHandle(async () =>
             {
                 var tournaments = await _tournaments.Query(query);
                 var total = await _tournaments.Total(query);
-                return Ok(new SearchOutputModel<TournamentOutputModel>(tournaments, query.Page, total));
+                return Ok(Result<SearchOutputModel<TournamentOutputModel>>.SuccessWith(
+                    new SearchOutputModel<TournamentOutputModel>(tournaments, query.Page, total)));
             },
             msgOnError: $"An error occured during Search request with query: {query}");
 
@@ -152,14 +153,14 @@ public class TournamentsController : ApiController
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(input.TournamentId) != _currentUser.UserId;
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
                     return BadRequest(
-                        Result.Failure("Only admins and tournament organiser are allowed to add guests to tournament!"));
+                        Result<int>.Failure("Only admins and tournament organiser are allowed to add guests to tournament!"));
                 if (string.IsNullOrWhiteSpace(input.Name))
-                    return BadRequest("Name is mandatory for guest participants");
+                    return BadRequest(Result<int>.Failure("Name is mandatory for guest participants"));
                 
                 var team = input.TeamId.HasValue ? await _teams.GetInternal(input.TeamId.Value) : null;
                 var tournament = await _tournaments.GetInternal(input.TournamentId);
                 if (tournament == null)
-                    return BadRequest(Result.Failure($"Tournament {input.TournamentId} could not be found!"));
+                    return BadRequest(Result<int>.Failure($"Tournament {input.TournamentId} could not be found!"));
                 
                 var participantId = await _participants.Create(input, tournament, team);
                 return Ok(Result<int>.SuccessWith(participantId));
@@ -207,7 +208,7 @@ public class TournamentsController : ApiController
                     return BadRequest(Result.Failure("Registration for doubles participation requires 2 participants"));
                 
                 if (input.ParticipantInfo.IsGuest && string.IsNullOrWhiteSpace(input.ParticipantInfo.Name))
-                    return BadRequest("Name is mandatory for guest participants");
+                    return BadRequest(Result.Failure("Name is mandatory for guest participants"));
                 
                 var participantId = await _participants.Create(input.ParticipantInfo, tournament, team);
                 var currentUserAccount = await _accounts.GetByUserId(_currentUser.UserId);
@@ -215,7 +216,7 @@ public class TournamentsController : ApiController
                 if (accounts.Count() != input.Accounts.Count())
                 {
                     Logger.LogCritical($"Some of the following accounts are missing from internal system: {string.Join(" ", input.Accounts)}");
-                    return BadRequest("Not all accounts could be found in internal system");
+                    return BadRequest(Result.Failure("Not all accounts could be found in internal system"));
                 }
                 var accsToSign = accounts.ToList();
                 if (input.IncludeCurrentUser && accsToSign.All(a => a.UserId != _currentUser.UserId))
@@ -223,7 +224,7 @@ public class TournamentsController : ApiController
                     if (currentUserAccount == null)
                     {
                         Logger.LogCritical($"{_currentUser.UserId} lacks account in internal system");
-                        return BadRequest("Current user account has lacking data preventing participations");
+                        return BadRequest(Result.Failure("Current user account has lacking data preventing participations"));
                     }
 
                     accsToSign.Add(currentUserAccount);
@@ -236,7 +237,7 @@ public class TournamentsController : ApiController
     [HttpPost]
     [Route(nameof(AddAccountToParticipant))]
     [Authorize]
-    public async Task<ActionResult<bool>> AddAccountToParticipant(int tournamentId, int participantId, int accountId)
+    public async Task<ActionResult<Result>> AddAccountToParticipant(int tournamentId, int participantId, int accountId)
         => await SafeHandle(async () =>
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(tournamentId) != _currentUser.UserId;
@@ -250,7 +251,7 @@ public class TournamentsController : ApiController
                 
                 var account = await _accounts.GetInternal(accountId);
                 if (account == null)
-                    return BadRequest($"Account {accountId} could not be found in internal system");
+                    return BadRequest(Result.Failure($"Account {accountId} could not be found in internal system"));
 
                 var isSuccess = await _participants.AddUsersToParticipant(participantId, new[] {account});
                 return isSuccess ? Result.Success : Result.Failure($"Failed to add account {accountId} to participant {participantId}");
@@ -260,7 +261,7 @@ public class TournamentsController : ApiController
     [HttpPost]
     [Route(nameof(RemoveAccountFromParticipant))]
     [Authorize]
-    public async Task<ActionResult<bool>> RemoveAccountFromParticipant(int tournamentId, int participantId, int accountId)
+    public async Task<ActionResult<Result>> RemoveAccountFromParticipant(int tournamentId, int participantId, int accountId)
         => await SafeHandle(async () =>
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(tournamentId) != _currentUser.UserId;
@@ -270,7 +271,7 @@ public class TournamentsController : ApiController
 
                 var account = await _accounts.GetInternal(accountId);
                 if (account == null)
-                    return BadRequest($"Account {accountId} could not be found in internal system");
+                    return BadRequest(Result.Failure($"Account {accountId} could not be found in internal system"));
 
                 var isSuccess = await _participants.RemoveUsersFromParticipant(participantId, new[] {account});
                 return isSuccess ? Result.Success : Result.Failure($"Failed to remove account {accountId} from participant {participantId}");
@@ -281,7 +282,7 @@ public class TournamentsController : ApiController
     [HttpPost]
     [Route(nameof(RemoveParticipantFromTournament))]
     [Authorize]
-    public async Task<ActionResult<bool>> RemoveParticipantFromTournament(int tournamentId, int participantId)
+    public async Task<ActionResult<Result>> RemoveParticipantFromTournament(int tournamentId, int participantId)
         => await SafeHandle(async () =>
             {
                 var participant = await _participants.GetInternal(participantId);
@@ -294,7 +295,6 @@ public class TournamentsController : ApiController
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser || !isCurrentUserParticipant)
                     return BadRequest(
                         Result.Failure("Only admins, tournament organiser and participant accounts are allowed to remove participant from existing competition!"));
-
 
                 var isSuccess = await _tournaments.RemoveParticipant(tournamentId, participant);
                 return isSuccess ? Result.Success : Result.Failure($"Failed to remove participant {participantId} from tournament {tournamentId}");

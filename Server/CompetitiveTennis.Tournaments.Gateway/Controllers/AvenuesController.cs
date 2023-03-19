@@ -10,7 +10,7 @@ public class AvenuesController : BaseGatewayController
 {
     private readonly IAvenuesService _avenues;
 
-    public AvenuesController(IAvenuesService avenues, ILogger logger) 
+    public AvenuesController(IAvenuesService avenues, ILogger<AvenuesController> logger) 
         : base(logger) 
         => _avenues = avenues;
 

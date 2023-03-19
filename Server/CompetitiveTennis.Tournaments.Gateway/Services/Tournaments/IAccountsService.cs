@@ -1,21 +1,21 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Services.Tournaments;
 
-using Microsoft.AspNetCore.Mvc;
+using CompetitiveTennis.Models;
 using Models.Account;
 using Refit;
 
 public interface IAccountsService
 {
     [Get("/Accounts/All")]
-    Task<ActionResult<IEnumerable<AccountOutputModel>>> All();
+    Task<Result<IEnumerable<AccountOutputModel>>> All();
     
     [Get("/Accounts/{id}")]
-    Task<ActionResult<IEnumerable<AccountOutputModel>>> ById(int id);
+    Task<Result<AccountOutputModel>> ById(int id);
 
     [Post("/Accounts")]
-    Task<ActionResult> Add(AccountInputModel input);
+    Task<Result> Add(AccountInputModel input);
     
-    [Post("/Accounts/ChangeNames/{id}")]
-    Task<ActionResult> ChangeNames(int id, AccountInputModel input);
+    [Put("/Accounts/ChangeNames/{id}")]
+    Task<Result> ChangeNames(int id, AccountInputModel input);
     
 }
