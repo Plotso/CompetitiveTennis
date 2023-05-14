@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+
+    data:
+        container_name: postgresql
+        image: postgres:latest
+        ports: 
+            - "5432:5432"
+        restart: always
+        environment:
+          POSTGRES_USER: sa
+          POSTGRES_PASSWORD: Sup3rStrongS3cretPass1111
+        ports:
+          - "5432:5432"
+        volumes:
+          - postgres-data:/var/lib/postgresql/data    
+        networks: 
+            - competitivetennis-network
+
+    identity:
+        container_name: identity
+        build:
+            context: ./Server
+            dockerfile: ./CompetitiveTennis.Identity/Dockerfile
+        ports: 
+            - "5003:80"
+        env_file: Server/CompetitiveTennis/Common.env
+        environment:
+            - ConnectionStrings__DefaultConnection=Server=postgresql;Port=5432;User Id=sa;Password=Sup3rStrongS3cretPass1111;Database=CompetitiveTennisIdentityDatabase;Integrated Security=True
+        restart: on-failure
+        volumes:
+            - ./.aspnet/identity/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+        networks: 
+            - competitivetennis-network
+        depends_on:
+            - data
+            
+    tournaments:
+        container_name: tournaments
+        build:
+            context: ./Server
+            dockerfile: ./CompetitiveTennis.Tournaments/Dockerfile
+        ports: 
+            - "5001:80"
+        env_file: Server/CompetitiveTennis/Common.env
+        environment:
+            - ConnectionStrings__DefaultConnection=Server=postgresql;Port=5432;User Id=sa;Password=Sup3rStrongS3cretPass1111;Database=CompetitiveTennisDatabase;Integrated Security=True
+        restart: on-failure
+        volumes:
+            - ./.aspnet/tournaments/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+        networks: 
+            - competitivetennis-network
+        depends_on:
+            - data
+            
+    tournaments-gateway:
+        container_name: tournaments-gateway
+        build:
+            context: ./Server
+            dockerfile: ./CompetitiveTennis.Tournaments.Gateway/Dockerfile
+        ports: 
+            - "5002:80"
+        env_file: Server/JWTShowcase/Common.env
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Docker
+        restart: on-failure
+        volumes:
+            - ./.aspnet/tournaments/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+        networks: 
+            - competitivetennis-network            
+
+networks:
+    competitivetennis-network:
+
+volumes:
+    postgres-data:
