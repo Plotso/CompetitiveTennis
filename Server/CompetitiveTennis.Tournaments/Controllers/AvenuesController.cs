@@ -71,7 +71,7 @@ public class AvenuesController : ApiController
         => await SafeHandle(async () =>
             {
                 if (!_currentUser.IsAdministrator)
-                    return BadRequest(Result.Failure("Only admins are allowed to update avenues!"));
+                    return Unauthorized(Result.Failure("Only admins are allowed to update avenues!"));
 
                 var isSuccess = await _avenues.Update(id, input, _currentUser.UserId);
                 return isSuccess ? Result.Success : Result.Failure($"Update for avenue {id} failed.");
@@ -86,7 +86,7 @@ public class AvenuesController : ApiController
         => await SafeHandle(async () =>
             {
                 if (!_currentUser.IsAdministrator)
-                    return BadRequest(Result.Failure("Only admins are allowed to delete avenues!"));
+                    return Unauthorized(Result.Failure("Only admins are allowed to delete avenues!"));
 
                 var isSuccess = await _avenues.Delete(id, _currentUser.UserId);
                 return isSuccess ? Result.Success : Result.Failure($"Delete operation for avenue {id} failed.");

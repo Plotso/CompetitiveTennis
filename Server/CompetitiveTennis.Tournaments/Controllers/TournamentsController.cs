@@ -103,7 +103,7 @@ public class TournamentsController : ApiController
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(id) != _currentUser.UserId;
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
-                    return BadRequest(
+                    return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update tournament!"));
 
                 var isSuccess = await _tournaments.Update(id, input);
@@ -119,7 +119,7 @@ public class TournamentsController : ApiController
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(tournamentId) != _currentUser.UserId;
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
-                    return BadRequest(
+                    return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update tournament!"));
 
                 var isSuccess = await _tournaments.ChangeAvenue(tournamentId, tournamentId);
@@ -136,7 +136,7 @@ public class TournamentsController : ApiController
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(id) != _currentUser.UserId;
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
-                    return BadRequest(
+                    return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to delete tournament!"));
 
                 var isSuccess = await _avenues.Delete(id, _currentUser.UserId);
@@ -152,7 +152,7 @@ public class TournamentsController : ApiController
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(input.TournamentId) != _currentUser.UserId;
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
-                    return BadRequest(
+                    return Unauthorized(
                         Result<int>.Failure("Only admins and tournament organiser are allowed to add guests to tournament!"));
                 if (string.IsNullOrWhiteSpace(input.Name))
                     return BadRequest(Result<int>.Failure("Name is mandatory for guest participants"));
@@ -242,7 +242,7 @@ public class TournamentsController : ApiController
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(tournamentId) != _currentUser.UserId;
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
-                    return BadRequest(
+                    return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to add accounts to existing participants!"));
                 if (await _participants.IsParticipantFull(participantId))
                     return BadRequest(
@@ -266,7 +266,7 @@ public class TournamentsController : ApiController
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(tournamentId) != _currentUser.UserId;
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
-                    return BadRequest(
+                    return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to remove accounts to existing participants!"));
 
                 var account = await _accounts.GetInternal(accountId);

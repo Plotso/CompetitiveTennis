@@ -1,3 +1,10 @@
+export interface Result<TData> {
+  isSuccess: boolean;
+  errors: string[];
+  data: TData;
+}
+
+
 /// Auth
 export namespace Auth {
   export interface ChangeNamesInputModel {

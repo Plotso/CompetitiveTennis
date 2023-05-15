@@ -1,5 +1,6 @@
 // @ts-nocheck
 // disabled ts due to issue with POST request when sending useFetch<T> requests https://github.com/nuxt/nuxt/issues/20150
+import {Auth, Result} from 'types'
 
 export const useAuthStore = defineStore("auth", () => {
     const router = useRouter();
@@ -13,7 +14,7 @@ export const useAuthStore = defineStore("auth", () => {
     const user = ref({})
     const token = ref("");
 
-    async function register(userInput:RegisterInputModel)  {
+    async function register(userInput:Auth.RegisterInputModel)  {
       const { data } = await useFetch(() => `/Identity/Register`, {
         baseURL: config.public.authBase,
         method: 'POST',
@@ -28,8 +29,8 @@ export const useAuthStore = defineStore("auth", () => {
       router.push("/")
     }
 
-    async function login(userInput:UserInputModel) {
-      const { data } = await useFetch<UserOutputModel>(() => `/Identity/Login`, {
+    async function login(userInput:Auth.UserInputModel) {
+      const { data } = await useFetch<Auth.UserOutputModel>(() => `/Identity/Login`, {
         baseURL: config.public.authBase,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
