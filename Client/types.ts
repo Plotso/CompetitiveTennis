@@ -48,14 +48,14 @@ export namespace Auth {
 }
 
 /// Tournaments
-export namespace Tournaments {
-  enum TournamentType {
+
+ export enum TournamentType {
     Singles,
     Doubles,
     Teams,
   }
 
-  enum Surface {
+  export enum Surface {
     Other,
     Hard,
     Clay,
@@ -68,20 +68,20 @@ export namespace Tournaments {
     ArtificialGrass,
   }
 
-  enum EventStatus {
+  export enum EventStatus {
     NotStarted,
     InProgress,
     Ended,
   }
 
-  enum MatchOutcome {
+  export enum MatchOutcome {
     Unknown,
     Participant1Won,
     Participant2Won,
     Draw,
   }
 
-  enum TournamentStage {
+  export enum TournamentStage {
     Unknown,
     GroupStage,
     KnockoutStage,
@@ -178,4 +178,5 @@ export namespace Tournaments {
     Participant2Points: string;
     Status: EventStatus;
   }
-}
+
+

@@ -1,8 +1,7 @@
 <template>
-    <nav>
-        <NuxtLink to="/"></NuxtLink>
-    </nav>
+    <Nav></Nav>
     <main>
         <slot />
     </main>
+    <Footer></Footer>
 </template>
