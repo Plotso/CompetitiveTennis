@@ -8,7 +8,7 @@ public interface IIdentityService
 {
     Task<Result<User>> Register(RegisterInputModel registerInput);
 
-    Task<Result<UserOutputModel>> Login(UserInputModel userInputModel);
+    Task<Result<FullUserOutputModel>> Login(UserInputModel userInputModel);
 
     Task<Result> ChangePassword(string userId, ChangePasswordInputModel changePasswordInput);
 

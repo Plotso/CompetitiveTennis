@@ -15,22 +15,22 @@ export const useAuthStore = defineStore("auth", () => {
     const token = ref("");
 
     async function register(userInput:Auth.RegisterInputModel)  {
-      const { data } = await useFetch(() => `/Identity/Register`, {
+      const { data, error, pending } = await useFetch(() => `/Identity/Register`, {
         baseURL: config.public.authBase,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userInput)
       })
 
-      user.value = data.value
-      token.value = data.value.token
+      user.value = data.value.data
+      token.value = data.value.data.token
       localStorage.setItem('token', token.value!)
-      localStorage.setItem('user', JSON.stringify(value.value))
+      localStorage.setItem('user', JSON.stringify(data.value.data))
       router.push("/")
     }
 
     async function login(userInput:Auth.UserInputModel) {
-      const { data } = await useFetch<Auth.UserOutputModel>(() => `/Identity/Login`, {
+      const { data, error, pending } = await useFetch<Result<Auth.UserOutputModel>>(() => `/Identity/Login`, {
         baseURL: config.public.authBase,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -42,10 +42,10 @@ export const useAuthStore = defineStore("auth", () => {
         return;
       }
 
-      user.value = data.value
-      token.value = data.value.token
+      user.value = data.value.data
+      token.value = data.value.data.token
       localStorage.setItem('token', token.value!)
-      localStorage.setItem('user', JSON.stringify(data.value))
+      localStorage.setItem('user', JSON.stringify(data.value.data))
       router.push("/")
     }
 
