@@ -22,6 +22,8 @@
       -->
   </div>
   <NuxtLayout>
+    
+    <SeoKit />
     <NuxtPage/>
 
     TournamentId: {{ tourId }}

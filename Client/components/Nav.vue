@@ -12,15 +12,12 @@
         </a>
       </div>
 
-      <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item">
-            Home
-          </a>
-
-          <a class="navbar-item">
-            Documentation
-          </a>
+          <NuxtLink to="/" class="navbar-item">Home</NuxtLink>          
+          <NuxtLink to="/tournaments" class="navbar-item">Tournaments</NuxtLink>
+          <NuxtLink to="/avenues" class="navbar-item">Avenues</NuxtLink>
+          <NuxtLink to="/about" class="navbar-item">About</NuxtLink>
 
           <div class="navbar-item has-dropdown is-hoverable">
             <a class="navbar-link">
@@ -28,9 +25,7 @@
             </a>
 
             <div class="navbar-dropdown">
-              <a class="navbar-item">
-                About
-              </a>
+              <NuxtLink to="/about" class="navbar-item">About</NuxtLink>
               <a class="navbar-item">
                 Jobs
               </a>

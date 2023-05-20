@@ -1,23 +1,32 @@
 <script setup lang="ts">
-    import {Tournaments, Result} from "types"
-    const route = useRoute();
-    const config = useRuntimeConfig();
-    
-    const {data, error} = await useFetch<Result<Tournaments.TournamentOutputModel>>(() => `/Tournaments/${route.params.id}`,{
-        baseURL: config.public.tournamentsBase
-    })
-    if(error && error.statusCode == 404)
-    {
-        //ToDo: Redirect to NotFound page
-    }
+import {TournamentOutputModel, Result} from "types"
+const route = useRoute();
+const config = useRuntimeConfig();
 
-    function rename(){
-        data.value.data.title += " Gosho";
-    }
+const {data, pending, refresh, error} = await useFetch<Result<TournamentOutputModel>>(() => `/Tournaments/${route.params.id}`,{
+    baseURL: config.public.tournamentsBase
+})
+if(error.value){
+    console.log('data', data.value)
+    console.log('pending', pending.value)
+    console.log('error', error.value)
+    refresh()
+}
+if(error && error.statusCode == 404)
+{
+    //ToDo: Redirect to NotFound page
+}
+
+function rename(){
+    data.value.data.title += " Gosho";
+}
 </script>
 
 <template>
-    <div>
+    <div v-if="pending">
+        <Loading></Loading>
+    </div>
+    <div v-else>
         <!--
         <button @click="rename" class="button"> Add Gosho</button>
         Gosho {{ $route.params }}

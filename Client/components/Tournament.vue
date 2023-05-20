@@ -1,3 +1,26 @@
+<script setup lang="ts">
+import { Surface, TournamentType, Result, TournamentOutputModel } from "@/types"
+const props = defineProps({
+    data: {type: Object as PropType<Result<TournamentOutputModel>>, required: true}
+})
+
+const tData = toRef(props, "data")
+const tournament = ref(tData.value.data)
+//const comp = computed(() => props.data) //Would work the same way as toRef from above
+const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+      };
+
+const startDate = computed(() => new Date(tournament.value.startDate).toLocaleDateString(undefined, options).replace(' at', ''));
+const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateString(undefined, options).replace(' at', ''));
+    
+</script>
+
 <template>
     <div class="container">
 
@@ -42,14 +65,14 @@
         
         <div class="box">
           <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-location-dot" /> Location</h2>
-          <p><strong>{{ tournament.avenue.name }}</strong> - {{ tournament.avenue.location }}</p>
+          <p><strong><NuxtLink :to="`/avenues/${tournament.avenue.id}`">{{ tournament.avenue.name }}</NuxtLink></strong> - {{ tournament.avenue.location }}</p>
           <p>{{ tournament.avenue.city }}, {{ tournament.avenue.country }} </p>
         </div>
         
         <div class="box">
           <h2 class="subtitle has-text-centered">Organizer</h2>
-          <p>{{ tournament.organiser.name }}</p>
-          <p>{{ tournament.organiser.email }}</p>
+          <p>{{ tournament.organiser.firstName }} {{ tournament.organiser.lastName }} ({{tournament.organiser.username}})</p>
+          <p>{{ tournament.organiser.lastName }}</p>
         </div>
       </div>
     </div>
@@ -110,29 +133,6 @@
   </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { Surface, TournamentType, Result, TournamentOutputModel } from "@/types"
-const props = defineProps({
-    data: {type: Object as PropType<Result<TournamentOutputModel>>, required: true}
-})
-
-const tData = toRef(props, "data")
-const tournament = ref(tData.value.data)
-//const comp = computed(() => props.data) //Would work the same way as toRef from above
-const options: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        hour12: false
-      };
-
-const startDate = computed(() => new Date(tournament.value.startDate).toLocaleDateString(undefined, options).replace(' at', ''));
-const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateString(undefined, options).replace(' at', ''));
-    
-</script>
 
 <style scoped>
 .container {

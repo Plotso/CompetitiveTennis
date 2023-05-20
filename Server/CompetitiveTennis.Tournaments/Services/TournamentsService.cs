@@ -39,6 +39,7 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
 
     public async Task<IEnumerable<TournamentOutputModel>> GetAll()
         => _mapper.Map<IEnumerable<TournamentOutputModel>>(await All()
+            .EnrichTournamentQueryData()
             .ToListAsync());
 
     public async Task<TournamentOutputModel> Get(int id)

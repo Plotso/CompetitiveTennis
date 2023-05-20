@@ -87,96 +87,129 @@ export namespace Auth {
     KnockoutStage,
   }
 
+  export enum CourtType {
+    Outdoor,
+    Indoor,
+  }
+
   export interface TournamentOutputModel {
-    Id: number;
-    Title: string;
-    Rules: string;
-    Description: string;
-    Type: TournamentType;
-    Surface: Surface;
-    EntryFee: number | null;
-    Prize: number | null;
-    CourtsAvailable: number;
-    MinParticipants: number;
-    MaxParticipants: number;
-    MatchWonPoints: number | null;
-    SetWonPoints: number | null;
-    GameWonPoints: number | null;
-    StartDate: Date;
-    EndDate: Date;
-    CreatedOn: Date;
-    ModifiedOn: Date;
-    Avenue: AvenueShortOutputModel;
-    Organiser: AccountOutputModel;
-    Participants: ParticipantShortOutputModel[];
-    Matches: MatchOutputModel[];
+    id: number;
+    title: string;
+    rules: string;
+    description: string;
+    type: TournamentType;
+    surface: Surface;
+    entryFee: number | null;
+    prize: number | null;
+    courtsAvailable: number;
+    minParticipants: number;
+    maxParticipants: number;
+    matchWonPoints: number | null;
+    setWonPoints: number | null;
+    gameWonPoints: number | null;
+    startDate: Date;
+    endDate: Date;
+    createdOn: Date;
+    modifiedOn: Date;
+    avenue: AvenueShortOutputModel;
+    organiser: AccountOutputModel;
+    participants: ParticipantShortOutputModel[];
+    matches: MatchOutputModel[];
   }
-
   export interface AvenueShortOutputModel {
-    Id: number;
-    Name: string;
-    Location: string;
-    City: string;
-    Country: string;
-    Details: string;
-    IsVerified: boolean;
-    IsActive: boolean;
+    id: number;
+    name: string;
+    location: string;
+    city: string;
+    country: string;
+    details: string;
+    isVerified: boolean;
+    isActive: boolean;
   }
-
+  
   export interface AccountOutputModel {
-    Id: number;
-    Username: string;
-    FirstName: string;
-    LastName: string;
-    PlayerRating: number;
-    Participations: ParticipantShortOutputModel[];
-    OrganisedTournaments: TournamentShortInfoOutput[];
+    id: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+    playerRating: number;
+    participations: ParticipantShortOutputModel[];
+    organisedTournaments: TournamentShortInfoOutput[];
   }
-
+  
   export interface ParticipantShortOutputModel {
-    Id: number;
-    Name: string | null;
-    Points: number | null;
-    IsGuest: boolean;
-    Players: AccountShortOutputModel[];
+    id: number;
+    name: string | null;
+    points: number | null;
+    isGuest: boolean;
+    players: AccountShortOutputModel[];
   }
-
+  
   export interface TournamentShortInfoOutput {
-    Id: number;
-    Title: string;
+    id: number;
+    title: string;
   }
-
+  
   export interface AccountShortOutputModel {
-    Id: number;
-    Username: string;
-    FirstName: string;
-    LastName: string;
-    PlayerRating: number;
+    id: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+    playerRating: number;
   }
-
+  
   export interface MatchOutputModel {
-    Id: number;
-    StartDate: Date;
-    EndDate: Date;
-    Participant1Id: number;
-    MatchWonPoints: number | null;
-    SetWonPoints: number | null;
-    GameWonPoints: number | null;
-    Stage: TournamentStage;
-    Details: string | null;
-    Status: EventStatus;
-    Outcome: MatchOutcome;
-    Scores: ScoreShortOutputModel[];
-    Participants: ParticipantShortOutputModel[];
+    id: number;
+    startDate: Date;
+    endDate: Date;
+    participant1Id: number;
+    matchWonPoints: number | null;
+    setWonPoints: number | null;
+    gameWonPoints: number | null;
+    stage: TournamentStage;
+    details: string | null;
+    status: EventStatus;
+    outcome: MatchOutcome;
+    scores: ScoreShortOutputModel[];
+    participants: ParticipantShortOutputModel[];
+  }
+  
+  export interface ScoreShortOutputModel {
+    id: number;
+    set: number;
+    game: number;
+    participant1Points: string;
+    participant2Points: string;
+    status: EventStatus;
   }
 
-  export interface ScoreShortOutputModel {
-    Id: number;
-    Set: number;
-    Game: number;
-    Participant1Points: string;
-    Participant2Points: string;
-    Status: EventStatus;
+  export interface CourtsInfo {
+    surface: Surface;
+    availableCourtsByType: { [key in CourtType]: number };
+  }
+  
+  export interface TournamentShortInfoOutput {
+    id: number;
+    title: string;
+    type: TournamentType;
+    surface: Surface;
+    entryFee: number | null;
+    prize: number | null;
+    startDate: Date;
+    endDate: Date;
+  }
+  
+  export interface AvenueOutputModel {
+    id: number;
+    name: string;
+    location: string;
+    city: string;
+    country: string;
+    details: string;
+    isVerified: boolean;
+    isActive: boolean;
+    courts: CourtsInfo[];
+    tournaments: TournamentShortInfoOutput[];
   }
 
 
