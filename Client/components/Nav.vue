@@ -1,3 +1,18 @@
+<script setup lang="ts">
+import {useAuthStore} from "../stores/auth"
+const authStore = useAuthStore();
+
+const isActive = ref(false);
+
+function toggle() {
+  isActive.value = !isActive.value
+}
+
+function classData(classInfo: string): string {
+  return isActive ? `${classInfo} is-active` : classInfo
+}
+</script>
+
 <template>
   <div>
     <nav class="navbar" role="navigation" aria-label="main navigation">
@@ -42,7 +57,13 @@
 
         <div class="navbar-end">
           <div class="navbar-item">
-            <div class="buttons">
+            <h1 class="welcome-msg">Welcome, <NuxtLink :to="`/users/user/${authStore.user.username}`">{{ authStore.user.username }}</NuxtLink>!</h1>
+            <div class="buttons" v-if="authStore.user.username">
+              <a class="button is-light" @click="authStore.logout">
+                Logout
+              </a>
+            </div>
+            <div class="buttons" v-else>
               <a class="button is-primary">
                 <strong>Sign up</strong>
               </a>
@@ -57,17 +78,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
-
-const isActive = ref(false);
-
-function toggle() {
-  isActive.value = !isActive.value
+<style scoped>
+.welcome-msg {
+  padding-right: 5px;
 }
-
-function classData(classInfo: string): string {
-  return isActive ? `${classInfo} is-active` : classInfo
-}
-</script>
-
-<style scoped></style>
+</style>

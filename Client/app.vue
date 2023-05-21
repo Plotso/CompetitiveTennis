@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {useAuthStore} from "@/stores/auth"
   const authStore = useAuthStore();
-  onMounted(() => {
+  onBeforeMount(() => {
     if(!authStore.user.username)
       authStore.loadFromStorage();
   })
@@ -33,6 +33,7 @@
         <NuxtLink to="/tournaments">Tournaments</NuxtLink> | 
         <NuxtLink :to="'tournaments'">TournamentsName</NuxtLink> | 
         <NuxtLink :to="{name: 'tournaments'}">TournamentsNameBr</NuxtLink> | 
-        <NuxtLink :to="`/tournaments/${tourId}`">Tournaments {{tourId}}</NuxtLink>
+        <NuxtLink :to="`/tournaments/${tourId}`">Tournaments {{tourId}}</NuxtLink> |
+        <NuxtLink :to="`/tournaments/create`">Create Tournament</NuxtLink>
   </NuxtLayout>
 </template>

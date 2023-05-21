@@ -34,6 +34,15 @@ public class AccountsService : DataService<Account>, IAccountsService
             .ProjectToType<AccountOutputModel>()
             .SingleOrDefaultAsync();
 
+    public async Task<AccountOutputModel> GetByUsernamme(string username)
+        => await All()
+            .Where(a => a.Username == username)
+            .Include(a => a.Participations)
+            .ThenInclude(p => p.Participant)
+            .Include(a => a.OrganisedTournaments)
+            .ProjectToType<AccountOutputModel>()
+            .SingleOrDefaultAsync();
+
     /// <summary>
     /// Retrieve PlayerRating for given account if there is such for current user
     /// </summary>

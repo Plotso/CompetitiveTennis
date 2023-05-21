@@ -11,6 +11,7 @@ public interface IAccountsService : IDataService<Account>
 {
     Task<IEnumerable<AccountOutputModel>> GetAll();
     Task<AccountOutputModel> GetById(int id);
+    Task<AccountOutputModel> GetByUsernamme(string username);
     Task<IEnumerable<Account>> GetMultiple(IEnumerable<int> ids);
     Task<Account?> GetByUserId(string userId);
     Task<Account?> GetInternal(int id);

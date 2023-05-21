@@ -38,6 +38,19 @@ public class AccountsController : BaseGatewayController
                 var account = await _accounts.ById(id);
                 return Ok(account);
             }, $"An error occured during GET request for account: {id}");
+    
+    [HttpGet]
+    [Route("{username}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountOutputModel))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ByUsername(string username) 
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var account = await _accounts.ByUsername(username);
+                return Ok(account);
+            }, $"An error occured during GET request for account: {username}");
 
     [HttpPost]
     [Authorize]

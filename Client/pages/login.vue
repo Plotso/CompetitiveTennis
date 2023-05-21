@@ -1,11 +1,19 @@
 <script setup lang="ts">
+import {useAuthStore} from "@/stores/auth"
+import { storeToRefs } from 'pinia'
 definePageMeta({
     layout: 'authentication',    
     middleware: ['login']
 })
-
-import {useAuthStore} from "@/stores/auth"
 const authStore = useAuthStore();
+
+const router = useRouter();
+onMounted(() =>{
+    const { user } = storeToRefs(authStore);
+    if(user.value.username){
+        router.push('/')
+    }
+} )
 
 const user = ref({
       loginInfo: '',

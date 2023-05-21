@@ -40,6 +40,18 @@ public class AccountsController : ApiController
                 return Ok(Result<AccountOutputModel>.SuccessWith(account));
             },
             msgOnError: $"An error occured during GET request for account: {id}");
+    
+    [HttpGet]
+    [Route("{username}")]
+    public async Task<ActionResult<Result<AccountOutputModel>>> ByUsername(string username) 
+        => await SafeHandle(async () =>
+            {
+                var account = await _accounts.GetByUsernamme(username);
+                if (account == null)
+                    return NotFound(Result<AccountOutputModel>.Failure($"Account {username} is missing"));
+                return Ok(Result<AccountOutputModel>.SuccessWith(account));
+            },
+            msgOnError: $"An error occured during GET request for account: {username}");
 
     [HttpPost]
     [Authorize]
