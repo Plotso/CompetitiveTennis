@@ -55,6 +55,7 @@ public class AccountsController : ApiController
 
     [HttpPost]
     [Authorize]
+    [Route(nameof(Add))]
     public async Task<ActionResult> Add(AccountInputModel input)
         => await SafeHandle(async () =>
             {

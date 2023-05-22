@@ -22,11 +22,21 @@ export const useAuthStore = defineStore("auth", () => {
         body: JSON.stringify(userInput)
       })
 
-      user.value = data.value.data
-      token.value = data.value.data.token
-      localStorage.setItem('token', token.value!)
-      localStorage.setItem('user', JSON.stringify(data.value.data))
-      router.push("/")
+      if(!error.value){
+        user.value = data.value.data
+        token.value = data.value.data.token
+        localStorage.setItem('token', token.value!)
+        localStorage.setItem('user', JSON.stringify(data.value.data))
+
+        const addAcc = {'firstName': data.value.data.firstName, 'lastName': data.value.data.lastName}
+        const accCreate = await useFetch(() => `/Accounts/Add`, {
+          baseURL: config.public.tournamentsBase,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token.value}` },
+          body: JSON.stringify(addAcc)
+        })
+        router.push("/")
+      }      
     }
 
     async function login(userInput:Auth.UserInputModel) {

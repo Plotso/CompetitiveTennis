@@ -63,11 +63,11 @@ const getCourtImg = (surface: Surface): striing => {
                                 width="75" height="75">
                         </td>
                         <td>
-                            <NuxtLink :to="`/tournaments/${tournament.id}`" class="has-text-weight-semibold">{{
+                            <NuxtLink :to="`/tournaments/${tournament.id}`" class="custom-link has-text-weight-semibold">{{
                                 tournament.title }}</NuxtLink>
 
                             <p class="mb-1">
-                                <NuxtLink :to="`avenues/${tournament.avenue.id}`">
+                                <NuxtLink :to="`avenues/${tournament.avenue.id}`" class="custom-link">
                                     {{ tournament.avenue.name }}, {{ tournament.avenue.city }}
                                 </NuxtLink>
                             </p>
@@ -263,4 +263,5 @@ const getCourtImg = (surface: Surface): striing => {
 .custom-box {
     background-color: rgb(248, 248, 235);
 }
+
 </style>

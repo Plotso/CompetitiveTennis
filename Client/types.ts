@@ -212,4 +212,26 @@ export namespace Auth {
     tournaments: TournamentShortInfoOutput[];
   }
 
+  export interface TournamentInputModel {
+    title: string;
+    rules: string;
+    description: string;
+    type: TournamentType;
+    surface: Surface;
+    entryFee?: number | null;
+    prize?: number | null;
+    courtsAvailable: number;
+    minParticipants: number;
+    maxParticipants: number;
+    matchWonPoints?: number | null;
+    setWonPoints?: number | null;
+    gameWonPoints?: number | null;
+    isIndoor: boolean;
+    isLeague: boolean;
+    startDate: Date;
+    endDate: Date;
+    avenueId: number;
+  }
+  
+
 

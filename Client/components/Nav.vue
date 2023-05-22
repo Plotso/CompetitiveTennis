@@ -57,7 +57,7 @@ function classData(classInfo: string): string {
 
         <div class="navbar-end">
           <div class="navbar-item">
-            <h1 class="welcome-msg">Welcome, <NuxtLink :to="`/users/user/${authStore.user.username}`">{{ authStore.user.username }}</NuxtLink>!</h1>
+            <h1 class="welcome-msg" v-if="authStore.user.username">Welcome, <NuxtLink :to="`/users/user/${authStore.user.username}`" >{{ authStore.user.username }}</NuxtLink>!</h1>
             <div class="buttons" v-if="authStore.user.username">
               <a class="button is-light" @click="authStore.logout">
                 Logout
@@ -65,10 +65,10 @@ function classData(classInfo: string): string {
             </div>
             <div class="buttons" v-else>
               <a class="button is-primary">
-                <strong>Sign up</strong>
+                <strong><NuxtLink to="/register" class="button-link">Sign up</NuxtLink></strong>
               </a>
               <a class="button is-light">
-                Log in
+                <NuxtLink to="/login" class="button-link-dark">Log in</NuxtLink>
               </a>
             </div>
           </div>
@@ -81,5 +81,13 @@ function classData(classInfo: string): string {
 <style scoped>
 .welcome-msg {
   padding-right: 5px;
+}
+
+.button-link {
+  color: aliceblue;
+}
+
+.button-link-dark {
+  color: black;
 }
 </style>

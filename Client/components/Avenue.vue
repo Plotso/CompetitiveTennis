@@ -77,7 +77,7 @@ const formatDate = (date: Date): string => {
         </thead>
         <tbody>
           <tr v-for="tournament in avenue.tournaments" :key="tournament.id">
-            <td><NuxtLink :to="`/tournaments/${tournament.id}`">{{ tournament.title }}</NuxtLink></td>
+            <td><NuxtLink class="custom-link" :to="`/tournaments/${tournament.id}`">{{ tournament.title }}</NuxtLink></td>
             <td>{{ getTournamentType(tournament.type) }}</td>
             <td>{{ getSurfaceLabel(tournament.surface) }}</td>
             <td>{{ tournament.entryFee ? `$${tournament.entryFee}` : 'N/A' }}</td>

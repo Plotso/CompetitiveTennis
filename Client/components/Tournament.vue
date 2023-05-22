@@ -65,7 +65,7 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
         
         <div class="box">
           <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-location-dot" /> Location</h2>
-          <p><strong><NuxtLink :to="`/avenues/${tournament.avenue.id}`">{{ tournament.avenue.name }}</NuxtLink></strong> - {{ tournament.avenue.location }}</p>
+          <p><strong><NuxtLink class="custom-link" :to="`/avenues/${tournament.avenue.id}`">{{ tournament.avenue.name }}</NuxtLink></strong> - {{ tournament.avenue.location }}</p>
           <p>{{ tournament.avenue.city }}, {{ tournament.avenue.country }} </p>
         </div>
         

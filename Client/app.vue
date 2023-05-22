@@ -37,3 +37,15 @@
         <NuxtLink :to="`/tournaments/create`">Create Tournament</NuxtLink>
   </NuxtLayout>
 </template>
+
+<style>
+@media (min-width: 769px) {
+  .is-hidden-desktop {
+    display: none;
+  }
+}
+  
+.custom-link {
+    color: green;
+}
+</style>

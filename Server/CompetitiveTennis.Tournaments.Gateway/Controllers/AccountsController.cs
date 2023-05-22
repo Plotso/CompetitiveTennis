@@ -54,6 +54,7 @@ public class AccountsController : BaseGatewayController
 
     [HttpPost]
     [Authorize]
+    [Route(nameof(Add))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Add(AccountInputModel input)

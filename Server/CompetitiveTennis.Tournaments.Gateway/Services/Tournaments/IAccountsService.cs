@@ -15,7 +15,7 @@ public interface IAccountsService
     [Get("/Accounts/{username}")]
     Task<Result<AccountOutputModel>> ByUsername(string username);
 
-    [Post("/Accounts")]
+    [Post("/Accounts/Add")]
     Task<Result> Add(AccountInputModel input);
     
     [Put("/Accounts/ChangeNames/{id}")]
