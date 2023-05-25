@@ -372,3 +372,4 @@ pnpm-debug.log*
 
 .DS_Store
 /dist
+.aspnet/*/DataProtection-Keys/*
