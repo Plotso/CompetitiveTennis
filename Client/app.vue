@@ -26,6 +26,7 @@
     <SeoKit />
     <NuxtPage/>
 
+    <!--
     TournamentId: {{ tourId }}
     <button @click="tourId++">+</button>
     <button @click="tourId--">-</button>
@@ -35,6 +36,7 @@
         <NuxtLink :to="{name: 'tournaments'}">TournamentsNameBr</NuxtLink> | 
         <NuxtLink :to="`/tournaments/${tourId}`">Tournaments {{tourId}}</NuxtLink> |
         <NuxtLink :to="`/tournaments/create`">Create Tournament</NuxtLink>
+        -->
   </NuxtLayout>
 </template>
 
