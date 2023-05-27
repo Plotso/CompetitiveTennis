@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { AvenueOutputModel, Result, Surface, CourtsInfo, CourtType} from '@/types';
+import { useAuthStore } from '@/stores/auth'
 const config = useRuntimeConfig();
+const authStore = useAuthStore();
 
 const { data, pending, refresh, error } = await useFetch<Result<AvenueOutputModel[]>>(() => `/Avenues/All`, {
     baseURL: config.public.tournamentsBase
@@ -13,7 +15,7 @@ if (error.value) {
 }
 
 const getSurfaceLabel = (surface: Surface): string => {
-    return Surface[surface];
+    return Number.isInteger(surface) ? Surface[surface] : surface.toString();
 };
 
 const getDistinctCourtTypes = (avenue: AvenueOutputModel): CourtType[] => {
@@ -36,6 +38,13 @@ const getDistinctCourtTypes = (avenue: AvenueOutputModel): CourtType[] => {
     </div>
     <div class="container" v-else>
         <h1 class="title is-1 has-text-centered">All Avenues</h1>
+        <div>
+            <hr>
+            <div v-if="authStore.user.username" class="buttons is-centered">
+                <NuxtLink to="/avenues/create" class="button is-primary">Create Avenue</NuxtLink>
+            </div>
+            <hr>
+        </div>
         <div class="table-container">
             <table class="table is-striped is-fullwidth">
                 <tbody>

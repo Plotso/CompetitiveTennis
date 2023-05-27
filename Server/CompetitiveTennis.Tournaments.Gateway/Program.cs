@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using CompetitiveTennis.Extensions;
 using CompetitiveTennis.Middlewares;
 using CompetitiveTennis.Services;
@@ -17,7 +18,12 @@ builder.Services
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
-    .AddControllers();
+    .AddControllers()
+    .AddJsonOptions(x =>
+    {
+        // serialize enums as strings in api responses (e.g. Role)
+        x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 var serviceEndpoints = builder.Configuration
     .GetSection(nameof(ServiceEndpoints))

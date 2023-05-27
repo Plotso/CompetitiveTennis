@@ -1,10 +1,13 @@
 <script setup lang="ts">
 //import { TournamentInputModel } from 'types'
 import { AvenueOutputModel, TournamentInputModel, Surface, TournamentType } from '@/types';
+import {useAuthStore} from "~/stores/auth"
 definePageMeta({
   'auth': true
 })
 const config = useRuntimeConfig();
+const router = useRouter();
+const authStore = useAuthStore();
 
 const { data, pending, refresh, error } = await useFetch<Result<AvenueOutputModel[]>>(() => `/Avenues/All`, {
   baseURL: config.public.tournamentsBase
@@ -15,16 +18,6 @@ if (error.value) {
   console.log('error', error.value)
   refresh()
 }
-
-/*
-interface TournamentInputModel {
-  title: string;
-  rules: string;
-  description: string;
-  avenueIId: number;
-  // Rest of the properties
-}
-*/
 const showCashPrize = ref(false);
 const showPoints = ref(false);
 const form = ref<TournamentInputModel>({
@@ -48,21 +41,34 @@ const form = ref<TournamentInputModel>({
   avenueId: 200
 })
 
-/*
-const form = ref({
-  title: "",
-  avenueId: 5
-  // Initialize other properties
-})
-*/
-const createTournament = () => {
-  // Implement the logic to send the form data to the API for tournament creation
-  console.log(form.value)
-}
+const createTournament = async () => {
+  try {
+    const response = await fetch(`${config.public.tournamentsBase}/Tournaments/Add`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify(form.value),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const tournamentId = data.data;
+
+      router.push(`/tournaments/${tournamentId}`);
+    } else {
+      // Handle the error case
+      console.error(`Failed to create tournament. Status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('An error occurred while creating the tournament', error);
+  }
+};
 
 // Check the value of data
-console.log('data', data.value)
-console.log('data.data', data.value.data)
+//console.log('data', data.value)
+//console.log('data.data', data.value.data)
 
 /*
 const avenuesLoaded = ref(false)
@@ -102,6 +108,26 @@ const openGoogleMaps = () => {
 const updateSelectedAvenue = () => {
   //const selectedId = form.value.avenueId;
   //selectedAvenue.value = data.value.data.find((avenue) => avenue.id === selectedId);
+};
+
+const confirmCancel = () => {
+  if (window.confirm("Are you sure you want to cancel?")) {
+    router.push("/tournaments");
+  }
+};
+
+const isConfirmationModalOpen = ref(false);
+
+const openConfirmationModal = () => {
+  isConfirmationModalOpen.value = true;
+};
+
+const closeConfirmationModal = () => {
+  isConfirmationModalOpen.value = false;
+};
+
+const cancel = () => {
+  router.push("/tournaments");
 };
 </script>
 
@@ -144,11 +170,9 @@ const updateSelectedAvenue = () => {
         <div class="control">
           <div class="select is-fullwidth">
             <select v-model="form.surface" required>
-              <option value="">Select Surface</option>
-              <option value="Hard">Hard</option>
-              <option value="Clay">Clay</option>
-              <option value="Grass">Grass</option>
-              <option value="Carpet">Carpet</option>
+                  <option v-for="surface in Object.values(Surface).filter(el => typeof(el) === 'string')" :value="surface" :key="surface">
+                    {{ surface }}
+                  </option>
             </select>
           </div>
         </div>
@@ -282,10 +306,19 @@ const updateSelectedAvenue = () => {
 
       </div>
       <div class="field">
-        <div class="control">
-          <button class="button is-primary" type="submit">Create</button>
+        <div class="control buttons is-centered">
+          <button class="button is-primary " type="submit">Create</button>
+          <button class="button " @click="openConfirmationModal">Cancel</button>
         </div>
       </div>
+
+      <ConfirmationModal
+      :isOpen="isConfirmationModalOpen"
+      title="Confirmation"
+      message="Are you sure you want to cancel tournament creation?"
+      @confirm="cancel"
+      @close="closeConfirmationModal"
+    />
     </form>
   </div>
 </template>

@@ -9,11 +9,11 @@ const avenueData = toRef(props, "data")
 const avenue = ref(avenueData.value.data)
 
 const getSurfaceLabel = (surface: Surface): string => {
-  return Surface[surface];
+  return Number.isInteger(surface) ? Surface[surface] : surface.toString();
 };
 
 const getTournamentType = (type: TournamentType): string => {
-  return TournamentType[type];
+  return Number.isInteger(type) ? TournamentType[type] : type.toString();
 };
 
 const formatDate = (date: Date): string => {

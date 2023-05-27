@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { TournamentOutputModel, Result, TournamentType, Surface } from '@/types'; // Update the path as per your project setup
+import { useAuthStore } from '@/stores/auth'
 const route = useRoute();
 const config = useRuntimeConfig();
+const authStore = useAuthStore();
 
 const clayImg = ref('https://www.publicdomainpictures.net/pictures/400000/nahled/clay-tennis-court-with-balls.jpg')
 
@@ -21,11 +23,11 @@ if (data?.value?.data) {
 }
 
 const getTournamentTypeLabel = (type: TournamentType): string => {
-    return TournamentType[type];
+    return Number.isInteger(type) ? TournamentType[type] : type.toString();
 };
 
 const getSurfaceLabel = (surface: Surface): string => {
-    return Surface[surface];
+    return  Number.isInteger(surface) ? Surface[surface] : surface.toString();
 };
 
 const formatDate = (date: Date): string => {
@@ -37,7 +39,7 @@ const formatDate = (date: Date): string => {
     return new Date(date).toLocaleDateString(undefined, options);
 };
 
-const getCourtImg = (surface: Surface): striing => {
+const getCourtImg = (surface: Surface): string => {
     console.log(surface)
     if (surface === Surface.Clay)
         return clayImg.value;
@@ -53,6 +55,13 @@ const getCourtImg = (surface: Surface): striing => {
 
     <div class="container" v-else>
         <h1 class="title is-1 has-text-centered">All Tournaments</h1>
+        <div>
+            <hr>
+            <div v-if="authStore.user.username" class="buttons is-centered">
+                <NuxtLink to="/tournaments/create" class="button is-primary">Create Tournament</NuxtLink>
+            </div>
+            <hr>
+        </div>
         <div class="table-container">
             <table class="table is-striped is-fullwidth">
                 <tbody>
@@ -111,6 +120,7 @@ const getCourtImg = (surface: Surface): striing => {
         </div>
     </div>
 
+    <!--
     <div class="container" v-if="!pending">
         <h1 class="title is-1 has-text-centered">All Tournaments</h1>
         <div class="box">
@@ -147,7 +157,6 @@ const getCourtImg = (surface: Surface): striing => {
             </div>
         </div>
     </div>
-
     <div class="container" v-if="!pending">
         <h1 class="title">All Tournaments</h1>
         <div class="columns is-multiline">
@@ -155,7 +164,6 @@ const getCourtImg = (surface: Surface): striing => {
                 <div class="card">
                     <div class="card-image">
                         <figure class="image is-4by3 backwards">
-                            <!-- Replace with tournament image -->
                             <img src="https://placekitten.com/800/600" alt="Tournament Image">
                         </figure>
                     </div>
@@ -216,7 +224,11 @@ const getCourtImg = (surface: Surface): striing => {
                 </tbody>
             </table>
         </div>
+        
     </div>
+-->
+
+    
 </template>
 
 <style scoped>

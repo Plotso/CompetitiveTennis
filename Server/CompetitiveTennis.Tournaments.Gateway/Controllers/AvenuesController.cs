@@ -52,6 +52,7 @@ public class AvenuesController : BaseGatewayController
             }, $"An error occured during avenues search with query: {query}");
     
     [HttpPost]
+    [Route(nameof(Add))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<int>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

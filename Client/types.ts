@@ -232,6 +232,16 @@ export namespace Auth {
     endDate: Date;
     avenueId: number;
   }
+
+  export interface AvenueInputModel {
+    name: string;
+    location: string;
+    city: string;
+    country: string;
+    details: string;
+    courts: CourtsInfo[];
+  }
+  
   
 
 
