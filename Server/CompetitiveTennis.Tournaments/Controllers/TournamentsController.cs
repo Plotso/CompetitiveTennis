@@ -102,7 +102,7 @@ public class TournamentsController : ApiController
         => await SafeHandle(async () =>
             {
                 var isCurrentUserOrganiser = await IsCurrentUserOrganiser(id);
-                if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update tournament!"));
 
@@ -118,7 +118,7 @@ public class TournamentsController : ApiController
         => await SafeHandle(async () =>
             {
                 var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId);
-                if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update tournament!"));
 
@@ -136,7 +136,7 @@ public class TournamentsController : ApiController
         => await SafeHandle(async () =>
             {
                 var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(id) != _currentUser.UserId;
-                if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to delete tournament!"));
 
@@ -152,7 +152,7 @@ public class TournamentsController : ApiController
         => await SafeHandle(async () =>
             {
                 var isCurrentUserOrganiser = await IsCurrentUserOrganiser(input.TournamentId);
-                if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result<int>.Failure("Only admins and tournament organiser are allowed to add guests to tournament!"));
                 if (string.IsNullOrWhiteSpace(input.Name))
@@ -242,7 +242,7 @@ public class TournamentsController : ApiController
         => await SafeHandle(async () =>
             {
                 var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId);
-                if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to add accounts to existing participants!"));
                 if (await _participants.IsParticipantFull(participantId))
@@ -266,7 +266,7 @@ public class TournamentsController : ApiController
         => await SafeHandle(async () =>
             {
                 var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId);
-                if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to remove accounts to existing participants!"));
 
@@ -293,7 +293,7 @@ public class TournamentsController : ApiController
                     return BadRequest(Result.Failure("Participant with existing matches cannot be removed from a tournament"));
                 var isCurrentUserParticipant = participant.Players.Any(p => p.Account.UserId == _currentUser.UserId);
                 var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId);
-                if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser || !isCurrentUserParticipant)
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser && !isCurrentUserParticipant)
                     return BadRequest(
                         Result.Failure("Only admins, tournament organiser and participant accounts are allowed to remove participant from existing competition!"));
 

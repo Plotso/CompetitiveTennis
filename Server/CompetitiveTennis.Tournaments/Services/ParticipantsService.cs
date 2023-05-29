@@ -18,7 +18,10 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
     }
 
     public async Task<Participant?> GetInternal(int id)
-        => await All().FirstOrDefaultAsync(p => p.Id == id);
+        => await All()
+            .Include(p=> p.Players)
+            .ThenInclude(p => p.Account)
+            .FirstOrDefaultAsync(p => p.Id == id);
 
     public async Task<bool> IsParticipantFull(int id)
     {

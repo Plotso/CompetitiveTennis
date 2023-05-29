@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Surface, TournamentType, Result, TournamentOutputModel } from "@/types"
+import {useAuthStore} from "~/stores/auth"
 const props = defineProps({
     data: {type: Object as PropType<Result<TournamentOutputModel>>, required: true}
 })
+const authStore = useAuthStore();
 
 const tData = toRef(props, "data")
 const tournament = ref(tData.value.data)
@@ -18,6 +20,7 @@ const options: Intl.DateTimeFormatOptions = {
 
 const startDate = computed(() => new Date(tournament.value.startDate).toLocaleDateString(undefined, options).replace(' at', ''));
 const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateString(undefined, options).replace(' at', ''));
+
     
 </script>
 
@@ -25,8 +28,11 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
     <div class="container">
 
         <div class="container">
-    <h1 class="title is-1 has-text-centered">{{ tournament.title }}</h1>
+    <h1 class="title is-1 has-text-centered">{{ tournament.title }} 
+      <NuxtLink :to="`/tournaments/edit/${tournament.id}`" v-if="authStore.user && (authStore.user.username == tournament.organiser.username || authStore.user.hasAdministrativeRights)"><font-awesome-icon icon="fa-solid fa-pen-to-square" /></NuxtLink></h1>
     <h4 class="subtitle has-text-centered">{{ tournament.avenue.name }}, {{ tournament.avenue.city }}</h4>
+
+    
     
     <div class="columns">
       <div class="column is-half">
