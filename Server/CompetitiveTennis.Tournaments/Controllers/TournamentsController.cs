@@ -101,7 +101,7 @@ public class TournamentsController : ApiController
     public async Task<ActionResult> Edit(int id, TournamentInputModel input)
         => await SafeHandle(async () =>
             {
-                var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(id) != _currentUser.UserId;
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(id);
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update tournament!"));
@@ -117,7 +117,7 @@ public class TournamentsController : ApiController
     public async Task<ActionResult> ChangeAvenue(int tournamentId, int newAvenueId)
         => await SafeHandle(async () =>
             {
-                var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(tournamentId) != _currentUser.UserId;
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId);
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update tournament!"));
@@ -127,6 +127,7 @@ public class TournamentsController : ApiController
             },
             msgOnError: $"Unexpected error during tournament avenue update. TournamentId: {tournamentId}. NewAvenueId: {newAvenueId}",
             msgOnNotFound: $"{nameof(ChangeAvenue)} failed due to missing avenue with id {newAvenueId}");
+
 
     [HttpDelete]
     [Route(Id)]
@@ -150,7 +151,7 @@ public class TournamentsController : ApiController
     public async Task<ActionResult<Result<int>>> AddGuest(ParticipantInputModel input)
         => await SafeHandle(async () =>
             {
-                var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(input.TournamentId) != _currentUser.UserId;
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(input.TournamentId);
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result<int>.Failure("Only admins and tournament organiser are allowed to add guests to tournament!"));
@@ -240,7 +241,7 @@ public class TournamentsController : ApiController
     public async Task<ActionResult<Result>> AddAccountToParticipant(int tournamentId, int participantId, int accountId)
         => await SafeHandle(async () =>
             {
-                var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(tournamentId) != _currentUser.UserId;
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId);
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to add accounts to existing participants!"));
@@ -264,7 +265,7 @@ public class TournamentsController : ApiController
     public async Task<ActionResult<Result>> RemoveAccountFromParticipant(int tournamentId, int participantId, int accountId)
         => await SafeHandle(async () =>
             {
-                var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(tournamentId) != _currentUser.UserId;
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId);
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to remove accounts to existing participants!"));
@@ -291,7 +292,7 @@ public class TournamentsController : ApiController
                 if (participant.TournamentId == tournamentId && participant.Matches.Any())
                     return BadRequest(Result.Failure("Participant with existing matches cannot be removed from a tournament"));
                 var isCurrentUserParticipant = participant.Players.Any(p => p.Account.UserId == _currentUser.UserId);
-                var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(tournamentId) != _currentUser.UserId;
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId);
                 if (!_currentUser.IsAdministrator || !isCurrentUserOrganiser || !isCurrentUserParticipant)
                     return BadRequest(
                         Result.Failure("Only admins, tournament organiser and participant accounts are allowed to remove participant from existing competition!"));
@@ -300,5 +301,9 @@ public class TournamentsController : ApiController
                 return isSuccess ? Result.Success : Result.Failure($"Failed to remove participant {participantId} from tournament {tournamentId}");
             },
             msgOnError: $"Unexpected error during participant removal from tournament. ParticipantId: {participantId}. TournamentId: {tournamentId}");
+    
+    
+    private async Task<bool> IsCurrentUserOrganiser(int tournamentId) 
+        => await _tournaments.GetOrganiserUserId(tournamentId) == _currentUser.UserId;
 
 }

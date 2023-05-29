@@ -52,7 +52,11 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         => await All().Where(a => a.Id == id).SingleOrDefaultAsync();
 
     public async Task<string> GetOrganiserUserId(int id)
-        => await All().Where(a => a.Id == id).Select(t => t.Organiser.UserId).SingleOrDefaultAsync();
+        => await All()
+            .Where(a => a.Id == id)
+            .Include(a => a.Organiser)
+            .Select(t => t.Organiser.UserId)
+            .SingleOrDefaultAsync();
 
     public async Task<IEnumerable<TournamentOutputModel>> Query(TournamentQuery query)
         => _mapper.Map<IEnumerable<TournamentOutputModel>>(await GetTournamentsQuery(query)
