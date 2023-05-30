@@ -36,6 +36,12 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
     
     <div class="columns">
       <div class="column is-half">
+        
+        <div class="box">
+          <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-calendar-days" /> Dates</h2>
+          <p><strong>Start Date:</strong> {{ startDate }}</p>
+          <p><strong>End Date:</strong> {{ endDate }}</p>
+        </div>
         <div class="box">
           <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-message" /> Description</h2>
           <p>{{ tournament.description }}</p>
@@ -44,12 +50,6 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
         <div class="box">
           <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-circle-exclamation" /> Rules</h2>
           <p>{{ tournament.rules }}</p>
-        </div>
-        
-        <div class="box">
-          <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-calendar-days" /> Dates</h2>
-          <p><strong>Start Date:</strong> {{ startDate }}</p>
-          <p><strong>End Date:</strong> {{ endDate }}</p>
         </div>
       </div>
       

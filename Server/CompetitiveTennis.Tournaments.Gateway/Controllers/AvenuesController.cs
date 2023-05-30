@@ -65,7 +65,7 @@ public class AvenuesController : BaseGatewayController
             }, $"An error occured during Create request for avenue. Request: {input}");
     
     [HttpPut]
-    [Route(Id)]
+    [Route($"{nameof(Edit)}/{Id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

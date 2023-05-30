@@ -1,9 +1,10 @@
 <script setup lang="ts">
-
 import { Surface, CourtType, TournamentType, Result, AvenueOutputModel } from "@/types"
+import {useAuthStore} from "~/stores/auth"
 const props = defineProps({
     data: {type: Object as PropType<Result<AvenueOutputModel>>, required: true}
 })
+const authStore = useAuthStore();
 
 const avenueData = toRef(props, "data")
 const avenue = ref(avenueData.value.data)
@@ -28,7 +29,8 @@ const formatDate = (date: Date): string => {
 
 <template>
     <div class="container">
-    <h1 class="title is-1 has-text-centered">{{ avenue.name }}</h1>
+    <h1 class="title is-1 has-text-centered">{{ avenue.name }} 
+      <NuxtLink :to="`/avenues/edit/${avenue.id}`" v-if="authStore.user && authStore.user.hasAdministrativeRights"><font-awesome-icon icon="fa-solid fa-pen-to-square" /></NuxtLink></h1>
     <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-location-dot" /> {{ avenue.location }}, {{ avenue.city }}, {{ avenue.country }}</h2>
         <hr>
     <div class="section box">

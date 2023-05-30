@@ -146,6 +146,7 @@ const cancel = () => {
         <div class="control">
           <textarea class="input" type="text" v-model="form.rules" required></textarea>
         </div>
+        <p class="help">General rules of the tournament including tennis game rules, tournament restrictions and etc.</p>
       </div>
       <div class="field">
         <label class="label">Description</label>
@@ -274,13 +275,13 @@ const cancel = () => {
       <div class="field">
         <label class="label">Start Date</label>
         <div class="control">
-          <input class="input" type="date" v-model="form.startDate" required />
+          <input class="input" type="datetime-local" v-model="form.startDate" required />
         </div>
       </div>
       <div class="field">
         <label class="label">End Date</label>
         <div class="control">
-          <input class="input" type="date" v-model="form.endDate" required />
+          <input class="input" type="datetime-local" v-model="form.endDate" required />
         </div>
       </div>
       <!-- Add other form fields based on the TournamentInputModel properties -->

@@ -53,9 +53,6 @@ const form = ref<TournamentInputModel>({
   avenueId: 200
 })
 
-const pesho = {...data.value}
-console.log('Pesho:', pesho)
-
 if(data.value){
   form.value.title = data.value.data.title;
   form.value.rules = data.value.data.rules;
@@ -306,13 +303,13 @@ const cancel = () => {
       <div class="field">
         <label class="label">Start Date</label>
         <div class="control">
-          <input class="input" type="date" v-model="form.startDate" required />
+          <input class="input" type="datetime-local" v-model="form.startDate" required />
         </div>
       </div>
       <div class="field">
         <label class="label">End Date</label>
         <div class="control">
-          <input class="input" type="date" v-model="form.endDate" required />
+          <input class="input" type="datetime-local" v-model="form.endDate" required />
         </div>
       </div>
       <!-- Add other form fields based on the TournamentInputModel properties -->
@@ -320,7 +317,7 @@ const cancel = () => {
         <label class="label">Avenue</label>
         <div class="control">
           <div class="select is-fullwidth">
-            <select v-model="form.avenueId" required @change="updateSelectedAvenue">
+            <select v-model="form.avenueId" required>
               <option value="">Select Avenue</option>
               <option v-for="avenue in avenues.data.value.data" :key="avenue.id" :value="avenue.id">{{ avenue.name }}, {{ avenue.city
               }}, {{ avenue.country }}</option>
