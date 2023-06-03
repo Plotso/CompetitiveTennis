@@ -87,7 +87,7 @@ public class AccountsService : DataService<Account>, IAccountsService
         catch (Exception e)
         {
             throw new InvalidOperationException(
-                $"An error occured during {nameof(UpdatePlayerRating)} execution for userId: {userId}. Error: {e.Message} ");
+                $"An error occurred during {nameof(UpdatePlayerRating)} execution for userId: {userId}. Error: {e.Message} ");
         }
     }
 

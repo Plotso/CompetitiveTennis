@@ -243,5 +243,18 @@ export namespace Auth {
   }
   
   
-
+  export interface ParticipantInputModel {
+    name?: string | null;
+    points?: number | null;
+    isGuest: boolean;
+    tournamentId: number;
+    teamId?: number | null;
+  }
+  
+  export interface MultiParticipantInputModel {
+    participantInfo: ParticipantInputModel;
+    accounts: number[];
+    includeCurrentUser: boolean;
+  }
+  
 

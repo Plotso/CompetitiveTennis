@@ -37,7 +37,7 @@ public class AvenuesController : BaseGatewayController
             {
                 var avenue = await _avenues.ById(id);
                 return Ok(avenue);
-            }, $"An error occured during GET request for avenue: {id}");
+            }, $"An error occurred during GET request for avenue: {id}");
     
     [HttpGet]
     [Route(nameof(Search))]
@@ -49,7 +49,7 @@ public class AvenuesController : BaseGatewayController
             {
                 var avenues = await _avenues.Search(query);
                 return Ok(avenues);
-            }, $"An error occured during avenues search with query: {query}");
+            }, $"An error occurred during avenues search with query: {query}");
     
     [HttpPost]
     [Route(nameof(Add))]
@@ -62,7 +62,7 @@ public class AvenuesController : BaseGatewayController
             {
                 var avenueId = await _avenues.Create(input);
                 return Ok(avenueId);
-            }, $"An error occured during Create request for avenue. Request: {input}");
+            }, $"An error occurred during Create request for avenue. Request: {input}");
     
     [HttpPut]
     [Route($"{nameof(Edit)}/{Id}")]
@@ -77,7 +77,7 @@ public class AvenuesController : BaseGatewayController
             {
                 var result = await _avenues.Edit(id, input);
                 return Ok(result);
-            }, $"An error occured during Edit request for avenue: {id}. Request: {input}");
+            }, $"An error occurred during Edit request for avenue: {id}. Request: {input}");
     
     [HttpDelete]
     [Route(Id)]
@@ -91,5 +91,5 @@ public class AvenuesController : BaseGatewayController
             {
                 var result = await _avenues.Delete(id);
                 return Ok(result);
-            }, $"An error occured during Delete request for avenue: {id}");
+            }, $"An error occurred during Delete request for avenue: {id}");
 }

@@ -27,7 +27,7 @@ public class AccountsController : ApiController
                 var accounts = await _accounts.GetAll();
                 return Ok(Result<IEnumerable<AccountOutputModel>>.SuccessWith(accounts));
             },
-            msgOnError: "An error occured during GET request for all accounts");
+            msgOnError: "An error occurred during GET request for all accounts");
     
     [HttpGet]
     [Route(Id)]
@@ -39,7 +39,7 @@ public class AccountsController : ApiController
                     return NotFound(Result<AccountOutputModel>.Failure($"Account {id} is missing"));
                 return Ok(Result<AccountOutputModel>.SuccessWith(account));
             },
-            msgOnError: $"An error occured during GET request for account: {id}");
+            msgOnError: $"An error occurred during GET request for account: {id}");
     
     [HttpGet]
     [Route("{username}")]
@@ -51,7 +51,7 @@ public class AccountsController : ApiController
                     return NotFound(Result<AccountOutputModel>.Failure($"Account {username} is missing"));
                 return Ok(Result<AccountOutputModel>.SuccessWith(account));
             },
-            msgOnError: $"An error occured during GET request for account: {username}");
+            msgOnError: $"An error occurred during GET request for account: {username}");
 
     [HttpPost]
     [Authorize]

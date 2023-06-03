@@ -117,11 +117,11 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
         if (string.IsNullOrWhiteSpace(userid))
             return false;
 
-        var team = await All().SingleOrDefaultAsync(t => t.Id == id);
-        if (team == null)
+        var participant = await All().SingleOrDefaultAsync(t => t.Id == id);
+        if (participant == null)
             return false;
 
-        await Delete(team, userid);
+        await Delete(participant, userid);
         return true;
     }
 
@@ -130,11 +130,17 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
         if (string.IsNullOrWhiteSpace(userid))
             return false;
 
-        var team = await All().SingleOrDefaultAsync(t => t.Id == id);
-        if (team == null)
+        var participant = await All().SingleOrDefaultAsync(t => t.Id == id);
+        if (participant == null)
             return false;
 
-        HardDelete(team);
+        var accountParticipants = Data.Set<AccountParticipant>().Where(ap => ap.ParticipantId == id);
+        foreach (var accountParticipant in accountParticipants)
+        {
+            Data.Remove(accountParticipant);
+        }
+
+        HardDelete(participant);
         _logger.LogInformation("Participant with id: {Id} has been permanently deleted by UserId: {Userid}", id, userid);
         await Data.SaveChangesAsync();
         return true;

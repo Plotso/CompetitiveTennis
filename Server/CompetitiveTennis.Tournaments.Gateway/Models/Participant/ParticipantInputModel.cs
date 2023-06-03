@@ -15,4 +15,4 @@ public record ParticipantInputModel
     public int TournamentId { get; set; }
     
     public int? TeamId { get; set; }
-};
+}

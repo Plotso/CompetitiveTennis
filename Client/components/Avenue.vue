@@ -30,7 +30,10 @@ const formatDate = (date: Date): string => {
 <template>
     <div class="container">
     <h1 class="title is-1 has-text-centered">{{ avenue.name }} 
-      <NuxtLink :to="`/avenues/edit/${avenue.id}`" v-if="authStore.user && authStore.user.hasAdministrativeRights"><font-awesome-icon icon="fa-solid fa-pen-to-square" /></NuxtLink></h1>
+      <NuxtLink :to="`/avenues/edit/${avenue.id}`" v-if="authStore.user && authStore.user.hasAdministrativeRights" class="edit-button"><font-awesome-icon icon="fa-solid fa-pen-to-square" /></NuxtLink>
+      <span>{{ " " }}</span>
+      <NuxtLink :to="`/avenues/delete/${avenue.id}`" v-if="authStore.user && authStore.user.hasAdministrativeRights" class="delete-button"><font-awesome-icon icon="fa-solid fa-trash" /></NuxtLink>
+    </h1>
     <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-location-dot" /> {{ avenue.location }}, {{ avenue.city }}, {{ avenue.country }}</h2>
         <hr>
     <div class="section box">

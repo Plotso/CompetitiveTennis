@@ -29,7 +29,10 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
 
         <div class="container">
     <h1 class="title is-1 has-text-centered">{{ tournament.title }} 
-      <NuxtLink :to="`/tournaments/edit/${tournament.id}`" v-if="authStore.user && (authStore.user.username == tournament.organiser.username || authStore.user.hasAdministrativeRights)"><font-awesome-icon icon="fa-solid fa-pen-to-square" /></NuxtLink></h1>
+      <NuxtLink :to="`/tournaments/edit/${tournament.id}`" v-if="authStore.user && (authStore.user.username == tournament.organiser.username || authStore.user.hasAdministrativeRights)" class="edit-button"><font-awesome-icon icon="fa-solid fa-pen-to-square" /></NuxtLink>
+      <span>{{ " " }}</span>
+      <NuxtLink :to="`/tournaments/delete/${tournament.id}`" v-if="authStore.user && (authStore.user.username == tournament.organiser.username || authStore.user.hasAdministrativeRights)" class="delete-button"><font-awesome-icon icon="fa-solid fa-trash" /></NuxtLink>
+    </h1>
     <h4 class="subtitle has-text-centered">{{ tournament.avenue.name }}, {{ tournament.avenue.city }}</h4>
 
     

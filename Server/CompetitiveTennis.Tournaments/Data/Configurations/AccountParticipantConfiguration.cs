@@ -15,13 +15,13 @@ public class AccountParticipantConfiguration : IEntityTypeConfiguration<AccountP
             .HasOne(ap => ap.Account)
             .WithMany(a => a.Participations)
             .HasForeignKey(ap => ap.AccountId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .HasOne(ap => ap.Participant)
             .WithMany(p => p.Players)
             .HasForeignKey(ap => ap.ParticipantId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .Property(t => t.CreatedOn)

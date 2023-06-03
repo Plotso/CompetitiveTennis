@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { TournamentOutputModel, Result, TournamentType, Surface } from '@/types'; // Update the path as per your project setup
-import { useAuthStore } from '@/stores/auth'
-const route = useRoute();
+import { TournamentOutputModel, Result, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel } from '@/types'; // Update the path as per your project setup
+import { storeToRefs } from 'pinia';
+import {useAuthStore} from "~/stores/auth"
+const router = useRouter();
 const config = useRuntimeConfig();
 const authStore = useAuthStore();
 
+const { user } = storeToRefs(useAuthStore());
 const clayImg = ref('https://www.publicdomainpictures.net/pictures/400000/nahled/clay-tennis-court-with-balls.jpg')
 
 const tournaments = ref<TournamentOutputModel[]>([]);
@@ -20,6 +22,13 @@ if (error.value) {
 }
 if (data?.value?.data) {
     tournaments.value = data.value?.data
+}
+const showLoadingModal = ref(false)
+const errorNotification = ref("")
+const showErrorNotification = ref(false)
+
+const hideErrorNotification = () => {
+    showErrorNotification.value = false;
 }
 
 const getTournamentTypeLabel = (type: TournamentType): string => {
@@ -46,6 +55,84 @@ const getCourtImg = (surface: Surface): string => {
 
 }
 
+const participate = async (tournamentId: number) => {
+    // Send participate request
+    // ToDo: Add logic for doubles + teams
+    console.log(tournamentId);
+    const participantInput:ParticipantInputModel = {
+        name: `${user.value.firstName} ${user.value.lastName} (${user.value.username})`,
+        points: null,
+        isGuest: false,
+        tournamentId: tournamentId,
+        teamId: null
+    }
+
+    try {
+    showLoadingModal.value = true;
+    const response = await fetch(`${config.public.tournamentsBase}/Tournaments/ParticipateSingle`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify(participantInput),
+    });
+
+    if (response.ok) {
+        showLoadingModal.value = false;      
+        await refreshNuxtData();
+    } else {
+        showLoadingModal.value = false;
+      if(response.status == 401){
+        errorNotification.value = `User not authorized to do the selected activity`
+      }
+      else{
+        errorNotification.value = `An error occurred during participation for tournament. Code: ${response.status}`
+      }
+      showErrorNotification.value = true;
+      console.error(`Failed to create tournament. Status: ${response.status}`);
+    }
+  } catch (error) {
+    showLoadingModal.value = false;
+    console.error('An error occurred while creating the tournament', error);
+  }
+}
+
+const optOutOfTournament = async (tournamentId: number, participantId: number) => {
+    // Send opt-out request request after modal confirmation
+    console.log(tournamentId);
+
+    try {
+    showLoadingModal.value = true;
+    const response = await fetch(`${config.public.tournamentsBase}/Tournaments/RemoveParticipantFromTournament?tournamentId=${tournamentId}&participantId=${participantId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${authStore.token}`
+      }
+    });
+
+    if (response.ok) {
+        showLoadingModal.value = false;    
+        await refreshNuxtData();
+    } else {
+        showLoadingModal.value = false;
+      if(response.status == 401){
+        errorNotification.value = `User not authorized to do the selected activity`
+      }
+      else{
+        errorNotification.value = `An error occurred during opt out attempt for tournament. Code: ${response.status}`
+      }
+      showErrorNotification.value = true;
+      console.error(`Failed to create tournament. Status: ${response.status}`);
+    }
+  } catch (error) {
+    showLoadingModal.value = false;
+    console.error('An error occurred while creating the tournament', error);
+  }
+}
+
+
 </script>
 
 <template>
@@ -57,10 +144,15 @@ const getCourtImg = (surface: Surface): string => {
         <h1 class="title is-1 has-text-centered">All Tournaments</h1>
         <div>
             <hr>
-            <div v-if="authStore.user.username" class="buttons is-centered">
+            <div v-if="user.username" class="buttons is-centered">
                 <NuxtLink to="/tournaments/create" class="button is-primary">Create Tournament</NuxtLink>
             </div>
             <hr>
+        </div>
+
+        <div class="notification is-danger" v-if="showErrorNotification">
+            <button class="delete" @click="hideErrorNotification"></button>
+            {{errorNotification}}
         </div>
         <div class="table-container">
             <table class="table is-striped is-fullwidth">
@@ -103,13 +195,22 @@ const getCourtImg = (surface: Surface): string => {
                             </div>
                         </td>
                         <td>
-                            <a href="/" class="button is-primary"
+                            <p v-if="!tournament.participants.find(p => p.players.find(pp => pp.username == user.username))">
+                                <button class="button is-primary"  @click="participate(tournament.id)"
                                 v-if="tournament.participants.length < tournament.maxParticipants">
                                 Participate
-                            </a>
-                            <a class="button is-primary" href="/" v-else disabled>
-                                Participate
-                            </a>
+                                </button>
+                                <button class="button is-primary" v-else disabled>
+                                    Participate
+                                </button>
+                            </p>
+                            <p v-else>
+                                <button class="button is-info" @click="optOutOfTournament(tournament.id, tournament.participants.find(p => p.players.find(pp => pp.username == user.username))?.id ?? -1)"
+                                v-if="tournament.participants.length < tournament.maxParticipants">
+                                Opt out of tournament
+                                </button>
+                            </p>
+                            
                         </td>
                         <hr>
                     </tr>
@@ -119,6 +220,10 @@ const getCourtImg = (surface: Surface): string => {
 
         </div>
     </div>
+
+    <LoadingModal
+      :isOpen="showLoadingModal"
+    />
 
     <!--
     <div class="container" v-if="!pending">

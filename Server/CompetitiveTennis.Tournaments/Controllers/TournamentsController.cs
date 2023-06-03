@@ -46,7 +46,7 @@ public class TournamentsController : ApiController
                 var tournaments = await _tournaments.GetAll();
                 return Ok(Result<IEnumerable<TournamentOutputModel>>.SuccessWith(tournaments));
             },
-            msgOnError: "An error occured during GET request for all tournaments");
+            msgOnError: "An error occurred during GET request for all tournaments");
 
     [HttpGet]
     [Route(Id)]
@@ -58,7 +58,7 @@ public class TournamentsController : ApiController
                     return NotFound(Result<TournamentOutputModel>.Failure($"Tournament {id} does not exist"));
                 return Ok(Result<TournamentOutputModel>.SuccessWith(tournament));
             },
-            msgOnError: $"An error occured during GET request for tournament: {id}");
+            msgOnError: $"An error occurred during GET request for tournament: {id}");
 
     [HttpGet]
     [Route(nameof(Search))]
@@ -70,7 +70,7 @@ public class TournamentsController : ApiController
                 return Ok(Result<SearchOutputModel<TournamentOutputModel>>.SuccessWith(
                     new SearchOutputModel<TournamentOutputModel>(tournaments, query.Page, total)));
             },
-            msgOnError: $"An error occured during Search request with query: {query}");
+            msgOnError: $"An error occurred during Search request with query: {query}");
 
     [HttpPost]
     [Route(nameof(Add))]
@@ -135,12 +135,12 @@ public class TournamentsController : ApiController
     public async Task<ActionResult> Delete(int id)
         => await SafeHandle(async () =>
             {
-                var isCurrentUserOrganiser = await _tournaments.GetOrganiserUserId(id) != _currentUser.UserId;
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(id);
                 if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to delete tournament!"));
 
-                var isSuccess = await _avenues.Delete(id, _currentUser.UserId);
+                var isSuccess = await _tournaments.Delete(id, _currentUser.UserId);
                 return isSuccess ? Result.Success : Result.Failure($"Delete operation for tournament {id} failed.");
             },
             msgOnError: $"Unexpected error during tournament delete. TournamentId: {id}");
@@ -297,7 +297,8 @@ public class TournamentsController : ApiController
                     return BadRequest(
                         Result.Failure("Only admins, tournament organiser and participant accounts are allowed to remove participant from existing competition!"));
 
-                var isSuccess = await _tournaments.RemoveParticipant(tournamentId, participant);
+                //var isSuccess = await _tournaments.RemoveParticipant(tournamentId, participant);
+                var isSuccess = await _participants.DeletePermanently(participantId, _currentUser.UserId);
                 return isSuccess ? Result.Success : Result.Failure($"Failed to remove participant {participantId} from tournament {tournamentId}");
             },
             msgOnError: $"Unexpected error during participant removal from tournament. ParticipantId: {participantId}. TournamentId: {tournamentId}");

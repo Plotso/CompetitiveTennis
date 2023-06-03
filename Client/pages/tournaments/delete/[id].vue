@@ -79,58 +79,46 @@ if(data.value){
   }
   
 }
-
-const avenues = await useFetch<Result<AvenueOutputModel[]>>(() => `/Avenues/All`, {
-  baseURL: config.public.tournamentsBase
-})
-if (avenues.error.value) {
-  console.log('data', avenues.data.value)
-  console.log('pending', avenues.pending.value)
-  console.log('error', avenues.error.value)
-  refresh()
-}
+const errorNotification = ref("")
+const showErrorNotification = ref(false)
 
 const isUnauthorizedModalOpen = ref(false);
-const updateTournament = async () => {
+const deleteTournament = async () => {
   try {
-    const response = await fetch(`${config.public.tournamentsBase}/Tournaments/Edit/${tournamentId}`, {
-      method: 'PUT',
+    const response = await fetch(`${config.public.tournamentsBase}/Tournaments/${tournamentId}`, {
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${authStore.token}`,
-      },
-      body: JSON.stringify(form.value),
+      }
     });
 
     if (response.ok) {
-      router.push(`/tournaments/${tournamentId}`);
+      router.push(`/tournaments`);
     } else {
       if(response.status == 401){
         isUnauthorizedModalOpen.value = true;
       }
-      console.error(`Failed to update tournament. Status: ${response.status}`);
+      else{
+        errorNotification.value = `An error occurred during Delete request for tournament "${data.value?.data.title}"`
+        showErrorNotification.value = true;
+      }
+      console.error(`Failed to delete tournament. Status: ${response.status}`);
+
     }
   } catch (error) {
-    console.error('An error occurred while updating the tournament', error);
+    console.error('An error occurred while deleting the tournament', error);
   }
 };
 
-const avenueLocation = ref("")
-watch(avenues, () => {
-  if (avenues.data.value.data && avenues.data.value.data.length > form.value.avenueId) {
-    avenueLocation.value = avenues.data.value.data.find(avenue => avenue.id === form.value.avenueId)
-  }
-})
-
 const selectedAvenue = computed(() => {
-  const selectedId = form.value.avenueId
-  return avenues.data.value?.data.find((avenue) => avenue.id === selectedId)
+  return data.value?.data.avenue
 })
 
 const openGoogleMaps = () => {
-  if (selectedAvenue.value) {
-    const queryInfo = `${selectedAvenue.value.location} ${selectedAvenue.value.name} ${selectedAvenue.value.city}`
-    const location = encodeURIComponent(queryInfo); //(selectedAvenue.value.location);
+  if (data.value?.data.avenue) {
+    const queryInfo = `${data.value?.data.avenue.location} ${data.value?.data.avenue.name} ${data.value?.data.avenue.city}`
+    const location = encodeURIComponent(queryInfo);
     const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${location}`;
     window.open(googleMapsUrl, '_blank');
   }
@@ -138,12 +126,18 @@ const openGoogleMaps = () => {
 
 const isConfirmationModalOpen = ref(false);
 
+const hideErrorNotification = () => {
+    showErrorNotification.value = false;
+}
+
 const openConfirmationModal = () => {
   isConfirmationModalOpen.value = true;
 };
 
 const closeConfirmationModal = () => {
-  isConfirmationModalOpen.value = false;
+    console.log("Close confirmation")
+    isConfirmationModalOpen.value = false;
+    console.log("isConfirmationModalOpen", isConfirmationModalOpen.value)
 };
 
 const openUnathorizedModal = () => {
@@ -162,8 +156,9 @@ const cancel = () => {
 
 <template>
   <div class="container">
-    <h1 class="title is-1 has-text-centered">Edit Tournament</h1>
-    <form @submit.prevent="updateTournament">
+    <h1 class="title is-1 has-text-centered">Delete Tournament</h1>
+    <form @submit.prevent="">
+        <fieldset disabled>
       <div class="field">
         <label class="label">Title</label>
         <div class="control">
@@ -319,8 +314,8 @@ const cancel = () => {
           <div class="select is-fullwidth">
             <select v-model="form.avenueId" required>
               <option value="">Select Avenue</option>
-              <option v-for="avenue in avenues.data.value.data" :key="avenue.id" :value="avenue.id">{{ avenue.name }}, {{ avenue.city
-              }}, {{ avenue.country }}</option>
+              <option :value="data?.data.avenue">{{ data?.data.avenue.name }}, {{ data?.data.avenue.city
+              }}, {{ data?.data.avenue.country }}</option>
             </select>
             <div v-if="selectedAvenue" class="field">
               <span v-if="selectedAvenue">Location: {{ selectedAvenue.location }}</span>
@@ -330,29 +325,35 @@ const cancel = () => {
           </div>
         </div>
       </div>
-      <br>
       <div class="field">
-
+        <br>
       </div>
+      <br>
+    </fieldset>
       <div class="field">
         <div class="control buttons is-centered">
-          <button class="button is-primary " type="submit">Edit</button>
-          <button class="button " @click="openConfirmationModal">Cancel</button>
+          <button class="button is-danger " @click="openConfirmationModal">Delete</button>
+          <button class="button " @click="cancel">Cancel</button>
         </div>
       </div>
 
       <ConfirmationModal
       :isOpen="isConfirmationModalOpen"
       title="Confirmation"
-      message="Are you sure you want to cancel tournament creation?"
-      @confirm="cancel"
+      message="Are you sure you want to delete tournament?"
+      @confirm="deleteTournament"
       @close="closeConfirmationModal"
     />
+
+    <div class="notification is-danger" v-if="showErrorNotification">
+        <button class="delete" @click="hideErrorNotification"></button>
+        {{errorNotification}}
+    </div>
 
 <DangerModal
 :isOpen="isUnauthorizedModalOpen"
 title="Unauthorized!"
-message="You are not authorized to edit this tournament!"
+message="You are not authorized to delete this tournament!"
 @close="closeUnathorizedModal"
 />
     </form>

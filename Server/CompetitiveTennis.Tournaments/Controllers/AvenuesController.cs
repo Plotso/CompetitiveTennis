@@ -28,7 +28,7 @@ public class AvenuesController : ApiController
                 var avenues = await _avenues.GetAll();
                 return Ok(Result<IEnumerable<AvenueOutputModel>>.SuccessWith(avenues));
             },
-            msgOnError: "An error occured during GET request for all avenues");
+            msgOnError: "An error occurred during GET request for all avenues");
 
     [HttpGet]
     [Route(Id)]
@@ -40,7 +40,7 @@ public class AvenuesController : ApiController
                     return NotFound(Result<AvenueOutputModel>.Failure($"Avenue {id} is missing"));
                 return Ok(Result<AvenueOutputModel>.SuccessWith(avenue));
             },
-            msgOnError: $"An error occured during GET request for avenue: {id}");
+            msgOnError: $"An error occurred during GET request for avenue: {id}");
 
     [HttpGet]
     [Route(nameof(Search))]
@@ -52,7 +52,7 @@ public class AvenuesController : ApiController
                 return Ok(Result<SearchOutputModel<AvenueOutputModel>>.SuccessWith(
                     new SearchOutputModel<AvenueOutputModel>(avenues, query.Page, total)));
             },
-            msgOnError: $"An error occured during Search request with query: {query}");
+            msgOnError: $"An error occurred during Search request with query: {query}");
 
     [HttpPost]
     [Authorize]

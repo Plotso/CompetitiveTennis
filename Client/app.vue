@@ -50,4 +50,12 @@
 .custom-link {
     color: green;
 }
+
+.edit-button {
+  color: rgb(0, 248, 45);
+}
+
+.delete-button {
+  color: rgb(255, 1, 1);
+}
 </style>

@@ -26,7 +26,7 @@ public abstract class ApiController : ControllerBase
 
     protected async Task<ActionResult> SafeHandle(
         Func<Task<ActionResult>> action,
-        string msgOnError = "Unexpected error occured",
+        string msgOnError = "Unexpected error occurred",
         string msgOnNotFound = "Entry could not be found")
         => await SafeHandle(action,
             failure: StatusCode((int) HttpStatusCode.InternalServerError, Result.Failure($"ErrorCode: {UnexpectedErrorCode}")),
@@ -35,7 +35,7 @@ public abstract class ApiController : ControllerBase
     protected async Task<ActionResult> SafeHandle(
         Func<Task<ActionResult>> action,
         ActionResult failure,
-        string msgOnError = "Unexpected error occured",
+        string msgOnError = "Unexpected error occurred",
         string msgOnNotFound = "Entry could not be found")
     {
         try

@@ -37,7 +37,7 @@ public class AccountsController : BaseGatewayController
             {
                 var account = await _accounts.ById(id);
                 return Ok(account);
-            }, $"An error occured during GET request for account: {id}");
+            }, $"An error occurred during GET request for account: {id}");
     
     [HttpGet]
     [Route("{username}")]
@@ -50,7 +50,7 @@ public class AccountsController : BaseGatewayController
             {
                 var account = await _accounts.ByUsername(username);
                 return Ok(account);
-            }, $"An error occured during GET request for account: {username}");
+            }, $"An error occurred during GET request for account: {username}");
 
     [HttpPost]
     [Authorize]

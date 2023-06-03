@@ -27,7 +27,7 @@ function classData(classInfo: string): string {
         </a>
       </div>
 
-      <div class="navbar-menu">
+      <div class="navbar-menu" :class="{ 'is-active': isActive }">
         <div class="navbar-start">
           <NuxtLink to="/" class="navbar-item">Home</NuxtLink>          
           <NuxtLink to="/tournaments" class="navbar-item">Tournaments</NuxtLink>
