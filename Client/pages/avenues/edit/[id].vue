@@ -78,10 +78,10 @@ const updateAvenue = async () => {
       if(response.status == 401){
         isUnauthorizedModalOpen.value = true;
       }
-      console.error(`Failed to create avenue. Status: ${response.status}`);
+      console.error(`Failed to updating avenue. Status: ${response.status}`);
     }
   } catch (error) {
-    console.error('An error occurred while creating the avenue', error);
+    console.error('An error occurred while updating the avenue', error);
   }
 };
 
