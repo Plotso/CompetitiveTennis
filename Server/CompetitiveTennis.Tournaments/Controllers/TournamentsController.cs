@@ -297,6 +297,7 @@ public class TournamentsController : ApiController
                     return BadRequest(
                         Result.Failure("Only admins, tournament organiser and participant accounts are allowed to remove participant from existing competition!"));
 
+                Logger.LogInformation($"{nameof(RemoveParticipantFromTournament)} requested for TournamentId: {tournamentId}, ParticipantId: {participantId}. RequestedBy -> Organiser: {isCurrentUserOrganiser}, Participant: {isCurrentUserParticipant}, Admin: {_currentUser.IsAdministrator}");
                 //var isSuccess = await _tournaments.RemoveParticipant(tournamentId, participant);
                 var isSuccess = await _participants.DeletePermanently(participantId, _currentUser.UserId);
                 return isSuccess ? Result.Success : Result.Failure($"Failed to remove participant {participantId} from tournament {tournamentId}");

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Surface, TournamentType, Result, TournamentOutputModel } from "@/types"
+import { Surface, TournamentType, Result, TournamentOutputModel, ParticipantInputModel } from "@/types"
 import {useAuthStore} from "~/stores/auth"
 const props = defineProps({
     data: {type: Object as PropType<Result<TournamentOutputModel>>, required: true}
 })
 const authStore = useAuthStore();
+const config = useRuntimeConfig();
 
 const tData = toRef(props, "data")
 const tournament = ref(tData.value.data)
@@ -18,10 +19,42 @@ const options: Intl.DateTimeFormatOptions = {
         hour12: false
       };
 
+
+const removeParticipantId = ref(-1);
+
+const isParticipantRemovalModalOpen = ref(false);
+
+const openParticipantRemovalModal = (participantId: number) => {
+  removeParticipantId.value = participantId;
+  isParticipantRemovalModalOpen.value = true;
+};
+
+const closeParticipantRemovalModal = () => {
+  isParticipantRemovalModalOpen.value = false;
+};
+const isAddGuestModalOpen = ref(false);
+
+const openAddGuestModal = () => {
+  isAddGuestModalOpen.value = true;
+};
+
+const closeAddGuestModal = () => {
+  isAddGuestModalOpen.value = false;
+};
+
 const startDate = computed(() => new Date(tournament.value.startDate).toLocaleDateString(undefined, options).replace(' at', ''));
 const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateString(undefined, options).replace(' at', ''));
 
-    
+const isAuthorized = computed(() => {
+    return authStore.user && (authStore.user.username == tournament.value.organiser.username || authStore.user.hasAdministrativeRights)
+});
+
+const removeParticipantErrorNotification = ref("")
+const showRemoveParticipantErrorNotification = ref(false)
+
+const hideRemoveParticipantErrorNotification = () => {
+    showRemoveParticipantErrorNotification.value = false;
+}
 </script>
 
 <template>
@@ -29,9 +62,9 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
 
         <div class="container">
     <h1 class="title is-1 has-text-centered">{{ tournament.title }} 
-      <NuxtLink :to="`/tournaments/edit/${tournament.id}`" v-if="authStore.user && (authStore.user.username == tournament.organiser.username || authStore.user.hasAdministrativeRights)" class="edit-button"><font-awesome-icon icon="fa-solid fa-pen-to-square" /></NuxtLink>
+      <NuxtLink :to="`/tournaments/edit/${tournament.id}`" v-if="isAuthorized" class="edit-button"><font-awesome-icon icon="fa-solid fa-pen-to-square" /></NuxtLink>
       <span>{{ " " }}</span>
-      <NuxtLink :to="`/tournaments/delete/${tournament.id}`" v-if="authStore.user && (authStore.user.username == tournament.organiser.username || authStore.user.hasAdministrativeRights)" class="delete-button"><font-awesome-icon icon="fa-solid fa-trash" /></NuxtLink>
+      <NuxtLink :to="`/tournaments/delete/${tournament.id}`" v-if="isAuthorized" class="delete-button"><font-awesome-icon icon="fa-solid fa-trash" /></NuxtLink>
     </h1>
     <h4 class="subtitle has-text-centered">{{ tournament.avenue.name }}, {{ tournament.avenue.city }}</h4>
 
@@ -88,11 +121,24 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
     
     <div class="box">
       <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-users" /> Participants </h2>
+      <div class="has-text-centered" v-if="isAuthorized">
+        <button class="button" @click="openAddGuestModal">
+          Add Guest
+        </button>
+      </div>
+      
+
+      <div class="notification is-danger" v-if="showRemoveParticipantErrorNotification">
+            <button class="delete" @click="hideRemoveParticipantErrorNotification"></button>
+            {{removeParticipantErrorNotification}}
+        </div>
       <div class="list">
 
         <ul>
         <div class="list-item">
             <li v-for="participant in tournament.participants" :key="participant.id">
+              
+              <br>
                 <div class="list-item-title">
                     <div v-if="participant.isGuest">
                         <font-awesome-icon icon="fa-solid fa-user-secret" />
@@ -100,16 +146,19 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
                         <div v-if="participant.players.some(x => x)">
                             (
                                 <span v-for="player in participant.players" :key="player.id">
-                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.rating}})
+                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.rating}})  
                                 </span>
                             )
                         </div>
+                        <button class="button is-danger remove-participant-button" v-if="isAuthorized" @click="openParticipantRemovalModal(participant.id)"><font-awesome-icon icon="fa-solid fa-user-minus" /></button>
                     </div>
                     <div v-else>                        
                         <div v-if="participant.players.some(x => x)">
                                <span v-if="participant.players.length > 1"><font-awesome-icon icon="fa-solid fa-people-arrows" /></span><span v-else><font-awesome-icon icon="fa-solid fa-user" /></span>  {{ '' }}
                                 <span v-for="player in participant.players" :key="player.id"> 
                                     {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.playerRating}})
+                                    
+                                <button class="button is-danger remove-participant-button" v-if="isAuthorized" @click="openParticipantRemovalModal(participant.id)"><font-awesome-icon icon="fa-solid fa-user-minus" /></button>
                                 </span>                            
                         </div>
                     </div>
@@ -141,6 +190,22 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
     </div>
   </div>
     </div>
+
+    <!--MODALS-->
+    <AddGuestModal
+      :isOpen="isAddGuestModalOpen"
+      :tournamentId="tournament.id"
+      @close="closeAddGuestModal"
+    />
+
+<RemoveParticipantModal
+  :isOpen="isParticipantRemovalModalOpen"
+  title="Participant Removal Confirmation"
+  message="Are you sure you want to remove participant?"
+  :tournamentId="tournament.id"
+  :participantId="removeParticipantId"
+  @close="closeParticipantRemovalModal"
+/>
 </template>
 
 <style scoped>
@@ -152,4 +217,7 @@ const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateSt
   margin-bottom: 20px;
 }
 
+.remove-participant-button {
+  font-size: x-small;
+}
 </style>

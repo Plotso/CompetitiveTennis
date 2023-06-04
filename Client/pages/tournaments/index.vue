@@ -55,6 +55,21 @@ const getCourtImg = (surface: Surface): string => {
 
 }
 
+const removalTournamentId = ref(-1);
+const removeParticipantId = ref(-1);
+const isParticipantRemovalModalOpen = ref(false);
+
+const openParticipantRemovalModal = (tournamentId: number, participantId: number) => {
+  removeParticipantId.value = participantId;
+  removalTournamentId.value = tournamentId;
+  isParticipantRemovalModalOpen.value = true;
+};
+
+const closeParticipantRemovalModal = () => {
+    console.log('HoLA')
+  isParticipantRemovalModalOpen.value = false;
+};
+
 const participate = async (tournamentId: number) => {
     // Send participate request
     // ToDo: Add logic for doubles + teams
@@ -205,7 +220,7 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
                                 </button>
                             </p>
                             <p v-else>
-                                <button class="button is-info" @click="optOutOfTournament(tournament.id, tournament.participants.find(p => p.players.find(pp => pp.username == user.username))?.id ?? -1)"
+                                <button class="button is-info" @click="openParticipantRemovalModal(tournament.id, tournament.participants.find(p => p.players.find(pp => pp.username == user.username))?.id ?? -1)"
                                 v-if="tournament.participants.length < tournament.maxParticipants">
                                 Opt out of tournament
                                 </button>
@@ -221,8 +236,19 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
         </div>
     </div>
 
+    <!--MODALS-->
     <LoadingModal
       :isOpen="showLoadingModal"
+    />
+
+    
+    <RemoveParticipantModal
+    :isOpen="isParticipantRemovalModalOpen"
+    title="Opt out of tournament confirmal"
+    message="Are you sure you want to opt out from the tournament?"
+    :tournamentId="removalTournamentId"
+    :participantId="removeParticipantId"
+    @close="closeParticipantRemovalModal"
     />
 
     <!--
