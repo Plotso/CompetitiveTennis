@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { TournamentOutputModel, Result, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel } from '@/types'; // Update the path as per your project setup
 import { storeToRefs } from 'pinia';
+import ParticipateDoublesModal from '~/components/ParticipateDoublesModal.vue';
 import {useAuthStore} from "~/stores/auth"
 const router = useRouter();
 const config = useRuntimeConfig();
@@ -57,6 +58,7 @@ const getCourtImg = (surface: Surface): string => {
 
 const removalTournamentId = ref(-1);
 const removeParticipantId = ref(-1);
+const doubleParticipationTournamentId = ref(-1)
 const isParticipantRemovalModalOpen = ref(false);
 
 const openParticipantRemovalModal = (tournamentId: number, participantId: number) => {
@@ -66,8 +68,23 @@ const openParticipantRemovalModal = (tournamentId: number, participantId: number
 };
 
 const closeParticipantRemovalModal = () => {
-    console.log('HoLA')
   isParticipantRemovalModalOpen.value = false;
+};
+const isParticipateDoublesModalOpen = ref(false);
+
+const openParticipateDoublesModal = (tournamentId: number) => {
+    console.log('part doubles');
+    doubleParticipationTournamentId.value = tournamentId;
+  isParticipateDoublesModalOpen.value = true;
+};
+
+const openParticipateTeamModal = (tournamnetId: number) => {
+    console.log('part teams');
+    //ToDo: currently not supported
+}
+
+const closeParticipateDoublesModal = () => {
+    isParticipateDoublesModalOpen.value = false;
 };
 
 const participate = async (tournamentId: number) => {
@@ -209,15 +226,19 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
                                 Prize - {{ tournament.prize ? `${tournament.prize} BGN` : 'N/A' }}
                             </div>
                         </td>
-                        <td>
+                        <td v-if="user.username">
                             <p v-if="!tournament.participants.find(p => p.players.find(pp => pp.username == user.username))">
-                                <button class="button is-primary"  @click="participate(tournament.id)"
-                                v-if="tournament.participants.length < tournament.maxParticipants">
-                                Participate
-                                </button>
-                                <button class="button is-primary" v-else disabled>
-                                    Participate
-                                </button>
+                                <ParticipateButton v-if="tournament.type == 'Singles'"
+                                :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+                                @participate="participate(tournament.id)"/>
+
+                                <ParticipateButton v-if="tournament.type == 'Doubles'"
+                                :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+                                @participate="openParticipateDoublesModal(tournament.id)"/>
+
+                                <ParticipateButton v-if="tournament.type == 'Teams'"
+                                :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+                                @participate="openParticipateTeamModal(tournament.id)"/>
                             </p>
                             <p v-else>
                                 <button class="button is-info" @click="openParticipantRemovalModal(tournament.id, tournament.participants.find(p => p.players.find(pp => pp.username == user.username))?.id ?? -1)"
@@ -239,6 +260,13 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
     <!--MODALS-->
     <LoadingModal
       :isOpen="showLoadingModal"
+    />
+
+    <ParticipateDoublesModal
+    :isOpen="isParticipateDoublesModalOpen"
+    :includeCurrentUser="true"
+    :tournamentId="doubleParticipationTournamentId"
+    @close="closeParticipateDoublesModal"
     />
 
     

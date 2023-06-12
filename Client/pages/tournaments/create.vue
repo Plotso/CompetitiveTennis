@@ -284,7 +284,6 @@ const cancel = () => {
           <input class="input" type="datetime-local" v-model="form.endDate" required />
         </div>
       </div>
-      <!-- Add other form fields based on the TournamentInputModel properties -->
       <div class="field">
         <label class="label">Avenue</label>
         <div class="control">

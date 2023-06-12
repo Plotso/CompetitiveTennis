@@ -205,7 +205,7 @@ public class TournamentsController : ApiController
                     return BadRequest(
                         Result.Failure("Registration for singles & teams tournaments are handled separately!"));
 
-                if (input.Accounts.Count() != 2 && (!input.ParticipantInfo.IsGuest || !input.IncludeCurrentUser))
+                if (input.Accounts.Count() != 2 && (!input.ParticipantInfo.IsGuest && !input.IncludeCurrentUser))
                     return BadRequest(Result.Failure("Registration for doubles participation requires 2 participants"));
                 
                 if (input.ParticipantInfo.IsGuest && string.IsNullOrWhiteSpace(input.ParticipantInfo.Name))
@@ -214,7 +214,7 @@ public class TournamentsController : ApiController
                 var participantId = await _participants.Create(input.ParticipantInfo, tournament, team);
                 var currentUserAccount = await _accounts.GetByUserId(_currentUser.UserId);
                 var accounts = await _accounts.GetMultiple(input.Accounts);
-                if (accounts.Count() != input.Accounts.Count())
+                if (accounts.Count() != input.Accounts.Count(id => id > 0))
                 {
                     Logger.LogCritical($"Some of the following accounts are missing from internal system: {string.Join(" ", input.Accounts)}");
                     return BadRequest(Result.Failure("Not all accounts could be found in internal system"));

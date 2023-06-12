@@ -141,25 +141,27 @@ const hideRemoveParticipantErrorNotification = () => {
               <br>
                 <div class="list-item-title">
                     <div v-if="participant.isGuest">
+                      
+                        <span v-if="participant.players.length == 1"><font-awesome-icon icon="fa-solid fa-people-arrows" />  &nbsp; *</span>  {{ '' }}
                         <font-awesome-icon icon="fa-solid fa-user-secret" />
-                        {{ participant.name }} 
-                        <div v-if="participant.players.some(x => x)">
-                            (
+                        {{ participant.name }}
+                        <span v-if="participant.players.some(x => x)">,
+                          <font-awesome-icon icon="fa-solid fa-user" />{{ '' }}
                                 <span v-for="player in participant.players" :key="player.id">
-                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.rating}})  
+                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.playerRating}})  
                                 </span>
-                            )
-                        </div>
+                            
+                        </span>
                         <button class="button is-danger remove-participant-button" v-if="isAuthorized" @click="openParticipantRemovalModal(participant.id)"><font-awesome-icon icon="fa-solid fa-user-minus" /></button>
                     </div>
                     <div v-else>                        
                         <div v-if="participant.players.some(x => x)">
                                <span v-if="participant.players.length > 1"><font-awesome-icon icon="fa-solid fa-people-arrows" /></span><span v-else><font-awesome-icon icon="fa-solid fa-user" /></span>  {{ '' }}
-                                <span v-for="player in participant.players" :key="player.id"> 
-                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.playerRating}})
+                                <span v-for="(player, index) in participant.players" :key="player.id"> 
+                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.playerRating}})<span v-if="participant.players.length - 1 > index">, </span>
                                     
-                                <button class="button is-danger remove-participant-button" v-if="isAuthorized" @click="openParticipantRemovalModal(participant.id)"><font-awesome-icon icon="fa-solid fa-user-minus" /></button>
-                                </span>                            
+                                </span>           
+                                <button class="button is-danger remove-participant-button" v-if="isAuthorized" @click="openParticipantRemovalModal(participant.id)"><font-awesome-icon icon="fa-solid fa-user-minus" /></button>                 
                         </div>
                     </div>
                 </div>
