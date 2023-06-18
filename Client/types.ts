@@ -92,6 +92,13 @@ export namespace Auth {
     Indoor,
   }
 
+  export enum SortOptions {
+    CreatedDescending,
+    CreatedAscending,
+    UpdatedAscending,
+    UpdatedDescending
+  }
+
   export interface TournamentOutputModel {
     id: number;
     title: string;
@@ -256,5 +263,30 @@ export namespace Auth {
     accounts: number[];
     includeCurrentUser: boolean;
   }
-  
 
+  export interface TournamentQuery {
+    keyword?: string;
+    hasEntryFee?: boolean | null;
+    hasPrize?: boolean | null;
+    sortOptions?: SortOptions;
+    surface?: Surface | null;
+    tournamentType?: TournamentType | null;
+    isIndoor?: boolean | null;
+    dateRangeFrom?: Date | null;
+    dateRangeUntil?: Date | null;
+    organiserId?: number | null;
+    participantIds?: number[] | null;
+    page?: number;
+    itemsPerPage?: number;
+  }
+  
+  export interface AvenueQuery {
+    keyword?: string;
+    city?: string;
+    country?: string;
+    sortOptions?: SortOptions;
+    surface?: Surface | null;
+    courtType?: CourtType | null;
+    page?: number;
+    itemsPerPage?: number;
+  }

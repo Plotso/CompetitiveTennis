@@ -154,7 +154,7 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
 
     private IQueryable<Tournament> GetTournamentsQuery(TournamentQuery query, int? tournamentId = null)
     {
-        var dataQuery = All();
+        var dataQuery = All().EnrichTournamentQueryData();
 
         if (tournamentId.HasValue)
         {
@@ -176,6 +176,10 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             dataQuery = dataQuery.Where(t => t.StartDate >= query.DateRangeFrom);
         if (query.DateRangeUntil.HasValue)
             dataQuery = dataQuery.Where(t => t.EndDate <= query.DateRangeUntil);
+        if (query.OrganiserId.HasValue)
+            dataQuery = dataQuery.Where(t => t.OrganiserId == query.OrganiserId.Value);
+        if (query.ParticipantIds != null && query.ParticipantIds.Any())
+            dataQuery = dataQuery.Where(t => t.Participants.Any(p => p.Players.Any(acc => query.ParticipantIds.Contains(acc.AccountId))));
 
         if (!string.IsNullOrWhiteSpace(query.Keyword))
         {
@@ -187,6 +191,6 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
 
         dataQuery = dataQuery.SortQuery(query.SortOptions);
 
-        return dataQuery.EnrichTournamentQueryData();
+        return dataQuery;
     }
 }
