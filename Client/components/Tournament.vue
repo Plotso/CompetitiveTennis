@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { Surface, TournamentType, Result, TournamentOutputModel, ParticipantInputModel } from "@/types"
 import {useAuthStore} from "~/stores/auth"
 const props = defineProps({
@@ -6,6 +7,7 @@ const props = defineProps({
 })
 const authStore = useAuthStore();
 const config = useRuntimeConfig();
+const { user } = storeToRefs(useAuthStore());
 
 const tData = toRef(props, "data")
 const tournament = ref(tData.value.data)
@@ -20,6 +22,7 @@ const options: Intl.DateTimeFormatOptions = {
       };
 
 
+const showLoadingModal = ref(false)
 const removeParticipantId = ref(-1);
 
 const isParticipantRemovalModalOpen = ref(false);
@@ -41,6 +44,40 @@ const openAddGuestModal = () => {
 const closeAddGuestModal = () => {
   isAddGuestModalOpen.value = false;
 };
+const isAddSinglesParticipantModalOpen = ref(false);
+
+const openParticipateSinglesModal = () => {
+  isAddSinglesParticipantModalOpen.value = true;
+};
+
+const closeAddSinglesParticipantModal = () => {
+  isAddSinglesParticipantModalOpen.value = false;
+};
+const isOrganiserParticipateDoublesModalOpen = ref(false);
+
+const openOrganiserParticipateDoublesModal = () => {
+    console.log('part doubles');
+    isOrganiserParticipateDoublesModalOpen.value = true;
+};
+
+const closeOrganiserParticipateDoublesModal = () => {
+  isOrganiserParticipateDoublesModalOpen.value = false;
+};
+const isParticipateDoublesModalOpen = ref(false);
+
+const openParticipateDoublesModal = () => {
+    console.log('part doubles');
+  isParticipateDoublesModalOpen.value = true;
+};
+
+const openParticipateTeamModal = () => {
+    console.log('part teams');
+    //ToDo: currently not supported
+}
+
+const closeParticipateDoublesModal = () => {
+    isParticipateDoublesModalOpen.value = false;
+};
 
 const startDate = computed(() => new Date(tournament.value.startDate).toLocaleDateString(undefined, options).replace(' at', ''));
 const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateString(undefined, options).replace(' at', ''));
@@ -49,11 +86,59 @@ const isAuthorized = computed(() => {
     return authStore.user && (authStore.user.username == tournament.value.organiser.username || authStore.user.hasAdministrativeRights)
 });
 
+const isAuthenticated = computed(() => {
+    return authStore.user && authStore.user.username
+});
+
 const removeParticipantErrorNotification = ref("")
 const showRemoveParticipantErrorNotification = ref(false)
 
 const hideRemoveParticipantErrorNotification = () => {
     showRemoveParticipantErrorNotification.value = false;
+}
+
+
+const participate = async (tournamentId: number) => {
+    // Send participate request
+    // ToDo: Add logic for doubles + teams
+    console.log(tournamentId);
+    const participantInput:ParticipantInputModel = {
+        name: `${user.value.firstName} ${user.value.lastName} (${user.value.username})`,
+        points: null,
+        isGuest: false,
+        tournamentId: tournamentId,
+        teamId: null
+    }
+
+    try {
+    showLoadingModal.value = true;
+    const response = await fetch(`${config.public.tournamentsBase}/Tournaments/ParticipateSingle`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify(participantInput),
+    });
+
+    if (response.ok) {
+        showLoadingModal.value = false;      
+        await refreshNuxtData();
+    } else {
+        showLoadingModal.value = false;
+      if(response.status == 401){
+        errorNotification.value = `User not authorized to do the selected activity`
+      }
+      else{
+        errorNotification.value = `An error occurred during participation for tournament. Code: ${response.status}`
+      }
+      showErrorNotification.value = true;
+      console.error(`Failed to participate tournament. Status: ${response.status}`);
+    }
+  } catch (error) {
+    showLoadingModal.value = false;
+    console.error('An error occurred while participating for the tournament', error);
+  }
 }
 </script>
 
@@ -68,7 +153,28 @@ const hideRemoveParticipantErrorNotification = () => {
     </h1>
     <h4 class="subtitle has-text-centered">{{ tournament.avenue.name }}, {{ tournament.avenue.city }}</h4>
 
-    
+    <div v-if="isAuthenticated" class="buttons is-centered">
+      
+      <p v-if="!tournament.participants.find(p => p.players.find(pp => pp.username == user.username))">
+          <ParticipateButton v-if="tournament.type == 'Singles'"
+          :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+          @participate="participate(tournament.id)"/>
+
+          <ParticipateButton v-if="tournament.type == 'Doubles'"
+          :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+          @participate="openParticipateDoublesModal()"/>
+
+          <ParticipateButton v-if="tournament.type == 'Teams'"
+          :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+          @participate="openParticipateTeamModal()"/>
+      </p>
+      <p v-else>
+          <button class="button is-info" @click="openParticipantRemovalModal(tournament.participants.find(p => p.players.find(pp => pp.username == user.username))?.id ?? -1)"
+          v-if="tournament.participants.length < tournament.maxParticipants">
+          Opt out of tournament
+          </button>
+      </p>
+    </div>
     
     <div class="columns">
       <div class="column is-half">
@@ -122,9 +228,26 @@ const hideRemoveParticipantErrorNotification = () => {
     <div class="box">
       <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-users" /> Participants </h2>
       <div class="has-text-centered" v-if="isAuthorized">
-        <button class="button" @click="openAddGuestModal">
-          Add Guest
-        </button>
+        <div class="buttons is-centered">
+          <button class="button" @click="openAddGuestModal">
+            Add Guest
+          </button>
+        
+          <ParticipateButton v-if="tournament.type == 'Singles'"
+          :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+          button-label="Add Participant"
+          @participate="openParticipateSinglesModal()"/>
+
+          <ParticipateButton v-if="tournament.type == 'Doubles'"
+          :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+          button-label="Add Doubles Participant"
+          @participate="openOrganiserParticipateDoublesModal()"/>
+
+          <ParticipateButton v-if="tournament.type == 'Teams'"
+          :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+          button-label="Add Team Participant"
+          @participate="openParticipateTeamModal()"/>
+        </div>
       </div>
       
 
@@ -194,6 +317,9 @@ const hideRemoveParticipantErrorNotification = () => {
     </div>
 
     <!--MODALS-->
+    <LoadingModal
+      :isOpen="showLoadingModal"
+    />
     <AddGuestModal
       :isOpen="isAddGuestModalOpen"
       :tournamentId="tournament.id"
@@ -207,6 +333,28 @@ const hideRemoveParticipantErrorNotification = () => {
   :tournamentId="tournament.id"
   :participantId="removeParticipantId"
   @close="closeParticipantRemovalModal"
+/>
+
+<ParticipateSinglesModal
+:isOpen="isAddSinglesParticipantModalOpen"
+:tournamentId="tournament.id"
+@close="closeAddSinglesParticipantModal"
+/>
+
+<ParticipateDoublesModal
+:isOpen="isOrganiserParticipateDoublesModalOpen"
+:includeCurrentUser="false"
+:tournamentId="tournament.id"
+:tournamentParticipants="tournament.participants"
+@close="closeOrganiserParticipateDoublesModal"
+/>
+
+<ParticipateDoublesModal
+:isOpen="isParticipateDoublesModalOpen"
+:includeCurrentUser="true"
+:tournamentId="tournament.id"
+:tournamentParticipants="tournament.participants"
+@close="closeParticipateDoublesModal"
 />
 </template>
 

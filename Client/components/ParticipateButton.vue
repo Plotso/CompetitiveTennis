@@ -2,10 +2,10 @@
     <div>
         <button class="button is-primary"  @click="participate()"
         v-if="!hasMaxParticipants">
-          Participate
+        {{ buttonLabel || 'Participate' }}
         </button>
         <button class="button is-primary" v-else disabled>
-            Participate
+          {{ buttonLabel || 'Participate' }}
         </button>
     </div>
   </template>
@@ -15,7 +15,11 @@
   const emit = defineEmits(['participate'])
   
   const props = defineProps({
-    hasMaxParticipants: Boolean
+    hasMaxParticipants: Boolean,
+    buttonLabel: {
+      type: String,
+      default: null
+    }
   });
   
   const participate = () => {

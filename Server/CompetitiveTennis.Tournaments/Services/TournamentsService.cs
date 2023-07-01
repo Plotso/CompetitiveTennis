@@ -9,6 +9,7 @@ using Interfaces;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Models.Account;
 using Models.Tournament;
 
 public class TournamentsService : DeletableDataService<Tournament>, ITournamentsService
@@ -57,6 +58,14 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             .Include(a => a.Organiser)
             .Select(t => t.Organiser.UserId)
             .SingleOrDefaultAsync();
+
+    public async Task<IEnumerable<int>> GetRegisteredAccountsForTournament(int tournamentId)
+        => await AllAsNoTracking()
+            .Include(t => t.Participants)
+            .ThenInclude(p => p.Players)
+            .Where(t => t.Id == tournamentId)
+            .SelectMany(t => t.Participants.SelectMany(p => p.Players.Select(a => a.AccountId)))
+            .ToListAsync();
 
     public async Task<IEnumerable<TournamentOutputModel>> Query(TournamentQuery query)
         => _mapper.Map<IEnumerable<TournamentOutputModel>>(await GetTournamentsQuery(query)

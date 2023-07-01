@@ -1,6 +1,6 @@
 
 <script setup lang="ts">
-import { Result, AccountOutputModel, ParticipantInputModel, MultiParticipantInputModel } from "@/types"
+import { Result, AccountOutputModel, ParticipantInputModel, MultiParticipantInputModel, ParticipantShortOutputModel } from "@/types"
 import { useAuthStore } from "~/stores/auth"
 import { storeToRefs } from 'pinia';
 const authStore = useAuthStore();
@@ -12,7 +12,16 @@ const emit = defineEmits(['close'])
 const props = defineProps({
   isOpen: Boolean,
   includeCurrentUser: Boolean,
-  tournamentId: Number
+  tournamentId: Number,
+  tournamentParticipants: {
+    type: [Array] as PropType<ParticipantShortOutputModel[]>,
+      required: true,
+      default: []
+  }
+});
+
+const isAccountAlreadyPartOfParticipant = ((accountId: number) => {
+    return accountId > 0 && props.tournamentParticipants.find(p => p.players.find(pp => pp.id == accountId))?.id != null
 });
 
 const close = () => {
@@ -50,8 +59,16 @@ const addDoublesParticipant = async () => {
     teamId: null
   }
 
-  const accs: number[] = hasGuest.value ? [] : secondParticipantAccountId.value == -1 ? [participantAccountId.value] : [participantAccountId.value, secondParticipantAccountId.value];
+  if (!hasGuest.value && secondParticipantAccountId.value != -1) {
+    secondParticipantAccountId.value = -1
+  }
 
+  const accs: number[] = hasGuest.value ? [participantAccountId.value] : secondParticipantAccountId.value == -1 ? [participantAccountId.value] : [participantAccountId.value, secondParticipantAccountId.value];
+  console.log("hasGuest.value", hasGuest.value);
+  console.log("secondParticipantAccountId.value == -1", secondParticipantAccountId.value == -1);
+  console.log("accs", accs);
+  console.log("participantAccountId.value", participantAccountId.value);
+  console.log("secondParticipantAccountId.value", secondParticipantAccountId.value);
   const multiParticipantInputModel: MultiParticipantInputModel = {
     participantInfo: participantInput,
     accounts: accs,
@@ -105,10 +122,10 @@ const addDoublesParticipant = async () => {
             <label class="label">Select Player</label>
             <div class="control">
               <div class="select is-fullwidth">
-                <select v-model="secondParticipantAccountId" :required="!hasGuest">
+                <select v-model="participantAccountId" :required="!hasGuest">
                   <option value="">Select Partner</option>
-                  <option v-for="account in data?.data" :key="account.id" :value="account.id" :disabled="account.id == participantAccountId">
-                    {{ account.firstName }} {{ account.lastName}} ({{ account.username }} | Rating: {{ account.playerRating }})
+                  <option v-for="account in data?.data" :key="account.id" :value="account.id" :disabled="account.id == participantAccountId|| isAccountAlreadyPartOfParticipant(account.id)">
+                    {{ account.firstName }} {{ account.lastName}} ({{ account.username }} | Rating: {{ account.playerRating }}) <span v-if="isAccountAlreadyPartOfParticipant(account.id)">(Already participating)</span>
                   </option>
                 </select>
               </div>
@@ -131,11 +148,13 @@ const addDoublesParticipant = async () => {
             <label class="label">Select Partner</label>
             <div class="control">
               <div class="select is-fullwidth">
-                <select v-model="participantAccountId" :required="!hasGuest">
+                <select v-model="secondParticipantAccountId" :required="!hasGuest">
                   <option value="">Select Partner</option>
                   <option v-for="account in data?.data" :key="account.id" :value="account.id" 
-                  :disabled="(user.username == account.username && props.includeCurrentUser) || (!props.includeCurrentUser && account.id == secondParticipantAccountId)">
+                  :disabled="(user.username == account.username && props.includeCurrentUser) || (!props.includeCurrentUser && account.id == participantAccountId)|| isAccountAlreadyPartOfParticipant(account.id)">
                     {{ account.firstName }} {{ account.lastName}} ({{ account.username }} | Rating: {{ account.playerRating }})
+                    <span v-if="isAccountAlreadyPartOfParticipant(account.id)">(Already participating)</span>
+                    <span v-if="!props.includeCurrentUser && account.id == participantAccountId">(Already selected)</span>
                   </option>
                 </select>
               </div>
@@ -143,7 +162,7 @@ const addDoublesParticipant = async () => {
           </div>
           <div class="field">
             <div class="control buttons is-centered">
-              <button class="button is-primary " type="submit" :disabled="hasGuest && !isNameValid">Add Doubles Participant</button>
+              <button class="button is-primary " type="submit" :disabled="(hasGuest && !isNameValid) ||(!hasGuest && participantAccountId == secondParticipantAccountId)">Add Doubles Participant</button>
             </div>
           </div>
         </form>

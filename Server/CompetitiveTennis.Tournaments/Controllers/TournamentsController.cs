@@ -210,7 +210,10 @@ public class TournamentsController : ApiController
                 
                 if (input.ParticipantInfo.IsGuest && string.IsNullOrWhiteSpace(input.ParticipantInfo.Name))
                     return BadRequest(Result.Failure("Name is mandatory for guest participants"));
-                
+                var registeredAccountsForTournament = await _tournaments.GetRegisteredAccountsForTournament(input.ParticipantInfo.TournamentId);
+                if (input.Accounts.Any(a => registeredAccountsForTournament.Contains(a)))
+                    return BadRequest(
+                        Result.Failure("One or more of the provided accounts is part of another participant!"));
                 var participantId = await _participants.Create(input.ParticipantInfo, tournament, team);
                 var currentUserAccount = await _accounts.GetByUserId(_currentUser.UserId);
                 var accounts = await _accounts.GetMultiple(input.Accounts);
@@ -234,6 +237,40 @@ public class TournamentsController : ApiController
                 return isSuccess ? Result.Success : Result.Failure($"Failed to add currentUser to participant {participantId}");
             },
             msgOnError: $"Unexpected error during guest participant creation. ParticipantInput: {input}");
+
+
+    [HttpPost]
+    [Route(nameof(AddSinglesParticipant))]
+    [Authorize]
+    public async Task<ActionResult<Result>> AddSinglesParticipant(AccountParticipantInputModel input)
+        => await SafeHandle(async () =>
+            {
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(input.ParticipantInput.TournamentId);
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
+                    return Unauthorized(
+                        Result.Failure("Only admins and tournament organiser are allowed to add other singles participants!"));
+
+                if (input.AccountId <= 0)
+                    return BadRequest(
+                        Result.Failure("AccountId must be greater than 0!"));
+                
+                var currentAccount = await _accounts.GetInternal(input.AccountId);
+                if (currentAccount == null)
+                    return BadRequest(Result.Failure("Account with provided id could not be found!"));
+                
+                var team = input.ParticipantInput.TeamId.HasValue ? await _teams.GetInternal(input.ParticipantInput.TeamId.Value) : null;
+                var tournament = await _tournaments.GetInternal(input.ParticipantInput.TournamentId);
+                if (tournament == null)
+                    return BadRequest(Result.Failure($"Tournament {input.ParticipantInput.TournamentId} could not be found!"));
+                if (tournament.Type != TournamentType.Singles)
+                    return BadRequest(
+                        Result.Failure("Registration for doubles & teams tournaments are handled separately!"));
+                
+                var participantId = await _participants.Create(input.ParticipantInput, tournament, team);
+                var isSuccess = await _participants.AddUsersToParticipant(participantId, new List<Account> {currentAccount});
+                return isSuccess ? Result.Success : Result.Failure($"Failed to add singles participant");
+            },
+            msgOnError: $"Unexpected error during singles participant addition. AccountParticipantInput: {input}.");
     
     [HttpPost]
     [Route(nameof(AddAccountToParticipant))]

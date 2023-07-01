@@ -153,6 +153,20 @@ public class TournamentsController : BaseGatewayController
             }, $"An error occurred during ParticipateDoubles request for tournament. Request: {input}");
     
     [HttpPost]
+    [Route(nameof(AddSinglesParticipant))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AddSinglesParticipant(AccountParticipantInputModel input) 
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var result = await _tournaments.AddSinglesParticipant(input);
+                return Ok(result);
+            }, $"An error occurred during AddSinglesParticipant request for tournament. Request: {input}");
+    
+    [HttpPost]
     [Route(nameof(AddAccountToParticipant))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

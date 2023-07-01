@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TournamentOutputModel, Result, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel } from '@/types'; // Update the path as per your project setup
+import { TournamentOutputModel, Result, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel, ParticipantShortOutputModel } from '@/types'; // Update the path as per your project setup
 import { storeToRefs } from 'pinia';
 import ParticipateDoublesModal from '~/components/ParticipateDoublesModal.vue';
 import {useAuthStore} from "~/stores/auth"
@@ -59,6 +59,7 @@ const getCourtImg = (surface: Surface): string => {
 const removalTournamentId = ref(-1);
 const removeParticipantId = ref(-1);
 const doubleParticipationTournamentId = ref(-1)
+const doubleTournamentsParticipants: Ref<ParticipantShortOutputModel[]> = ref([])
 const isParticipantRemovalModalOpen = ref(false);
 
 const openParticipantRemovalModal = (tournamentId: number, participantId: number) => {
@@ -72,10 +73,11 @@ const closeParticipantRemovalModal = () => {
 };
 const isParticipateDoublesModalOpen = ref(false);
 
-const openParticipateDoublesModal = (tournamentId: number) => {
+const openParticipateDoublesModal = (tournamentId: number, participants: ParticipantShortOutputModel[]) => {
     console.log('part doubles');
     doubleParticipationTournamentId.value = tournamentId;
   isParticipateDoublesModalOpen.value = true;
+  doubleTournamentsParticipants.value = participants;
 };
 
 const openParticipateTeamModal = (tournamnetId: number) => {
@@ -122,11 +124,11 @@ const participate = async (tournamentId: number) => {
         errorNotification.value = `An error occurred during participation for tournament. Code: ${response.status}`
       }
       showErrorNotification.value = true;
-      console.error(`Failed to create tournament. Status: ${response.status}`);
+      console.error(`Failed to participate tournament. Status: ${response.status}`);
     }
   } catch (error) {
     showLoadingModal.value = false;
-    console.error('An error occurred while creating the tournament', error);
+    console.error('An error occurred while participating for the tournament', error);
   }
 }
 
@@ -156,11 +158,11 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
         errorNotification.value = `An error occurred during opt out attempt for tournament. Code: ${response.status}`
       }
       showErrorNotification.value = true;
-      console.error(`Failed to create tournament. Status: ${response.status}`);
+      console.error(`Failed to opt out from tournament. Status: ${response.status}`);
     }
   } catch (error) {
     showLoadingModal.value = false;
-    console.error('An error occurred while creating the tournament', error);
+    console.error('An error occurred while optiong out of the tournament', error);
   }
 }
 
@@ -234,7 +236,7 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
 
                                 <ParticipateButton v-if="tournament.type == 'Doubles'"
                                 :has-max-participants="tournament.participants.length === tournament.maxParticipants"
-                                @participate="openParticipateDoublesModal(tournament.id)"/>
+                                @participate="openParticipateDoublesModal(tournament.id, tournament.participants)"/>
 
                                 <ParticipateButton v-if="tournament.type == 'Teams'"
                                 :has-max-participants="tournament.participants.length === tournament.maxParticipants"
@@ -266,6 +268,14 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
     :isOpen="isParticipateDoublesModalOpen"
     :includeCurrentUser="true"
     :tournamentId="doubleParticipationTournamentId"
+    @close="closeParticipateDoublesModal"
+    />
+
+    <ParticipateDoublesModal
+    :isOpen="isParticipateDoublesModalOpen"
+    :includeCurrentUser="true"
+    :tournamentId="doubleParticipationTournamentId"
+    :tournamentParticipants="doubleTournamentsParticipants"
     @close="closeParticipateDoublesModal"
     />
 

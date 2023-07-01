@@ -16,6 +16,8 @@ public interface ITournamentsService : IDataService<Tournament>
     Task<Tournament> GetInternal(int id);
     
     Task<string> GetOrganiserUserId(int id);
+
+    Task<IEnumerable<int>> GetRegisteredAccountsForTournament(int tournamentId);
     
     Task<IEnumerable<TournamentOutputModel>> Query(TournamentQuery query);
     

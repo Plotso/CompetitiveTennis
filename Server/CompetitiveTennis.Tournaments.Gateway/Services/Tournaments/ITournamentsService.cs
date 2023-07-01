@@ -38,6 +38,9 @@ public interface ITournamentsService
     [Post("/Tournaments/ParticipateDoubles")]
     Task<Result> ParticipateDoubles(MultiParticipantInputModel input);
 
+    [Post("/Tournaments/AddSinglesParticipant")]
+    Task<Result> AddSinglesParticipant(AccountParticipantInputModel input);
+
     [Post("/Tournaments/AddAccountToParticipant")]
     Task<Result> AddAccountToParticipant(int tournamentId, int participantId, int accountId);
 
