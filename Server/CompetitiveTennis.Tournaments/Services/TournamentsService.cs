@@ -34,7 +34,6 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             tournament.Participants.Remove(participant);
             await SaveAsync(tournament);
         }
-
         return true;
     }
 
@@ -47,6 +46,12 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         => _mapper.Map<TournamentOutputModel>(await All()
             .Where(a => a.Id == id)
             .EnrichTournamentQueryData()
+            .SingleOrDefaultAsync());
+
+    public async Task<TournamentOutputModel> GetForDrawGeneration(int id)
+        => _mapper.Map<TournamentOutputModel>(await All()
+            .Where(a => a.Id == id)
+            .EnrichTournamentQueryForDrawGeneration()
             .SingleOrDefaultAsync());
 
     public async Task<Tournament> GetInternal(int id)

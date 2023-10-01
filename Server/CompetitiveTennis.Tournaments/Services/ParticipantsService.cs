@@ -23,6 +23,12 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
             .ThenInclude(p => p.Account)
             .FirstOrDefaultAsync(p => p.Id == id);
 
+    public IEnumerable<Participant> GetParticipantForTournament(int tournamentId)
+        => All()
+            .Include(p => p.Players)
+            .ThenInclude(p => p.Account)
+            .Where(p => p.TournamentId == tournamentId);
+
     public async Task<bool> IsParticipantFull(int id)
     {
         var participant = await All().Include(p => p.Players).SingleOrDefaultAsync(p => p.Id == id);

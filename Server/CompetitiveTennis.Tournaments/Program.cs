@@ -3,7 +3,9 @@ using CompetitiveTennis.Services.Interfaces;
 using CompetitiveTennis.Tournaments.Data;
 using CompetitiveTennis.Tournaments.SerializerOptions;
 using CompetitiveTennis.Tournaments.Services;
+using CompetitiveTennis.Tournaments.Services.BL;
 using CompetitiveTennis.Tournaments.Services.Interfaces;
+using CompetitiveTennis.Tournaments.Services.Interfaces.BL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +22,8 @@ builder.Services
     .AddTransient<IMatchesService, MatchesService>()
     .AddTransient<IScoresService, ScoresService>()
     .AddTransient<IDataSeeder, TournamentDataSeeder>()
-    .AddSingleton<ISerializerOptions, SerializerOptions>();
+    .AddSingleton<ISerializerOptions, SerializerOptions>()
+    .AddSingleton<ITournamentDrawGenerator, TournamentDrawGenerator>();
 /*
 .AddNpgsqlDataSource(builder.Configuration.GetConnectionString("DefaultConnection"), sourceBuilder =>
 {

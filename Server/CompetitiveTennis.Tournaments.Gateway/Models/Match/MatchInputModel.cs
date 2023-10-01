@@ -11,11 +11,11 @@ public record MatchInputModel
     
     [Required]
     [Range(1, int.MaxValue)]
-    public int Participant1Id { get; set; }
+    public int HomeParticipantId { get; set; }
     
     [Required]
     [Range(1, int.MaxValue)]
-    public int Participant2Id { get; set; }
+    public int AwayParticipantId { get; set; }
     
     public short? MatchWonPoints { get; set; }
     public short? SetWonPoints { get; set; }
@@ -34,6 +34,4 @@ public record MatchInputModel
     [Required]
     [Range(1, int.MaxValue)]
     public int TournamentId { get; set; }
-    
-    public int? NextMatchId { get; set; }
 };

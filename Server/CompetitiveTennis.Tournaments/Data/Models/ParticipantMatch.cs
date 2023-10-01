@@ -8,4 +8,6 @@ public class ParticipantMatch : CompositeKeyDeletableEntity
     public Participant Participant { get; set; }
     public int MatchId { get; set; }
     public Match Match { get; set; }
+    
+    public string Specifier { get; set; }
 }

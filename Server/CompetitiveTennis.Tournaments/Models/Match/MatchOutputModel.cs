@@ -9,7 +9,6 @@ public record MatchOutputModel(
     int Id,
     DateTime StartDate,
     DateTime EndDate,
-    int Participant1Id,
     short? MatchWonPoints,
     short? SetWonPoints,
     short? GameWonPoints,

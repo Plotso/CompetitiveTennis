@@ -12,6 +12,7 @@ public interface ITournamentsService : IDataService<Tournament>
     Task<IEnumerable<TournamentOutputModel>> GetAll();
     
     Task<TournamentOutputModel> Get(int id);
+    Task<TournamentOutputModel> GetForDrawGeneration(int id);
     
     Task<Tournament> GetInternal(int id);
     

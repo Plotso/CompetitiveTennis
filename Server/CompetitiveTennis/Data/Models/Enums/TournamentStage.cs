@@ -3,6 +3,7 @@
 public enum TournamentStage
 {
     Unknown,
+    Qualification,
     RoundOf128,
     RoundOf64,
     RoundOf32,

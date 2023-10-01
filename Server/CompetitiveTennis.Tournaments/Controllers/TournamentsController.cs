@@ -10,7 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.Participant;
 using Models.Tournament;
+using Models.TournamentDrawGenerator;
+using Services.BL;
 using Services.Interfaces;
+using Services.Interfaces.BL;
 
 public class TournamentsController : ApiController
 {
@@ -19,6 +22,7 @@ public class TournamentsController : ApiController
     private readonly IAccountsService _accounts;
     private readonly IParticipantsService _participants;
     private readonly ITeamsService _teams;
+    private readonly ITournamentDrawGenerator _tournamentDrawGenerator;
     private readonly ICurrentUserService _currentUser;
 
     public TournamentsController(
@@ -27,6 +31,7 @@ public class TournamentsController : ApiController
         IAccountsService accounts,
         IParticipantsService participants,
         ITeamsService teams,
+        ITournamentDrawGenerator tournamentDrawGenerator,
         ICurrentUserService currentUser,
         ILogger<TournamentsController> logger) : base(logger)
     {
@@ -35,6 +40,7 @@ public class TournamentsController : ApiController
         _accounts = accounts;
         _participants = participants;
         _teams = teams;
+        _tournamentDrawGenerator = tournamentDrawGenerator;
         _currentUser = currentUser;
     }
 
@@ -340,8 +346,35 @@ public class TournamentsController : ApiController
                 return isSuccess ? Result.Success : Result.Failure($"Failed to remove participant {participantId} from tournament {tournamentId}");
             },
             msgOnError: $"Unexpected error during participant removal from tournament. ParticipantId: {participantId}. TournamentId: {tournamentId}");
-    
-    
+
+    [HttpPost]
+    [Route(nameof(GenerateTournamentDraw))]
+    [Authorize]
+    public async Task<ActionResult<Result>> GenerateTournamentDraw(int tournamentId)
+        => await SafeHandle(async () =>
+        {
+            var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId);
+            if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
+                return Unauthorized(
+                    Result.Failure(
+                        "Only admins and tournament organiser are allowed to trigger tournament draw generation!"));
+            
+            var tournament = await _tournaments.GetForDrawGeneration(tournamentId);
+            if (tournament == null)
+                return BadRequest(Result.Failure($"Tournament {tournamentId} could not be found!"));
+
+            Logger.LogInformation($"Tournament draw generation for Tournament {tournamentId} has been triggered by user {_currentUser.UserId}");
+
+            var isSuccess = await _tournamentDrawGenerator.GenerateTournamentDraw(tournament); 
+            return isSuccess
+                ? Result.Success
+                : Result.Failure($"Failed to generate draw for tournament {tournamentId}");
+        });
+
+    private Seed ConvertParticipantToSeed(ParticipantShortOutputModel participant) 
+        => new(participant.Id, participant.Name ?? string.Join($" /", participant.Players.Select(p => $"{p.FirstName} {p.LastName}")));
+
+
     private async Task<bool> IsCurrentUserOrganiser(int tournamentId) 
         => await _tournaments.GetOrganiserUserId(tournamentId) == _currentUser.UserId;
 

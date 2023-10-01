@@ -7,6 +7,7 @@ using Models.Participant;
 public interface IParticipantsService : IDataService<Participant>
 {
     Task<Participant?> GetInternal(int id);
+    IEnumerable<Participant> GetParticipantForTournament(int tournamentId);
 
     Task<bool> IsParticipantFull(int id);
     

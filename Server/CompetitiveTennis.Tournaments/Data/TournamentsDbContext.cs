@@ -34,6 +34,7 @@ public class TournamentsDbContext : DbContext
     public DbSet<AccountParticipant> AccountParticipants { get; set; }
     
     public DbSet<Score> Scores { get; set; }
+    public DbSet<MatchFlow> MatchFlows { get; set; }
     
     public override int SaveChanges() => SaveChanges(true);
 

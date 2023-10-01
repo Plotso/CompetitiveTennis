@@ -2,6 +2,7 @@
 
 using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
+using Data;
 using Data.Models;
 using Interfaces;
 using Mapster;
@@ -45,50 +46,93 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         return match.Id;
     }
 
-    public async Task<int> Create(MatchInputModel input, Tournament tournament, Participant participant1, Participant participant2)
+    public async Task<int> Create(MatchInputModel input, Tournament tournament, Participant homeParticipant, Participant awayParticipant)
     {
         var match = _mapper.Map<Match>(input);
         match.Tournament = tournament;
-        match.Participant1Id = participant1.Id;
 
         await SaveAsync(match);
 
-        await AddParticipants(match, participant1, participant2);
+        await AddParticipant(match, homeParticipant, DataConstants.ParticipantSpecifiers.Home);
+        await AddParticipant(match, awayParticipant, DataConstants.ParticipantSpecifiers.Away);
         await Data.SaveChangesAsync();
         return match.Id;
     }
 
-    public async Task<bool> UpdateParticipants(int id, Participant participant1, Participant participant2)
+    public async Task<int> AddMatchFlow(int tournamentId, int matchId, int successorMatchId, bool isWinnerHome)
+    {
+        var match = await All().Include(m => m.Tournament).SingleOrDefaultAsync(m => m.Id == matchId);
+        if (match == null)
+            return ServiceConstants.MissingEntityId;
+        if (match.TournamentId != tournamentId)
+            throw new ArgumentException($"Match {matchId} is linked to a different tournament than the one from the input");
+        
+        var successorMatch = await All().Include(m => m.Tournament).SingleOrDefaultAsync(m => m.Id == successorMatchId);
+        if (successorMatch == null)
+            return ServiceConstants.MissingEntityId;
+        if (successorMatch.TournamentId != match.TournamentId)
+            throw new ArgumentException($"Match {matchId} and followup match {successorMatch} are linked to different tournaments");
+
+        var matchFlow = new MatchFlow
+        {
+            IsHome = isWinnerHome,
+            MatchId = match.Id,
+            SuccessorMatchId = successorMatch.Id,
+            Tournament = match.Tournament
+        };
+        await Data.Set<MatchFlow>().AddAsync(matchFlow);
+        await Data.SaveChangesAsync();
+        return matchFlow.Id;
+    }
+
+    public async Task<bool> UpdateParticipant(int id, Participant newParticipant, bool isHome)
+    {
+        var match = await All().Include(m => m.Participants).SingleOrDefaultAsync(m => m.Id == id);
+        if (match == null)
+            return false;
+
+        var specifier = isHome ? DataConstants.ParticipantSpecifiers.Home : DataConstants.ParticipantSpecifiers.Away;
+        var currentParticipant = match.Participants.FirstOrDefault(p => p.Specifier == specifier);
+        if (currentParticipant != null)
+        {
+            match.Participants.Remove(currentParticipant);
+        }
+        await AddParticipant(match, newParticipant, specifier);
+
+        await Data.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> UpdateParticipants(int id, Participant homeParticipant, Participant awayParticipant)
     {
         var match = await All().Include(m => m.Participants).SingleOrDefaultAsync(m => m.Id == id);
         if (match == null)
             return false;
         
-        match.Participant1Id = participant1.Id;
-        var hasParticipant1 = match.Participants.Select(p => p.ParticipantId).Any(pid => pid == participant1.Id);
-        var hasParticipant2 = match.Participants.Select(p => p.ParticipantId).Any(pid => pid == participant2.Id);
+        var hasHomeParticipant = match.Participants.Select(p => p.ParticipantId).Any(pid => pid == homeParticipant.Id);
+        var hasAwayParticipant = match.Participants.Select(p => p.ParticipantId).Any(pid => pid == awayParticipant.Id);
 
-        if (!hasParticipant1 && hasParticipant2)
+        if (!hasHomeParticipant && hasAwayParticipant)
         {
-            var participantsToRemove = match.Participants.Where(p => p.ParticipantId != participant2.Id);
+            var participantsToRemove = match.Participants.Where(p => p.ParticipantId != awayParticipant.Id);
             foreach (var participantToRemove in participantsToRemove)
             {
                 match.Participants.Remove(participantToRemove);
             }
-            await AddParticipants(match, participant1);
+            await AddParticipant(match, homeParticipant, DataConstants.ParticipantSpecifiers.Home);
         }
 
-        if (!hasParticipant2 && hasParticipant1)
+        if (!hasAwayParticipant && hasHomeParticipant)
         {
-            var participantsToRemove = match.Participants.Where(p => p.ParticipantId != participant1.Id);
+            var participantsToRemove = match.Participants.Where(p => p.ParticipantId != homeParticipant.Id);
             foreach (var participantToRemove in participantsToRemove)
             {
                 match.Participants.Remove(participantToRemove);
             }
-            await AddParticipants(match, participant2);
+            await AddParticipant(match, awayParticipant, DataConstants.ParticipantSpecifiers.Away);
         }
 
-        if (!hasParticipant2 && !hasParticipant1)
+        if (!hasAwayParticipant && !hasHomeParticipant)
         {
             var participantsToRemove = match.Participants.Select(p => p.ParticipantId);
             foreach (var participantId in participantsToRemove)
@@ -96,7 +140,8 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
                 var participant = match.Participants.FirstOrDefault(p => p.ParticipantId == participantId);
                 match.Participants.Remove(participant);
             }
-            await AddParticipants(match, participant1, participant2);
+            await AddParticipant(match, homeParticipant, DataConstants.ParticipantSpecifiers.Home);
+            await AddParticipant(match, awayParticipant, DataConstants.ParticipantSpecifiers.Away);
         }
 
         await Data.SaveChangesAsync();
@@ -138,7 +183,6 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         match.GameWonPoints = inputModel.GameWonPoints;
         match.Stage = inputModel.Stage;
         match.Details = inputModel.Details;
-        match.NextMatchId = inputModel.NextMatchId;
 
         await SaveAsync(match);
         return true;
@@ -172,13 +216,18 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         return true;
     }
 
-    private async Task AddParticipants(Match match, params Participant[] participants)
+    public async Task BeginTransaction() => await Data.Database.BeginTransactionAsync();
+    public async Task CommitTransaction() => await Data.Database.CommitTransactionAsync();
+    public async Task RollbackTransaction() => await Data.Database.RollbackTransactionAsync();
+
+    private async Task AddParticipant(Match match, Participant participant, string specifier)
     {
-        var entities = participants.Select(p => new ParticipantMatch
+        var entities = new ParticipantMatch
         {
             Match = match,
-            Participant = p
-        });
-        await Data.Set<ParticipantMatch>().AddRangeAsync(entities);
+            Participant = participant,
+            Specifier = specifier
+        };
+        await Data.Set<ParticipantMatch>().AddAsync(entities);
     }
 }
