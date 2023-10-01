@@ -49,4 +49,7 @@ public interface ITournamentsService
     
     [Post("/Tournaments/RemoveParticipantFromTournament")]
     Task<Result> RemoveParticipantFromTournament(int tournamentId, int participantId);
+    
+    [Post("/Tournaments/GenerateTournamentDraw")]
+    Task<Result> GenerateTournamentDraw(int tournamentId);
 }

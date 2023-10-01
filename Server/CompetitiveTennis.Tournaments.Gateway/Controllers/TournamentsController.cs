@@ -207,4 +207,19 @@ public class TournamentsController : BaseGatewayController
                 var result = await _tournaments.RemoveParticipantFromTournament(tournamentId, participantId);
                 return Ok(result);
             }, $"An error occurred during RemoveParticipantFromTournament request for tournament: {tournamentId}, participant: {participantId}");
+    
+    
+    [HttpPost]
+    [Route(nameof(GenerateTournamentDraw))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GenerateTournamentDraw(int tournamentId)
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var result = await _tournaments.GenerateTournamentDraw(tournamentId);
+                return Ok(result);
+            }, $"An error occurred during GenerateTournamentDraw request for tournament: {tournamentId}");
 }
