@@ -14,16 +14,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddWebService<TournamentsDbContext>(builder.Configuration, builder.Environment, swaggerEnabled: true,
         enableLegacyTimestampBehaviour: true, dataSourceDelegate: null)
-    .AddTransient<IAccountsService, AccountsService>()
-    .AddTransient<IAvenuesService, AvenuesService>()
-    .AddTransient<ITournamentsService, TournamentsService>()
-    .AddTransient<IParticipantsService, ParticipantsService>()
-    .AddTransient<ITeamsService, TeamsService>()
-    .AddTransient<IMatchesService, MatchesService>()
-    .AddTransient<IScoresService, ScoresService>()
+    .AddScoped<IAccountsService, AccountsService>()
+    .AddScoped<IAvenuesService, AvenuesService>()
+    .AddScoped<ITournamentsService, TournamentsService>()
+    .AddScoped<IParticipantsService, ParticipantsService>()
+    .AddScoped<ITeamsService, TeamsService>()
+    .AddScoped<IMatchesService, MatchesService>()
+    .AddScoped<IScoresService, ScoresService>()
     .AddTransient<IDataSeeder, TournamentDataSeeder>()
     .AddSingleton<ISerializerOptions, SerializerOptions>()
-    .AddSingleton<ITournamentDrawGenerator, TournamentDrawGenerator>();
+    .AddScoped<ITournamentDrawGenerator, TournamentDrawGenerator>();
 /*
 .AddNpgsqlDataSource(builder.Configuration.GetConnectionString("DefaultConnection"), sourceBuilder =>
 {
