@@ -27,7 +27,7 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
     {
         try
         {
-            await _matchesService.BeginTransaction();
+            //await _matchesService.BeginTransaction();
             var dbTournament = await _tournamentsService.GetInternal(tournament.Id);
             var seeds = ConvertParticipantData(tournament.Participants).ToList();
             var matches = GenerateMatches(seeds);
@@ -42,12 +42,12 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
                 if (match.HomeSeed == null || match.AwaySeed == null)
                 {
                     dbMatchId = await _matchesService.CreateEmptyMatch(new MatchInputModel{Stage = match.TournamentStage}, dbTournament);
-                    if (match.HomeSeed != null || match.AwaySeed == null)
+                    if (match is {HomeSeed: not null, AwaySeed: null})
                     {
                         var participant = await _participantsService.GetInternal(match.HomeSeed.Id);
                         await _matchesService.UpdateParticipant(dbMatchId, participant, isHome: true);
                     }
-                    if (match.HomeSeed == null || match.AwaySeed != null)
+                    if (match is {HomeSeed: null, AwaySeed: not null})
                     {
                         var participant = await _participantsService.GetInternal(match.AwaySeed.Id);
                         await _matchesService.UpdateParticipant(dbMatchId, participant, isHome: false);
@@ -67,13 +67,14 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
                     _ = await _matchesService.AddMatchFlow(dbTournament.Id, matchId: drawMatchIdToDbMatchIdMap[match.AwayPrevMatch.Value], successorMatchId: dbMatchId, isWinnerHome: false);
             }
 
-            await _matchesService.CommitTransaction();
+            //await _matchesService.CommitTransaction();
             return true;
         }
         catch (Exception ex)
         {
-            await _matchesService.RollbackTransaction();
-            _logger.LogError(ex, $"An error occured while drawing matches for tournament {tournament.Id}. Transactions were rollbacked");
+            //await _matchesService.RollbackTransaction();
+            //.LogError(ex, $"An error occured while drawing matches for tournament {tournament.Id}. Transactions were rollbacked");
+            _logger.LogError(ex, $"An error occured while drawing matches for tournament {tournament.Id}.");
             return false;
         }
     }
@@ -243,6 +244,8 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
                     PlayOrderNumber = matchesGenerated - 1,
                     HomePlayer = qualificationPlayers[i - 1].Name,
                     AwayPlayer = qualificationPlayers[qualificationPlayers.Length - i].Name,
+                    HomeSeed = qualificationPlayers[i-1],
+                    AwaySeed = qualificationPlayers[qualificationPlayers.Length - i],
                     TournamentStage = TournamentStage.Qualification
                 };
                 matches.Add(match);

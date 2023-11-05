@@ -41,11 +41,11 @@ public class IdentityService : IIdentityService
     {
         var user = await GetUser(userInput);
         if (user == null)
-            return InvalidErrorMessage;
+            return Result<FullUserOutputModel>.Failure(new [] {InvalidErrorMessage});
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, userInput.Password);
         if (!passwordValid)
-            return InvalidErrorMessage;
+            return Result<FullUserOutputModel>.Failure(new [] {InvalidErrorMessage});
 
         var roles = await _userManager.GetRolesAsync(user);
         var isAdministrator = roles.Any(r => r == Constants.AdministratorRoleName);

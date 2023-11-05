@@ -189,8 +189,11 @@ public class TournamentsController : ApiController
                     return BadRequest(
                         Result.Failure("Registration for doubles & teams tournaments are handled separately!"));
                 
-                var participantId = await _participants.Create(input, tournament, team);
                 var currentAccount = await _accounts.GetByUserId(_currentUser.UserId);
+                if (await _tournaments.IsAccountPresentInAnyParticipant(currentAccount.Id, input.TournamentId))
+                    return Result.Success;
+                
+                var participantId = await _participants.Create(input, tournament, team);
                 var isSuccess = await _participants.AddUsersToParticipant(participantId, new List<Account> {currentAccount});
                 return isSuccess ? Result.Success : Result.Failure($"Failed to add currentUser to participant {participantId}");
             },
@@ -239,6 +242,13 @@ public class TournamentsController : ApiController
 
                     accsToSign.Add(currentUserAccount);
                 }
+
+                foreach (var accountId in accsToSign.Select(a => a.Id))
+                {
+                    if (await _tournaments.IsAccountPresentInAnyParticipant(accountId, input.ParticipantInfo.TournamentId))
+                        return BadRequest(
+                            Result.Failure($"Account {accountId} is already part of a participant for tournament {input.ParticipantInfo.TournamentId}"));
+                }
                 var isSuccess = await _participants.AddUsersToParticipant(participantId, accsToSign);
                 return isSuccess ? Result.Success : Result.Failure($"Failed to add currentUser to participant {participantId}");
             },
@@ -263,6 +273,9 @@ public class TournamentsController : ApiController
                 var currentAccount = await _accounts.GetInternal(input.AccountId);
                 if (currentAccount == null)
                     return BadRequest(Result.Failure("Account with provided id could not be found!"));
+
+                if (await _tournaments.IsAccountPresentInAnyParticipant(currentAccount.Id, input.ParticipantInput.TournamentId))
+                    return Result.Success;
                 
                 var team = input.ParticipantInput.TeamId.HasValue ? await _teams.GetInternal(input.ParticipantInput.TeamId.Value) : null;
                 var tournament = await _tournaments.GetInternal(input.ParticipantInput.TournamentId);
@@ -291,6 +304,10 @@ public class TournamentsController : ApiController
                 if (await _participants.IsParticipantFull(participantId))
                     return BadRequest(
                         Result.Failure($"No more players can be added to participant {participantId} since it has reached max cap for tournament type"));
+
+                if (await _tournaments.IsAccountPresentInAnyParticipant(accountId, tournamentId))
+                    return BadRequest(
+                        Result.Failure($"Account {accountId} is already part of a participant for tournament {tournamentId}"));
                 
                 
                 var account = await _accounts.GetInternal(accountId);

@@ -5,6 +5,11 @@ using Models;
 
 public static class QueryableExtensions
 {
+    public static IQueryable<Tournament> EnrichWithMatches(this IQueryable<Tournament> tournaments)
+        => tournaments
+            .Include(t => t.MatchFlows)
+            .Include(t => t.Matches)
+            .ThenInclude(m => m.Participants);
     public static IQueryable<Tournament> EnrichTournamentQueryData(this IQueryable<Tournament> tournaments)
         => tournaments
             .Include(t => t.Avenue)

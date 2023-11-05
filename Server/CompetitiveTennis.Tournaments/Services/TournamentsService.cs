@@ -46,7 +46,22 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         => _mapper.Map<TournamentOutputModel>(await All()
             .Where(a => a.Id == id)
             .EnrichTournamentQueryData()
+            .EnrichWithMatches()
             .SingleOrDefaultAsync());
+
+    public async Task<bool> IsAccountPresentInAnyParticipant(int accountId, int tournamentId)
+    {
+        var tournament = await AllAsNoTracking()
+            .Include(t => t.Participants)
+            .ThenInclude(tp => tp.Players)
+            .FirstOrDefaultAsync(t => t.Id == tournamentId);
+        if (tournament == null)
+            return false;
+
+        return tournament.Participants.Any(tp => tp.Players.Any(p => p.AccountId == accountId));
+        var participatingAccountIds = tournament.Participants.SelectMany(p => p.Players).Select(ap => ap.AccountId);
+        return participatingAccountIds.Contains(accountId);
+    }
 
     public async Task<TournamentOutputModel> GetForDrawGeneration(int id)
         => _mapper.Map<TournamentOutputModel>(await All()

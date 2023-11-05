@@ -10,6 +10,8 @@ public interface ITournamentsService : IDataService<Tournament>
     Task<bool> RemoveParticipant(int id, Participant participant);
     
     Task<IEnumerable<TournamentOutputModel>> GetAll();
+
+    Task<bool> IsAccountPresentInAnyParticipant(int accountId, int tournamentId);
     
     Task<TournamentOutputModel> Get(int id);
     Task<TournamentOutputModel> GetForDrawGeneration(int id);
