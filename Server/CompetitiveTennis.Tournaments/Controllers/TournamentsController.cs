@@ -380,6 +380,13 @@ public class TournamentsController : ApiController
             if (tournament == null)
                 return BadRequest(Result.Failure($"Tournament {tournamentId} could not be found!"));
 
+            if (tournament.Participants.Count() < tournament.MinParticipants)
+                return BadRequest(Result.Failure(
+                    $"Participants in tournament {tournamentId} are less than the configured minimal amount of participants!"));
+
+            if (tournament.Matches.Any())
+                return Result.Success;
+
             Logger.LogInformation($"Tournament draw generation for Tournament {tournamentId} has been triggered by user {_currentUser.UserId}");
 
             var isSuccess = await _tournamentDrawGenerator.GenerateTournamentDraw(tournament); 

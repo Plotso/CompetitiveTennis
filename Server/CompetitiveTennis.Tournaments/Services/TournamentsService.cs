@@ -67,6 +67,7 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         => _mapper.Map<TournamentOutputModel>(await All()
             .Where(a => a.Id == id)
             .EnrichTournamentQueryForDrawGeneration()
+            .EnrichWithMatches()
             .SingleOrDefaultAsync());
 
     public async Task<Tournament> GetInternal(int id)
