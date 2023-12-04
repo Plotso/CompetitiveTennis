@@ -1,5 +1,6 @@
 using CompetitiveTennis.Extensions;
 using CompetitiveTennis.Services.Interfaces;
+using CompetitiveTennis.Tournaments.Configurations;
 using CompetitiveTennis.Tournaments.Data;
 using CompetitiveTennis.Tournaments.SerializerOptions;
 using CompetitiveTennis.Tournaments.Services;
@@ -23,7 +24,9 @@ builder.Services
     .AddScoped<IScoresService, ScoresService>()
     .AddTransient<IDataSeeder, TournamentDataSeeder>()
     .AddSingleton<ISerializerOptions, SerializerOptions>()
-    .AddScoped<ITournamentDrawGenerator, TournamentDrawGenerator>();
+    .AddScoped<ITournamentDrawGenerator, TournamentDrawGenerator>()
+    .Configure<TournamentCreationConfiguration>(builder.Configuration.GetSection(nameof(TournamentCreationConfiguration)))
+    ;
 /*
 .AddNpgsqlDataSource(builder.Configuration.GetConnectionString("DefaultConnection"), sourceBuilder =>
 {

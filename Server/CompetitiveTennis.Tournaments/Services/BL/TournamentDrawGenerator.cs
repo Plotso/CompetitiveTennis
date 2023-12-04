@@ -1,8 +1,11 @@
 namespace CompetitiveTennis.Tournaments.Services.BL;
 
 using CompetitiveTennis.Data.Models.Enums;
+using Configurations;
+using Extensions;
 using Interfaces;
 using Interfaces.BL;
+using Microsoft.Extensions.Options;
 using Models.Match;
 using Models.Participant;
 using Models.Tournament;
@@ -10,16 +13,26 @@ using Models.TournamentDrawGenerator;
 
 public class TournamentDrawGenerator : ITournamentDrawGenerator
 {
+    private const short DefaultStartHour = 8;
+    private const short DefaultEndHour = 8;
+    
     private readonly IMatchesService _matchesService;
     private readonly IParticipantsService _participantsService;
     private readonly ITournamentsService _tournamentsService;
+    private readonly IOptionsMonitor<TournamentCreationConfiguration> _tournamentConfiguration;
     private readonly ILogger<TournamentDrawGenerator> _logger;
 
-    public TournamentDrawGenerator(IMatchesService matchesService, IParticipantsService participantsService, ITournamentsService tournamentsService, ILogger<TournamentDrawGenerator> logger)
+    public TournamentDrawGenerator(
+        IMatchesService matchesService,
+        IParticipantsService participantsService,
+        ITournamentsService tournamentsService,
+        IOptionsMonitor<TournamentCreationConfiguration> tournamentConfiguration,
+        ILogger<TournamentDrawGenerator> logger)
     {
         _matchesService = matchesService;
         _participantsService = participantsService;
         _tournamentsService = tournamentsService;
+        _tournamentConfiguration = tournamentConfiguration;
         _logger = logger;
     }
 
@@ -31,17 +44,24 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
             var dbTournament = await _tournamentsService.GetInternal(tournament.Id);
             var seeds = ConvertParticipantData(tournament.Participants).ToList();
             var matches = GenerateMatches(seeds);
+            var startHour = _tournamentConfiguration.CurrentValue.HasValidDailyStartHour()
+                ? _tournamentConfiguration.CurrentValue.DailyStartHour
+                : DefaultStartHour;;
+            var endHour = _tournamentConfiguration.CurrentValue.HasValidDailyEndHour()
+                ? _tournamentConfiguration.CurrentValue.DailyEndHour
+                : DefaultEndHour;
+            MatchScheduler.ScheduleMatches
+                (matches, dbTournament.StartDate, dbTournament.EndDate, dbTournament.CourtsAvailable,
+                    startTime: new TimeSpan(startHour, 0, 0), endTime: new TimeSpan(endHour, 0, 0));
+
 
             var drawMatchIdToDbMatchIdMap = new Dictionary<int, int>(matches.Count);
-            //ToDo: Insert matches in reversed order (Final -> 1/2 -> 1/4 ... Qualifications)
-            // Each match has prev 2 match ids. However, the matchflows here are using successorIds, that's why we would be inserting in reversed order
-            // Or maybe that's wrong ?!?
             foreach (var match in matches)
             {
                 var dbMatchId = -1;
                 if (match.HomeSeed == null || match.AwaySeed == null)
                 {
-                    dbMatchId = await _matchesService.CreateEmptyMatch(new MatchInputModel{Stage = match.TournamentStage}, dbTournament);
+                    dbMatchId = await _matchesService.CreateEmptyMatch(new MatchInputModel{Stage = match.TournamentStage, StartDate = match.StartTime}, dbTournament);
                     if (match is {HomeSeed: not null, AwaySeed: null})
                     {
                         var participant = await _participantsService.GetInternal(match.HomeSeed.Id);
@@ -57,7 +77,7 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
                 {
                     var homeParticipant = await _participantsService.GetInternal(match.HomeSeed.Id);
                     var awayParticipant = await _participantsService.GetInternal(match.AwaySeed.Id);
-                    dbMatchId = await _matchesService.Create(new MatchInputModel {Stage = match.TournamentStage},
+                    dbMatchId = await _matchesService.Create(new MatchInputModel {Stage = match.TournamentStage, StartDate = match.StartTime},
                         dbTournament, homeParticipant, awayParticipant);
                 }
                 drawMatchIdToDbMatchIdMap.Add(match.Id, dbMatchId);
@@ -78,6 +98,7 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
             return false;
         }
     }
+    
     public static IEnumerable<Seed> ConvertParticipantData(IEnumerable<ParticipantShortOutputModel> participants)
     {
         var rng = new Random();
