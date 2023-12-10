@@ -61,7 +61,7 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
                 var dbMatchId = -1;
                 if (match.HomeSeed == null || match.AwaySeed == null)
                 {
-                    dbMatchId = await _matchesService.CreateEmptyMatch(new MatchInputModel{Stage = match.TournamentStage, StartDate = match.StartTime}, dbTournament);
+                    dbMatchId = await _matchesService.CreateEmptyMatch(new MatchInputModel{Stage = match.TournamentStage, StartDate = match.StartTime, EndDate = match.EndTime}, dbTournament);
                     if (match is {HomeSeed: not null, AwaySeed: null})
                     {
                         var participant = await _participantsService.GetInternal(match.HomeSeed.Id);
@@ -77,7 +77,7 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
                 {
                     var homeParticipant = await _participantsService.GetInternal(match.HomeSeed.Id);
                     var awayParticipant = await _participantsService.GetInternal(match.AwaySeed.Id);
-                    dbMatchId = await _matchesService.Create(new MatchInputModel {Stage = match.TournamentStage, StartDate = match.StartTime},
+                    dbMatchId = await _matchesService.Create(new MatchInputModel {Stage = match.TournamentStage, StartDate = match.StartTime, EndDate = match.EndTime},
                         dbTournament, homeParticipant, awayParticipant);
                 }
                 drawMatchIdToDbMatchIdMap.Add(match.Id, dbMatchId);

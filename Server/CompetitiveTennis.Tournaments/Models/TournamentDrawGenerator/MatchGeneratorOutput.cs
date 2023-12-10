@@ -15,6 +15,7 @@ public record MatchGeneratorOutput()
     public int? AwayPrevMatch { get; set; }
     
     public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
     
     public TournamentStage TournamentStage { get; set; }
 }

@@ -5,12 +5,13 @@ using Models.TournamentDrawGenerator;
 
 public static class MatchScheduler
 {
+    private const int MatchLengthInHours = 1;
     public static void ScheduleMatches(List<MatchGeneratorOutput> matches, DateTime tournamentStartDate, DateTime tournamentEndDate, int availableCourts, TimeSpan startTime, TimeSpan endTime)
     {
         var tournamentPeriod = tournamentEndDate - tournamentStartDate;
         var tournamentDays = (int)Math.Ceiling(tournamentPeriod.TotalDays);
         var totalRounds = matches.GroupBy(m => m.TournamentStage).Count();
-        var matchDuration = TimeSpan.FromHours(1);
+        var matchDuration = TimeSpan.FromHours(MatchLengthInHours);
         var dayOneStartTime = new TimeSpan(tournamentStartDate.Hour, tournamentStartDate.Minute, tournamentStartDate.Second);
         var finalEndTime =  new TimeSpan(tournamentEndDate.Hour, tournamentEndDate.Minute, tournamentEndDate.Second);
 
@@ -113,6 +114,7 @@ public static class MatchScheduler
             if (match.TournamentStage == TournamentStage.Final)
             {
                 match.StartTime = day.Add(endTime);
+                match.EndTime = match.StartTime.Add(matchDuration);
                 break;
             }
             if (availableCourts > 1)
@@ -128,17 +130,19 @@ public static class MatchScheduler
                     if (!overlappingMatches.Any() || overlappingMatches.Count() < availableCourts)
                     {
                         match.StartTime = day.Add(startTime);
+                        match.EndTime = match.StartTime.Add(matchDuration);
                         matchesScheduled.Add(match);
                         break;
                     }
 
-                    startTime = startTime.Add(TimeSpan.FromHours(1)); // Move to the next hour
+                    startTime = startTime.Add(TimeSpan.FromHours(MatchLengthInHours)); // Move to the next hour
                 }
             }
             else
             {
                 // If only one court is available, schedule matches consecutively
                 match.StartTime = day.Add(startTime);
+                match.EndTime = match.StartTime.Add(matchDuration);
                 startTime = startTime.Add(matchDuration);
                 matchesScheduled.Add(match);
             }
