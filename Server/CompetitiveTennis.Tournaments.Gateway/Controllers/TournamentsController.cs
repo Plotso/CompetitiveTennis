@@ -1,10 +1,10 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Controllers;
 
 using CompetitiveTennis.Models;
+using Contracts;
+using Contracts.Participant;
+using Contracts.Tournament;
 using Microsoft.AspNetCore.Mvc;
-using Models;
-using Models.Participant;
-using Models.Tournament;
 using Services.Tournaments;
 
 public class TournamentsController : BaseGatewayController

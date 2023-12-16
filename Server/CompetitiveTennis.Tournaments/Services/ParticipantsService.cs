@@ -2,11 +2,11 @@
 
 using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
+using Contracts.Participant;
 using Data.Models;
 using Exceptions;
 using Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Models.Participant;
 
 public class ParticipantsService : DeletableDataService<Participant>, IParticipantsService
 {

@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompetitiveTennis.Tournamen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompetitiveTennis.CMS", "CompetitiveTennis.CMS\CompetitiveTennis.CMS.csproj", "{CBC0F918-452B-4332-AAD8-35FC1B6479FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompetitiveTennis.Tournaments.Contracts", "CompetitiveTennis.Tournaments.Contracts\CompetitiveTennis.Tournaments.Contracts.csproj", "{44A002E3-C188-4A6E-BDF6-32236C567858}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{CBC0F918-452B-4332-AAD8-35FC1B6479FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBC0F918-452B-4332-AAD8-35FC1B6479FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBC0F918-452B-4332-AAD8-35FC1B6479FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44A002E3-C188-4A6E-BDF6-32236C567858}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44A002E3-C188-4A6E-BDF6-32236C567858}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44A002E3-C188-4A6E-BDF6-32236C567858}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44A002E3-C188-4A6E-BDF6-32236C567858}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

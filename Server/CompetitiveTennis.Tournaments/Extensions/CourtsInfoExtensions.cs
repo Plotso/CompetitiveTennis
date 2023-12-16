@@ -1,8 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Extensions;
 
 using CompetitiveTennis.Data.Models.Enums;
-using Models;
-using Models.Enums;
+using Contracts;
+using Contracts.Enums;
 
 public static class CourtsInfoExtensions
 {

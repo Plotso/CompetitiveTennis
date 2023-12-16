@@ -1,14 +1,13 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services;
 
 using CompetitiveTennis.Data;
+using Contracts.Account;
 using Data.Models;
 using Exceptions;
 using Interfaces;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using Models.Account;
-using Models.Avenue;
 using static ServiceConstants;
 
 public class AccountsService : DataService<Account>, IAccountsService

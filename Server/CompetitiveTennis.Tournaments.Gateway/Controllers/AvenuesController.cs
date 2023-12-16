@@ -1,9 +1,9 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Controllers;
 
 using CompetitiveTennis.Models;
+using Contracts;
+using Contracts.Avenue;
 using Microsoft.AspNetCore.Mvc;
-using Models;
-using Models.Avenue;
 using Services.Tournaments;
 
 public class AvenuesController : BaseGatewayController

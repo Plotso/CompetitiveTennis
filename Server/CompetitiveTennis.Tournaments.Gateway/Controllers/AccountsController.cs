@@ -1,9 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Controllers;
 
-using CompetitiveTennis.Models;
+using Contracts.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Account;
 using Services.Tournaments;
 
 public class AccountsController : BaseGatewayController

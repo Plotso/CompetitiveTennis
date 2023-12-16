@@ -1,9 +1,9 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Services.Tournaments;
 
 using CompetitiveTennis.Models;
-using Models;
-using Models.Participant;
-using Models.Tournament;
+using Contracts;
+using Contracts.Participant;
+using Contracts.Tournament;
 using Refit;
 
 public interface ITournamentsService

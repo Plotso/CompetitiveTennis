@@ -55,7 +55,7 @@ const submitForm = async () => {
 
                                 <div class="field">
                                     <p class="control has-icons-left has-icons-right">
-                                        <input class="input" type="email" placeholder="Email or username" v-model="user.loginInfo"  required>
+                                        <input class="input" type="text" placeholder="Email or username" v-model="user.loginInfo"  required>
                                         <span class="icon is-small is-left">
                                             <font-awesome-icon icon="fa-solid fa-user" />
                                         </span>
@@ -73,7 +73,7 @@ const submitForm = async () => {
                                     </p>
                                 </div>
                                 <div class="field">
-                                    <input type="checkbox" class="form-check-input custom-checkbox" id="email-login" v-model="user.emailLogin"  required>
+                                    <input type="checkbox" class="form-check-input custom-checkbox" id="email-login" v-model="user.emailLogin" >
                                     <label class="form-check-label" for="email-login">Use email to login</label>
                                 </div>
                                 <!--

@@ -4,14 +4,13 @@ using CompetitiveTennis.Controllers;
 using CompetitiveTennis.Data.Models.Enums;
 using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
+using Contracts;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models;
-using Models.Participant;
-using Models.Tournament;
+using Contracts.Participant;
+using Contracts.Tournament;
 using Models.TournamentDrawGenerator;
-using Services.BL;
 using Services.Interfaces;
 using Services.Interfaces.BL;
 

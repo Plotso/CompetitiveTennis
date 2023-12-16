@@ -1,9 +1,9 @@
 ﻿namespace CompetitiveTennis.Tournaments.Mapping;
 
+using Contracts.Match;
+using Contracts.Participant;
 using Data.Models;
 using Mapster;
-using Models.Match;
-using Models.Participant;
 
 public class MatchMappingConfig : IRegister
 {

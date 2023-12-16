@@ -1,11 +1,11 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services;
 
 using CompetitiveTennis.Data;
+using Contracts.Team;
 using Data.Models;
 using Interfaces;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Models.Team;
 
 public class TeamsService : DeletableDataService<Team>, ITeamsService
 {

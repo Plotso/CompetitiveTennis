@@ -3,11 +3,12 @@
 using CompetitiveTennis.Controllers;
 using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
+using Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models;
-using Models.Avenue;
+using Contracts.Avenue;
 using Services.Interfaces;
+using Constants = CompetitiveTennis.Constants;
 
 public class AvenuesController : ApiController
 {

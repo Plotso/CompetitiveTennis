@@ -1,16 +1,14 @@
 namespace CompetitiveTennis.Tournaments.Services;
 
 using CompetitiveTennis.Data;
+using Contracts.Tournament;
 using Data;
 using Data.Models;
 using Exceptions;
 using Extensions;
 using Interfaces;
-using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using Models.Account;
-using Models.Tournament;
 
 public class TournamentsService : DeletableDataService<Tournament>, ITournamentsService
 {

@@ -2,6 +2,7 @@
 
 using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
+using Contracts.Match;
 using Data.Models;
 using Models.Match;
 

@@ -1,8 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces;
 
 using CompetitiveTennis.Data;
+using Contracts.Avenue;
 using Data.Models;
-using Models.Avenue;
 
 public interface IAvenuesService : IDataService<Avenue>
 {

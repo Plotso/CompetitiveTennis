@@ -7,14 +7,13 @@ services:
         image: postgres:latest
         ports: 
             - "5432:5432"
+            - "5433:5432"
         restart: always
         environment:
           POSTGRES_USER: sa
           POSTGRES_PASSWORD: Sup3rStrongS3cretPass1111
-        ports:
-          - "5432:5432"
         volumes:
-          - postgres-data:/var/lib/postgresql/data    
+            - postgres-data:/var/lib/postgresql/data    
         networks: 
             - competitivetennis-network
 
@@ -54,21 +53,21 @@ services:
         depends_on:
             - data
             
-    tournaments-gateway:
-        container_name: tournaments-gateway
-        build:
-            context: ./Server
-            dockerfile: ./CompetitiveTennis.Tournaments.Gateway/Dockerfile
-        ports: 
-            - "5002:80"
-        env_file: Server/JWTShowcase/Common.env
-        environment:
-            - ASPNETCORE_ENVIRONMENT=Docker
-        restart: on-failure
-        volumes:
-            - ./.aspnet/tournaments/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
-        networks: 
-            - competitivetennis-network            
+    #tournaments-gateway:
+    #    container_name: tournaments-gateway
+    #    build:
+    #        context: ./Server
+    #        dockerfile: ./CompetitiveTennis.Tournaments.Gateway/Dockerfile
+    #    ports: 
+    #        - "5002:80"
+    #    env_file: Server/CompetitiveTennis/Common.env
+    #    environment:
+    #        - ASPNETCORE_ENVIRONMENT=Docker
+    #    restart: on-failure
+    #    volumes:
+    #        - ./.aspnet/tournaments/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+    #    networks: 
+    #        - competitivetennis-network            
 
 networks:
     competitivetennis-network:

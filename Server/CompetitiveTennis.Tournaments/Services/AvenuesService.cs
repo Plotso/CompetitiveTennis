@@ -2,6 +2,7 @@
 
 using System.Text.Json;
 using CompetitiveTennis.Data;
+using Contracts.Avenue;
 using Data.Models;
 using Exceptions;
 using Extensions;
@@ -9,7 +10,6 @@ using Interfaces;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using Models.Avenue;
 using SerializerOptions;
 
 public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService

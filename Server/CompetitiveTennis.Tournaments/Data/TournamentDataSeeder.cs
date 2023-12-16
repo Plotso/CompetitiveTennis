@@ -2,14 +2,14 @@
 
 using CompetitiveTennis.Data.Models.Enums;
 using CompetitiveTennis.Services.Interfaces;
-using Models;
+using Contracts;
+using Contracts.Account;
+using Contracts.Avenue;
+using Contracts.Enums;
+using Contracts.Participant;
+using Contracts.Tournament;
 using Services.Interfaces;
-using Tournaments.Models;
-using Tournaments.Models.Account;
-using Tournaments.Models.Avenue;
-using Tournaments.Models.Enums;
-using Tournaments.Models.Participant;
-using Tournaments.Models.Tournament;
+using Constants = CompetitiveTennis.Constants;
 
 public class TournamentDataSeeder : IDataSeeder
 {

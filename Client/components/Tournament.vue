@@ -11,6 +11,9 @@ const { user } = storeToRefs(useAuthStore());
 
 const tData = toRef(props, "data")
 const tournament = ref(tData.value.data)
+console.log(tournament)
+console.log(tournament.id)
+console.log(tournament.matches)
 //const comp = computed(() => props.data) //Would work the same way as toRef from above
 const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
@@ -134,6 +137,39 @@ const participate = async (tournamentId: number) => {
       }
       showErrorNotification.value = true;
       console.error(`Failed to participate tournament. Status: ${response.status}`);
+    }
+  } catch (error) {
+    showLoadingModal.value = false;
+    console.error('An error occurred while participating for the tournament', error);
+  }
+}
+
+
+
+const generateDraw = async (tournamentId: number) => {
+    try {
+    showLoadingModal.value = true;
+    const response = await fetch(`${config.public.tournamentsBase}/Tournaments/GenerateTournamentDraw?tournamentId=${tournamentId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${authStore.token}`
+      }
+    });
+
+    if (response.ok) {
+        showLoadingModal.value = false;      
+        await refreshNuxtData();
+    } else {
+        showLoadingModal.value = false;
+      if(response.status == 401){
+        errorNotification.value = `User not authorized to generate matches for tournament`
+      }
+      else{
+        errorNotification.value = `An error occurred during generation of matches for tournament. Code: ${response.status}`
+      }
+      showErrorNotification.value = true;
+      console.error(`Failed to generate tournament draw. Status: ${response.status}`);
     }
   } catch (error) {
     showLoadingModal.value = false;
@@ -296,19 +332,44 @@ const participate = async (tournamentId: number) => {
     
     <div class="box">
       <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-ranking-star" /> Matches</h2>
+      <div class="has-text-centered" v-if="isAuthorized">
+        <div class="buttons is-centered">
+          <button class="button" @click="generateDraw(tournament.id)">
+            Generate Tournament Draw
+          </button>
+        </div>
+      </div>
       <table class="table is-striped is-fullwidth">
         <thead>
           <tr>
             <th>Player 1</th>
-            <th>Player 2</th>
-            <th>Score</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="match in tournament.matches" :key="match.Id">
-            <td>{{ match.player1 }}</td>
-            <td>{{ match.player2 }}</td>
-            <td>{{ match.score }}</td>
+          <tr v-for="match in tournament.matches" :key="match.id">
+            <td>
+                    <div v-if="match.participants[0].isGuest">
+                      
+                        <span v-if="match.participants[0].players.length == 1"><font-awesome-icon icon="fa-solid fa-people-arrows" />  &nbsp; *</span>  {{ '' }}
+                        <font-awesome-icon icon="fa-solid fa-user-secret" />
+                        {{ match.participants[0].name }}
+                        <span v-if="match.participants[0].players.some(x => x)">,
+                          <font-awesome-icon icon="fa-solid fa-user" />{{ '' }}
+                                <span v-for="player in match.participants[0].players" :key="player.id">
+                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.playerRating}})  
+                                </span>
+                            
+                        </span>
+                    </div>
+                    <div v-else>                        
+                        <div v-if="match.participants[0].players.some(x => x)">
+                               <span v-if="match.participants[0].players.length > 1"><font-awesome-icon icon="fa-solid fa-people-arrows" /></span><span v-else><font-awesome-icon icon="fa-solid fa-user" /></span>  {{ '' }}
+                                <span v-for="(player, index) in match.participants[0].players" :key="player.id"> 
+                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.playerRating}})<span v-if="match.participants[0].players.length - 1 > index">, </span>
+                                    
+                                </span>                
+                        </div>
+                    </div></td>
           </tr>
         </tbody>
       </table>

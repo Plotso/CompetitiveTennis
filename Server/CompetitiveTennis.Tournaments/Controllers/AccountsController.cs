@@ -5,7 +5,7 @@ using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Account;
+using Contracts.Account;
 using Services.Interfaces;
 
 public class AccountsController : ApiController

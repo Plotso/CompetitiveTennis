@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\CompetitiveTennis.Tournaments.Contracts\CompetitiveTennis.Tournaments.Contracts.csproj" />
         <ProjectReference Include="..\CompetitiveTennis\CompetitiveTennis.csproj" />
     </ItemGroup>
 

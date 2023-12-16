@@ -1,10 +1,10 @@
 ﻿namespace CompetitiveTennis.Tournaments.Mapping;
 
+using Contracts.Account;
+using Contracts.Match;
+using Contracts.Participant;
 using Data.Models;
 using Mapster;
-using Models.Account;
-using Models.Match;
-using Models.Participant;
 
 public class ParticipantMappingConfig : IRegister
 {

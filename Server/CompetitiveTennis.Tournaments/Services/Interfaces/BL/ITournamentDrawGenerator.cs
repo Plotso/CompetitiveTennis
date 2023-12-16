@@ -1,6 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces.BL;
 
-using Models.Tournament;
+using Contracts.Tournament;
 
 public interface ITournamentDrawGenerator
 {

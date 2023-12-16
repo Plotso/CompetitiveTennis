@@ -1,6 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Extensions;
 
-using Models;
+using Contracts;
 
 public static class EnumerableExtensions
 {

@@ -1,7 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Services.Tournaments;
 
 using CompetitiveTennis.Models;
-using Models.Account;
+using Contracts.Account;
 using Refit;
 
 public interface IAccountsService
