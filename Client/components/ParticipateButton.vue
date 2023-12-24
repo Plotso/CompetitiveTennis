@@ -1,7 +1,7 @@
 <template>
     <div>
         <button class="button is-primary"  @click="participate()"
-        v-if="!hasMaxParticipants">
+        v-if="!hasMaxParticipants && !isDisabled">
         {{ buttonLabel || 'Participate' }}
         </button>
         <button class="button is-primary" v-else disabled>
@@ -19,7 +19,8 @@
     buttonLabel: {
       type: String,
       default: null
-    }
+    },
+    isDisabled: Boolean
   });
   
   const participate = () => {

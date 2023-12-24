@@ -1,5 +1,5 @@
 <template>
-    <Nav :is-transparent=true></Nav>
+    <Nav :is-transparent=false></Nav>
     <main>
         <slot />
     </main>

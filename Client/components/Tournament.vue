@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { Surface, TournamentType, Result, TournamentOutputModel, ParticipantInputModel } from "@/types"
+import { Surface, TournamentType, Result, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel } from "@/types"
 import {useAuthStore} from "~/stores/auth"
 const props = defineProps({
-    data: {type: Object as PropType<Result<TournamentOutputModel>>, required: true}
+    data: {type: Object as PropType<Result<SlimTournamentOutputModel>>, required: true}
 })
 const authStore = useAuthStore();
 const config = useRuntimeConfig();
@@ -84,6 +84,7 @@ const closeParticipateDoublesModal = () => {
 
 const startDate = computed(() => new Date(tournament.value.startDate).toLocaleDateString(undefined, options).replace(' at', ''));
 const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateString(undefined, options).replace(' at', ''));
+const hasTournamentStarted = computed(() => tournament.value.matches.length > 0);
 
 const isAuthorized = computed(() => {
     return authStore.user && (authStore.user.username == tournament.value.organiser.username || authStore.user.hasAdministrativeRights)
@@ -179,6 +180,9 @@ const generateDraw = async (tournamentId: number) => {
 </script>
 
 <template>
+  <br>
+  <br>
+  <br>
     <div class="container">
 
         <div class="container">
@@ -189,7 +193,7 @@ const generateDraw = async (tournamentId: number) => {
     </h1>
     <h4 class="subtitle has-text-centered">{{ tournament.avenue.name }}, {{ tournament.avenue.city }}</h4>
 
-    <div v-if="isAuthenticated" class="buttons is-centered">
+    <div v-if="isAuthenticated && !hasTournamentStarted" class="buttons is-centered">
       
       <p v-if="!tournament.participants.find(p => p.players.find(pp => pp.username == user.username))">
           <ParticipateButton v-if="tournament.type == 'Singles'"
@@ -263,7 +267,7 @@ const generateDraw = async (tournamentId: number) => {
     
     <div class="box">
       <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-users" /> Participants </h2>
-      <div class="has-text-centered" v-if="isAuthorized">
+      <div class="has-text-centered" v-if="isAuthorized && !hasTournamentStarted">
         <div class="buttons is-centered">
           <button class="button" @click="openAddGuestModal">
             Add Guest
@@ -311,7 +315,7 @@ const generateDraw = async (tournamentId: number) => {
                                 </span>
                             
                         </span>
-                        <button class="button is-danger remove-participant-button" v-if="isAuthorized" @click="openParticipantRemovalModal(participant.id)"><font-awesome-icon icon="fa-solid fa-user-minus" /></button>
+                        <button class="button is-danger remove-participant-button" v-if="isAuthorized && !hasTournamentStarted" @click="openParticipantRemovalModal(participant.id)"><font-awesome-icon icon="fa-solid fa-user-minus" /></button>
                     </div>
                     <div v-else>                        
                         <div v-if="participant.players.some(x => x)">
@@ -320,7 +324,7 @@ const generateDraw = async (tournamentId: number) => {
                                     {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.playerRating}})<span v-if="participant.players.length - 1 > index">, </span>
                                     
                                 </span>           
-                                <button class="button is-danger remove-participant-button" v-if="isAuthorized" @click="openParticipantRemovalModal(participant.id)"><font-awesome-icon icon="fa-solid fa-user-minus" /></button>                 
+                                <button class="button is-danger remove-participant-button" v-if="isAuthorized && !hasTournamentStarted" @click="openParticipantRemovalModal(participant.id)"><font-awesome-icon icon="fa-solid fa-user-minus" /></button>                 
                         </div>
                     </div>
                 </div>
@@ -332,7 +336,7 @@ const generateDraw = async (tournamentId: number) => {
     
     <div class="box">
       <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-ranking-star" /> Matches</h2>
-      <div class="has-text-centered" v-if="isAuthorized">
+      <div class="has-text-centered" v-if="isAuthorized && !hasTournamentStarted && tournament.participants.length >= tournament.minParticipants">
         <div class="buttons is-centered">
           <button class="button" @click="generateDraw(tournament.id)">
             Generate Tournament Draw
@@ -342,34 +346,27 @@ const generateDraw = async (tournamentId: number) => {
       <table class="table is-striped is-fullwidth">
         <thead>
           <tr>
+            <th>Start Date</th>
+            <th>Match Id</th>
+            <th>Stage</th>
             <th>Player 1</th>
+            <th>Player 2</th>
+            <th>Score</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="match in tournament.matches" :key="match.id">
             <td>
-                    <div v-if="match.participants[0].isGuest">
-                      
-                        <span v-if="match.participants[0].players.length == 1"><font-awesome-icon icon="fa-solid fa-people-arrows" />  &nbsp; *</span>  {{ '' }}
-                        <font-awesome-icon icon="fa-solid fa-user-secret" />
-                        {{ match.participants[0].name }}
-                        <span v-if="match.participants[0].players.some(x => x)">,
-                          <font-awesome-icon icon="fa-solid fa-user" />{{ '' }}
-                                <span v-for="player in match.participants[0].players" :key="player.id">
-                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.playerRating}})  
-                                </span>
-                            
-                        </span>
-                    </div>
-                    <div v-else>                        
-                        <div v-if="match.participants[0].players.some(x => x)">
-                               <span v-if="match.participants[0].players.length > 1"><font-awesome-icon icon="fa-solid fa-people-arrows" /></span><span v-else><font-awesome-icon icon="fa-solid fa-user" /></span>  {{ '' }}
-                                <span v-for="(player, index) in match.participants[0].players" :key="player.id"> 
-                                    {{ player.firstName }} {{ player.lastName }} ({{player.username}} | {{player.playerRating}})<span v-if="match.participants[0].players.length - 1 > index">, </span>
-                                    
-                                </span>                
-                        </div>
-                    </div></td>
+              {{ new Date(match.startDate).toLocaleDateString(undefined, options).replace(' at', '') }}
+            </td>
+            <td>{{ match.id }}</td>
+            <td>{{ match.stage }}</td>
+            <td>
+                {{ match.homeParticipant?.name ?? "Unknown" }}
+            </td>
+            <td>
+                {{ match.awayParticipant?.name ?? "Unknown"}}</td>
+            <td>INSERT SCORE</td>
           </tr>
         </tbody>
       </table>

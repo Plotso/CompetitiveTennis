@@ -99,6 +99,31 @@ export namespace Auth {
     UpdatedDescending
   }
 
+  export interface TournamentOLDOutputModel {
+    id: number;
+    title: string;
+    rules: string;
+    description: string;
+    type: TournamentType;
+    surface: Surface;
+    entryFee: number | null;
+    prize: number | null;
+    courtsAvailable: number;
+    minParticipants: number;
+    maxParticipants: number;
+    matchWonPoints: number | null;
+    setWonPoints: number | null;
+    gameWonPoints: number | null;
+    startDate: Date;
+    endDate: Date;
+    createdOn: Date;
+    modifiedOn: Date;
+    avenue: AvenueShortOutputModel;
+    organiser: AccountOutputModel;
+    participants: ParticipantShortOutputModel[];
+    matches: MatchOutputModel[];
+  }
+
   export interface TournamentOutputModel {
     id: number;
     title: string;
@@ -122,6 +147,31 @@ export namespace Auth {
     organiser: AccountOutputModel;
     participants: ParticipantShortOutputModel[];
     matches: MatchOutputModel[];
+  }
+
+  export interface SlimTournamentOutputModel {
+    id: number;
+    title: string;
+    rules: string;
+    description: string;
+    type: TournamentType;
+    surface: Surface;
+    entryFee: number | null;
+    prize: number | null;
+    courtsAvailable: number;
+    minParticipants: number;
+    maxParticipants: number;
+    matchWonPoints: number | null;
+    setWonPoints: number | null;
+    gameWonPoints: number | null;
+    startDate: Date;
+    endDate: Date;
+    createdOn: Date;
+    modifiedOn: Date;
+    avenue: AvenueShortOutputModel;
+    organiser: AccountOutputModel;
+    participants: ParticipantShortOutputModel[];
+    matches: MatchShortOutputModel[];
   }
   export interface AvenueShortOutputModel {
     id: number;
@@ -152,6 +202,20 @@ export namespace Auth {
     players: AccountShortOutputModel[];
   }
   
+  export interface ParticipantInfo {
+    id: number;
+    name: string | null;
+    points: number | null;
+    hasGuest: boolean;
+    players: AccountShortOutputModel[];
+    team: TeamShortOutputModel;
+  }
+  
+  export interface TeamShortOutputModel {
+    id: number;
+    name: string | null;
+  }
+  
   export interface TournamentShortInfoOutput {
     id: number;
     title: string;
@@ -179,6 +243,23 @@ export namespace Auth {
     outcome: MatchOutcome;
     scores: ScoreShortOutputModel[];
     participants: ParticipantShortOutputModel[];
+  }
+  
+  export interface MatchShortOutputModel {
+    id: number;
+    startDate: Date;
+    homePredecesorMatchId: number;
+    awayPredecesorMatchId: number;
+    matchWonPoints: number | null;
+    setWonPoints: number | null;
+    gameWonPoints: number | null;
+    stage: TournamentStage;
+    details: string | null;
+    status: EventStatus;
+    outcome: MatchOutcome;
+    homeParticipant: ParticipantInfo;
+    awayParticipant: ParticipantInfo;
+    scores: ScoreShortOutputModel[];
   }
   
   export interface ScoreShortOutputModel {

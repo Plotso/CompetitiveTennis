@@ -62,6 +62,8 @@ const doubleParticipationTournamentId = ref(-1)
 const doubleTournamentsParticipants: Ref<ParticipantShortOutputModel[]> = ref([])
 const isParticipantRemovalModalOpen = ref(false);
 
+const hasTournamentStarted = (tournament: TournamentOutputModel) => tournament != null && tournament.matches.length > 0;
+
 const openParticipantRemovalModal = (tournamentId: number, participantId: number) => {
   removeParticipantId.value = participantId;
   removalTournamentId.value = tournamentId;
@@ -170,11 +172,22 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
 </script>
 
 <template>
+    <div class="view-window">
+        <Banner title="All Tournaments">            
+            <div>
+                <hr>
+                <div v-if="user.username" class="buttons is-centered">
+                    <NuxtLink to="/tournaments/create" class="button is-primary">Create Tournament</NuxtLink>
+                </div>
+                <hr>
+            </div>
+        </Banner>
     <div v-if="pending">
         <Loading></Loading>
     </div>
 
     <div class="container" v-else>
+        <!--
         <h1 class="title is-1 has-text-centered">All Tournaments</h1>
         <div>
             <hr>
@@ -183,6 +196,7 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
             </div>
             <hr>
         </div>
+    -->
 
         <div class="notification is-danger" v-if="showErrorNotification">
             <button class="delete" @click="hideErrorNotification"></button>
@@ -232,19 +246,22 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
                             <p v-if="!tournament.participants.find(p => p.players.find(pp => pp.username == user.username))">
                                 <ParticipateButton v-if="tournament.type == 'Singles'"
                                 :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+                                :is-disabled="hasTournamentStarted(tournament)"
                                 @participate="participate(tournament.id)"/>
 
                                 <ParticipateButton v-if="tournament.type == 'Doubles'"
                                 :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+                                :is-disabled="hasTournamentStarted(tournament)"
                                 @participate="openParticipateDoublesModal(tournament.id, tournament.participants)"/>
 
                                 <ParticipateButton v-if="tournament.type == 'Teams'"
                                 :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+                                :is-disabled="hasTournamentStarted(tournament)"
                                 @participate="openParticipateTeamModal(tournament.id)"/>
                             </p>
                             <p v-else>
                                 <button class="button is-info" @click="openParticipantRemovalModal(tournament.id, tournament.participants.find(p => p.players.find(pp => pp.username == user.username))?.id ?? -1)"
-                                v-if="tournament.participants.length < tournament.maxParticipants">
+                                :disabled="hasTournamentStarted(tournament)">
                                 Opt out of tournament
                                 </button>
                             </p>
@@ -396,6 +413,7 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
         
     </div>
 -->
+    </div>
 
     
 </template>

@@ -5,7 +5,9 @@
 </template>
 
 <script setup lang="ts">
-
+definePageMeta({
+  layout: "default-alt",
+});
 </script>
 
 <style scoped>
