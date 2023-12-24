@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Contracts.Participant;
 using Contracts.Tournament;
 using Models.TournamentDrawGenerator;
+using Services;
 using Services.Interfaces;
 using Services.Interfaces.BL;
 
@@ -55,13 +56,13 @@ public class TournamentsController : ApiController
 
     [HttpGet]
     [Route(Id)]
-    public async Task<ActionResult<TournamentOutputModel>> ById(int id)
+    public async Task<ActionResult<SlimTournamentOutputModel>> ById(int id)
         => await SafeHandle(async () =>
             {
                 var tournament = await _tournaments.Get(id);
                 if (tournament == null)
-                    return NotFound(Result<TournamentOutputModel>.Failure($"Tournament {id} does not exist"));
-                return Ok(Result<TournamentOutputModel>.SuccessWith(tournament));
+                    return NotFound(Result<SlimTournamentOutputModel>.Failure($"Tournament {id} does not exist"));
+                return Ok(Result<SlimTournamentOutputModel>.SuccessWith(TournamentInfoProvider.GetTournamentInfo(tournament)));
             },
             msgOnError: $"An error occurred during GET request for tournament: {id}");
 
@@ -95,6 +96,9 @@ public class TournamentsController : ApiController
                 if (avenue == null)
                     return BadRequest(Result.Failure("Provided avenue could not be found in internal system."));
 
+                if (input.EndDate < input.StartDate)
+                    return BadRequest(Result.Failure("Tournament cannot have end date that is before the start date."));
+
                 var tournamentId = await _tournaments.Create(input, organiser, avenue);
                 return Ok(Result<int>.SuccessWith(tournamentId));
             },
@@ -110,6 +114,8 @@ public class TournamentsController : ApiController
                 if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update tournament!"));
+                if (input.EndDate < input.StartDate)
+                    return BadRequest(Result.Failure("Tournament cannot have end date that is before the start date."));
 
                 var isSuccess = await _tournaments.Update(id, input);
                 return isSuccess ? Result.Success : Result.Failure($"Update for tournament {id} failed.");
@@ -167,6 +173,11 @@ public class TournamentsController : ApiController
                 var tournament = await _tournaments.GetInternal(input.TournamentId);
                 if (tournament == null)
                     return BadRequest(Result<int>.Failure($"Tournament {input.TournamentId} could not be found!"));
+                if (tournament.Matches.Any())
+                {
+                    Logger.LogInformation($"An attempt to add guest to an ongoing tournament has been made. TournamentId: {input.TournamentId}. Endpoint: {nameof(AddGuest)}. Input: {input}");
+                    return BadRequest(Result.Failure($"Cannot add guest to an ongoing tournament. Tournament {input.TournamentId}."));
+                }
                 
                 var participantId = await _participants.Create(input, tournament, team);
                 return Ok(Result<int>.SuccessWith(participantId));
@@ -184,6 +195,11 @@ public class TournamentsController : ApiController
                 var tournament = await _tournaments.GetInternal(input.TournamentId);
                 if (tournament == null)
                     return BadRequest(Result.Failure($"Tournament {input.TournamentId} could not be found!"));
+                if (tournament.Matches.Any())
+                {
+                    Logger.LogInformation($"An attempt to participate in an ongoing tournament has been made. TournamentId: {input.TournamentId}. Endpoint: {nameof(ParticipateSingle)}. Input: {input}");
+                    return BadRequest(Result.Failure($"Cannot participate in an ongoing tournament. Tournament {input.TournamentId}."));
+                }
                 if (tournament.Type != TournamentType.Singles)
                     return BadRequest(
                         Result.Failure("Registration for doubles & teams tournaments are handled separately!"));
@@ -209,6 +225,11 @@ public class TournamentsController : ApiController
                 var tournament = await _tournaments.GetInternal(input.ParticipantInfo.TournamentId);
                 if (tournament == null)
                     return BadRequest(Result.Failure($"Tournament {input.ParticipantInfo.TournamentId} could not be found!"));
+                if (tournament.Matches.Any())
+                {
+                    Logger.LogInformation($"An attempt to participate in an ongoing tournament has been made. TournamentId: {input.ParticipantInfo.TournamentId}. Endpoint: {nameof(ParticipateDoubles)}. Input: {input}");
+                    return BadRequest(Result.Failure($"Cannot participate in an ongoing tournament. Tournament {input.ParticipantInfo.TournamentId}."));
+                }
                 if (tournament.Type != TournamentType.Doubles)
                     return BadRequest(
                         Result.Failure("Registration for singles & teams tournaments are handled separately!"));
@@ -280,6 +301,11 @@ public class TournamentsController : ApiController
                 var tournament = await _tournaments.GetInternal(input.ParticipantInput.TournamentId);
                 if (tournament == null)
                     return BadRequest(Result.Failure($"Tournament {input.ParticipantInput.TournamentId} could not be found!"));
+                if (tournament.Matches.Any())
+                {
+                    Logger.LogInformation($"An attempt to add a participant to an ongoing tournament has been made. TournamentId: {input.ParticipantInput.TournamentId}. Endpoint: {nameof(AddSinglesParticipant)}. Input: {input}");
+                    return BadRequest(Result.Failure($"Cannot add a participant to an ongoing in an ongoing tournament. Tournament {input.ParticipantInput.TournamentId}."));
+                }
                 if (tournament.Type != TournamentType.Singles)
                     return BadRequest(
                         Result.Failure("Registration for doubles & teams tournaments are handled separately!"));
@@ -300,6 +326,11 @@ public class TournamentsController : ApiController
                 if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to add accounts to existing participants!"));
+                if (await _tournaments.HasTournamentAlreadyStarted(tournamentId))
+                {
+                    Logger.LogInformation($"An attempt to add an account to a participant for an ongoing tournament has been made. TournamentId: {tournamentId}. Endpoint: {nameof(AddAccountToParticipant)}. ParticipantId: {participantId}. AccountId: {accountId}");
+                    return BadRequest(Result.Failure($"Cannot add an account to a participant for an ongoing in an ongoing tournament. Tournament {tournamentId}."));
+                }
                 if (await _participants.IsParticipantFull(participantId))
                     return BadRequest(
                         Result.Failure($"No more players can be added to participant {participantId} since it has reached max cap for tournament type"));
@@ -328,6 +359,11 @@ public class TournamentsController : ApiController
                 if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to remove accounts to existing participants!"));
+                if (await _tournaments.HasTournamentAlreadyStarted(tournamentId))
+                {
+                    Logger.LogInformation($"An attempt to remove an account from a participant for an ongoing tournament has been made. TournamentId: {tournamentId}. Endpoint: {nameof(RemoveAccountFromParticipant)}. ParticipantId: {participantId}. AccountId: {accountId}");
+                    return BadRequest(Result.Failure($"Cannot remove an account from a participant for an ongoing in an ongoing tournament. Tournament {tournamentId}."));
+                }
 
                 var account = await _accounts.GetInternal(accountId);
                 if (account == null)
@@ -345,6 +381,11 @@ public class TournamentsController : ApiController
     public async Task<ActionResult<Result>> RemoveParticipantFromTournament(int tournamentId, int participantId)
         => await SafeHandle(async () =>
             {
+                if (await _tournaments.HasTournamentAlreadyStarted(tournamentId))
+                {
+                    Logger.LogInformation($"An attempt to remove a participant from an ongoing tournament has been made. TournamentId: {tournamentId}. Endpoint: {nameof(RemoveParticipantFromTournament)}. ParticipantId: {participantId}.");
+                    return BadRequest(Result.Failure($"Cannot remove a participant from an ongoing in an ongoing tournament. Tournament {tournamentId}."));
+                }
                 var participant = await _participants.GetInternal(participantId);
                 if (participant == null)
                     return BadRequest(Result.Failure($"Participant {participantId} could not be found."));
@@ -357,7 +398,6 @@ public class TournamentsController : ApiController
                         Result.Failure("Only admins, tournament organiser and participant accounts are allowed to remove participant from existing competition!"));
 
                 Logger.LogInformation($"{nameof(RemoveParticipantFromTournament)} requested for TournamentId: {tournamentId}, ParticipantId: {participantId}. RequestedBy -> Organiser: {isCurrentUserOrganiser}, Participant: {isCurrentUserParticipant}, Admin: {_currentUser.IsAdministrator}");
-                //var isSuccess = await _tournaments.RemoveParticipant(tournamentId, participant);
                 var isSuccess = await _participants.DeletePermanently(participantId, _currentUser.UserId);
                 return isSuccess ? Result.Success : Result.Failure($"Failed to remove participant {participantId} from tournament {tournamentId}");
             },

@@ -12,7 +12,7 @@ public interface ITournamentsService
     Task<Result<IEnumerable<TournamentOutputModel>>> All();
 
     [Get("/Tournaments/{id}")]
-    Task<Result<TournamentOutputModel>> ById(int id);
+    Task<Result<SlimTournamentOutputModel>> ById(int id);
 
     [Get("/Tournaments/Search")]
     Task<Result<SearchOutputModel<TournamentOutputModel>>> Search([Query] TournamentQuery query);

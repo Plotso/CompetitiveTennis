@@ -8,6 +8,7 @@ using Extensions;
 using Interfaces;
 using Interfaces.BL;
 using Microsoft.Extensions.Options;
+using Models;
 using Models.Match;
 using Models.TournamentDrawGenerator;
 
@@ -36,7 +37,7 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
         _logger = logger;
     }
 
-    public async Task<bool> GenerateTournamentDraw(TournamentOutputModel tournament)
+    public async Task<bool> GenerateTournamentDraw(FullTournamentOutputModel tournament)
     {
         try
         {

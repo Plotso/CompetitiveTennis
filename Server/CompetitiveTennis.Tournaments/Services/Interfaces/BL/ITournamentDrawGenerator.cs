@@ -1,8 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces.BL;
 
-using Contracts.Tournament;
+using Models;
 
 public interface ITournamentDrawGenerator
 {
-    Task<bool> GenerateTournamentDraw(TournamentOutputModel tournament);
+    Task<bool> GenerateTournamentDraw(FullTournamentOutputModel fullTournament);
 }
