@@ -34,7 +34,7 @@ public static class TournamentInfoProvider
 
             matches.Add(new MatchShortOutputModel(matchOuput.Id, matchOuput.StartDate, matchOuput.MatchWonPoints,
                 matchOuput.SetWonPoints, matchOuput.GameWonPoints, matchOuput.Stage,
-                matchOuput.Details, matchOuput.Status, matchOuput.Outcome, homePredecesorMatch?.MatchId,
+                matchOuput.Details, matchOuput.Status, matchOuput.Outcome, OutcomeCondition: null, homePredecesorMatch?.MatchId,
                 awayPredecesorMatch?.MatchId,
                 homeParticipantInfo, awayParticipantInfo, matchOuput.Scores));
         }

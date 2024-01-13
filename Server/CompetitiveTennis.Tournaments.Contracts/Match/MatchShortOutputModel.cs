@@ -14,6 +14,7 @@ public record MatchShortOutputModel(
     string? Details,
     EventStatus Status,
     MatchOutcome Outcome,
+    OutcomeCondition? OutcomeCondition,
     int? HomePredecesorMatchId,
     int? AwayPredecesorMatchId,
     ParticipantInfo? HomeParticipant,

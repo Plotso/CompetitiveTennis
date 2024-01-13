@@ -35,6 +35,10 @@ public class ScoreConfiguration : IEntityTypeConfiguration<Score>
             .Property(s => s.Status)
             .HasColumnType(CustomDbTypes.EventStatusEnum)
             .IsRequired();
+        builder
+            .Property( m=> m.PointWinner)
+            .HasColumnType(CustomDbTypes.MatchOutcomeEnum)
+            .IsRequired(false);
 
         builder
             .HasOne(s => s.Match)

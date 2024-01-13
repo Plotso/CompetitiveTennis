@@ -81,6 +81,13 @@ export namespace Auth {
     Draw,
   }
 
+  export enum OutcomeCondition {
+    Points,
+    Injury,
+    Disqualification,
+    Withdrawal,
+  }
+
   export enum TournamentStage {
     Unknown,
     GroupStage,
@@ -241,6 +248,7 @@ export namespace Auth {
     details: string | null;
     status: EventStatus;
     outcome: MatchOutcome;
+    outcomeCondition: OutcomeCondition | null;
     scores: ScoreShortOutputModel[];
     participants: ParticipantShortOutputModel[];
   }
@@ -257,6 +265,7 @@ export namespace Auth {
     details: string | null;
     status: EventStatus;
     outcome: MatchOutcome;
+    outcomeCondition: OutcomeCondition | null;
     homeParticipant: ParticipantInfo;
     awayParticipant: ParticipantInfo;
     scores: ScoreShortOutputModel[];
@@ -269,6 +278,7 @@ export namespace Auth {
     participant1Points: string;
     participant2Points: string;
     status: EventStatus;
+    pointWinner: MatchOutcome
   }
 
   export interface CourtsInfo {

@@ -24,6 +24,11 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
             .Property( m=> m.Stage)
             .HasColumnType(CustomDbTypes.TournamentStageEnum)
             .IsRequired();
+        
+        builder
+            .Property( m=> m.OutcomeCondition)
+            .HasColumnType(CustomDbTypes.OutcomeConditionEnum)
+            .IsRequired(false);
 
         builder
             .Property(m => m.MatchWonPoints)

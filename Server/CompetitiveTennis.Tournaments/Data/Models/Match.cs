@@ -19,6 +19,7 @@ public class Match : BaseDeletableEntity<int>
     
     public EventStatus Status { get; set; }
     public MatchOutcome? Outcome { get; set; }
+    public OutcomeCondition? OutcomeCondition { get; set; }
     
     public int TournamentId { get; set; }
     
