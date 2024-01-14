@@ -16,7 +16,7 @@ public class ParticipantConfiguration : IEntityTypeConfiguration<Participant>
             .WithMany(t => t.Participants)
             .HasForeignKey(p => p.TournamentId)
             .OnDelete(DeleteBehavior.Restrict)
-            .IsRequired(); 
+            .IsRequired(false); 
         // ToDo: Decide whether we need to delete participants when tournament is deleted or we may want to preserve them for match statistics
 
         builder

@@ -1,9 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Controllers;
 
-using CompetitiveTennis.Models;
+using Contracts.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Account;
 using Services.Tournaments;
 
 public class AccountsController : BaseGatewayController
@@ -37,10 +36,24 @@ public class AccountsController : BaseGatewayController
             {
                 var account = await _accounts.ById(id);
                 return Ok(account);
-            }, $"An error occured during GET request for account: {id}");
+            }, $"An error occurred during GET request for account: {id}");
+    
+    [HttpGet]
+    [Route("{username}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountOutputModel))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ByUsername(string username) 
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var account = await _accounts.ByUsername(username);
+                return Ok(account);
+            }, $"An error occurred during GET request for account: {username}");
 
     [HttpPost]
     [Authorize]
+    [Route(nameof(Add))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Add(AccountInputModel input)

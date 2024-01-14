@@ -1,7 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Services.Tournaments;
 
 using CompetitiveTennis.Models;
-using Models.Account;
+using Contracts.Account;
 using Refit;
 
 public interface IAccountsService
@@ -11,8 +11,11 @@ public interface IAccountsService
     
     [Get("/Accounts/{id}")]
     Task<Result<AccountOutputModel>> ById(int id);
+    
+    [Get("/Accounts/{username}")]
+    Task<Result<AccountOutputModel>> ByUsername(string username);
 
-    [Post("/Accounts")]
+    [Post("/Accounts/Add")]
     Task<Result> Add(AccountInputModel input);
     
     [Put("/Accounts/ChangeNames/{id}")]

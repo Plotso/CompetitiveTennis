@@ -1,15 +1,15 @@
 namespace CompetitiveTennis.Tournaments.Services;
 
 using CompetitiveTennis.Data;
+using Contracts.Tournament;
 using Data;
 using Data.Models;
 using Exceptions;
 using Extensions;
 using Interfaces;
-using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using Models.Tournament;
+using Models;
 
 public class TournamentsService : DeletableDataService<Tournament>, ITournamentsService
 {
@@ -33,28 +33,70 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             tournament.Participants.Remove(participant);
             await SaveAsync(tournament);
         }
-
         return true;
     }
 
-    public async Task<IEnumerable<TournamentOutputModel>> GetAll()
-        => _mapper.Map<IEnumerable<TournamentOutputModel>>(await All()
+    public async Task<IEnumerable<FullTournamentOutputModel>> GetAll()
+        => _mapper.Map<IEnumerable<FullTournamentOutputModel>>(await All()
+            .EnrichTournamentQueryData()
+            .Include(t => t.Matches) //Only matches are needed for FE visualisation purposes, not whole EnrichWithMatches data method
             .ToListAsync());
 
-    public async Task<TournamentOutputModel> Get(int id)
-        => _mapper.Map<TournamentOutputModel>(await All()
+    public async Task<bool> HasTournamentAlreadyStarted(int tournamentId)
+    {
+        var tournament = await GetInternal(tournamentId);
+        return tournament != null && tournament.Matches.Any();
+    }
+
+    public async Task<FullTournamentOutputModel> Get(int id)
+        => _mapper.Map<FullTournamentOutputModel>(await All()
             .Where(a => a.Id == id)
             .EnrichTournamentQueryData()
+            .EnrichWithMatches()
+            .SingleOrDefaultAsync());
+            
+
+    public async Task<bool> IsAccountPresentInAnyParticipant(int accountId, int tournamentId)
+    {
+        var tournament = await AllAsNoTracking()
+            .Include(t => t.Participants)
+            .ThenInclude(tp => tp.Players)
+            .FirstOrDefaultAsync(t => t.Id == tournamentId);
+        if (tournament == null)
+            return false;
+
+        return tournament.Participants.Any(tp => tp.Players.Any(p => p.AccountId == accountId));
+        var participatingAccountIds = tournament.Participants.SelectMany(p => p.Players).Select(ap => ap.AccountId);
+        return participatingAccountIds.Contains(accountId);
+    }
+
+    public async Task<FullTournamentOutputModel> GetForDrawGeneration(int id)
+        => _mapper.Map<FullTournamentOutputModel>(await All()
+            .Where(a => a.Id == id)
+            .EnrichTournamentQueryForDrawGeneration()
+            .EnrichWithMatches()
             .SingleOrDefaultAsync());
 
     public async Task<Tournament> GetInternal(int id)
-        => await All().Where(a => a.Id == id).SingleOrDefaultAsync();
+        => await All().Where(a => a.Id == id).Include(t => t.Matches).SingleOrDefaultAsync();
 
     public async Task<string> GetOrganiserUserId(int id)
-        => await All().Where(a => a.Id == id).Select(t => t.Organiser.UserId).SingleOrDefaultAsync();
+        => await All()
+            .Where(a => a.Id == id)
+            .Include(a => a.Organiser)
+            .Select(t => t.Organiser.UserId)
+            .SingleOrDefaultAsync();
 
-    public async Task<IEnumerable<TournamentOutputModel>> Query(TournamentQuery query)
-        => _mapper.Map<IEnumerable<TournamentOutputModel>>(await GetTournamentsQuery(query)
+    public async Task<IEnumerable<int>> GetRegisteredAccountsForTournament(int tournamentId)
+        => await AllAsNoTracking()
+            .Include(t => t.Participants)
+            .ThenInclude(p => p.Players)
+            .Where(t => t.Id == tournamentId)
+            .SelectMany(t => t.Participants.SelectMany(p => p.Players.Select(a => a.AccountId)))
+            .ToListAsync();
+
+    public async Task<IEnumerable<FullTournamentOutputModel>> Query(TournamentQuery query)
+        => _mapper.Map<IEnumerable<FullTournamentOutputModel>>(await GetTournamentsQuery(query)
                 .ToListAsync())
             .PageFilterResult(query);
 
@@ -149,7 +191,7 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
 
     private IQueryable<Tournament> GetTournamentsQuery(TournamentQuery query, int? tournamentId = null)
     {
-        var dataQuery = All();
+        var dataQuery = All().EnrichTournamentQueryData();
 
         if (tournamentId.HasValue)
         {
@@ -171,6 +213,10 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             dataQuery = dataQuery.Where(t => t.StartDate >= query.DateRangeFrom);
         if (query.DateRangeUntil.HasValue)
             dataQuery = dataQuery.Where(t => t.EndDate <= query.DateRangeUntil);
+        if (query.OrganiserId.HasValue)
+            dataQuery = dataQuery.Where(t => t.OrganiserId == query.OrganiserId.Value);
+        if (query.ParticipantIds != null && query.ParticipantIds.Any())
+            dataQuery = dataQuery.Where(t => t.Participants.Any(p => p.Players.Any(acc => query.ParticipantIds.Contains(acc.AccountId))));
 
         if (!string.IsNullOrWhiteSpace(query.Keyword))
         {
@@ -182,6 +228,6 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
 
         dataQuery = dataQuery.SortQuery(query.SortOptions);
 
-        return dataQuery.EnrichTournamentQueryData();
+        return dataQuery;
     }
 }

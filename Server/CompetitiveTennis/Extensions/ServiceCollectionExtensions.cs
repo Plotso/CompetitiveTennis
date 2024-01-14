@@ -3,6 +3,7 @@
 using System.Data.Common;
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -33,7 +34,12 @@ public static class ServiceCollectionExtensions
             .AddTokenAuthentication(configuration, env)
             .AddHealth(configuration)
             .AddMapster(Assembly.GetCallingAssembly())
-            .AddControllers();
+            .AddControllers()
+            .AddJsonOptions(x =>
+            {
+                // serialize enums as strings in api responses (e.g. Role)
+                x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
         if (swaggerEnabled)
         {

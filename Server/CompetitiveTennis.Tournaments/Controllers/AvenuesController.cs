@@ -3,11 +3,12 @@
 using CompetitiveTennis.Controllers;
 using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
+using Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models;
-using Models.Avenue;
+using Contracts.Avenue;
 using Services.Interfaces;
+using Constants = CompetitiveTennis.Constants;
 
 public class AvenuesController : ApiController
 {
@@ -28,7 +29,7 @@ public class AvenuesController : ApiController
                 var avenues = await _avenues.GetAll();
                 return Ok(Result<IEnumerable<AvenueOutputModel>>.SuccessWith(avenues));
             },
-            msgOnError: "An error occured during GET request for all avenues");
+            msgOnError: "An error occurred during GET request for all avenues");
 
     [HttpGet]
     [Route(Id)]
@@ -40,7 +41,7 @@ public class AvenuesController : ApiController
                     return NotFound(Result<AvenueOutputModel>.Failure($"Avenue {id} is missing"));
                 return Ok(Result<AvenueOutputModel>.SuccessWith(avenue));
             },
-            msgOnError: $"An error occured during GET request for avenue: {id}");
+            msgOnError: $"An error occurred during GET request for avenue: {id}");
 
     [HttpGet]
     [Route(nameof(Search))]
@@ -52,7 +53,7 @@ public class AvenuesController : ApiController
                 return Ok(Result<SearchOutputModel<AvenueOutputModel>>.SuccessWith(
                     new SearchOutputModel<AvenueOutputModel>(avenues, query.Page, total)));
             },
-            msgOnError: $"An error occured during Search request with query: {query}");
+            msgOnError: $"An error occurred during Search request with query: {query}");
 
     [HttpPost]
     [Authorize]
@@ -71,7 +72,7 @@ public class AvenuesController : ApiController
         => await SafeHandle(async () =>
             {
                 if (!_currentUser.IsAdministrator)
-                    return BadRequest(Result.Failure("Only admins are allowed to update avenues!"));
+                    return Unauthorized(Result.Failure("Only admins are allowed to update avenues!"));
 
                 var isSuccess = await _avenues.Update(id, input, _currentUser.UserId);
                 return isSuccess ? Result.Success : Result.Failure($"Update for avenue {id} failed.");
@@ -86,7 +87,7 @@ public class AvenuesController : ApiController
         => await SafeHandle(async () =>
             {
                 if (!_currentUser.IsAdministrator)
-                    return BadRequest(Result.Failure("Only admins are allowed to delete avenues!"));
+                    return Unauthorized(Result.Failure("Only admins are allowed to delete avenues!"));
 
                 var isSuccess = await _avenues.Delete(id, _currentUser.UserId);
                 return isSuccess ? Result.Success : Result.Failure($"Delete operation for avenue {id} failed.");

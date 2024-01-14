@@ -9,7 +9,7 @@ public class Participant : BaseDeletableEntity<int>
     public int? Points { get; set; }
     
     public bool IsGuest { get; set; }
-    public int TournamentId { get; set; }
+    public int? TournamentId { get; set; }
     public Tournament Tournament { get; set; }
     
     public int? TeamId { get; set; }

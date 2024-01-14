@@ -2,6 +2,7 @@
 
 using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
+using Contracts.Match;
 using Data.Models;
 using Models.Match;
 
@@ -18,9 +19,13 @@ public interface IMatchesService : IDataService<Match>
     /// </summary>
     Task<int> CreateEmptyMatch(MatchInputModel input, Tournament tournament);
     
-    Task<int> Create(MatchInputModel input, Tournament tournament, Participant participant1, Participant participant2);
+    Task<int> Create(MatchInputModel input, Tournament tournament, Participant homeParticipant, Participant awayParticipant);
 
-    Task<bool> UpdateParticipants(int id, Participant participant1, Participant participant2);
+    Task<int> AddMatchFlow(int tournamentId, int matchId, int successorMatchId, bool isWinnerHome);
+
+    Task<bool> UpdateParticipant(int id, Participant newParticipant, bool isHome);
+
+    Task<bool> UpdateParticipants(int id, Participant homeParticipant, Participant awayParticipant);
 
     Task<bool> UpdateStatus(int id, EventStatus status);
 
@@ -32,4 +37,8 @@ public interface IMatchesService : IDataService<Match>
 
     Task<bool> DeletePermanently(int id, string userid);
     
+    Task BeginTransaction();
+    Task CommitTransaction();
+    Task RollbackTransaction();
+
 }

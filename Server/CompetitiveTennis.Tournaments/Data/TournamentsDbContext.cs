@@ -34,6 +34,7 @@ public class TournamentsDbContext : DbContext
     public DbSet<AccountParticipant> AccountParticipants { get; set; }
     
     public DbSet<Score> Scores { get; set; }
+    public DbSet<MatchFlow> MatchFlows { get; set; }
     
     public override int SaveChanges() => SaveChanges(true);
 
@@ -59,6 +60,7 @@ public class TournamentsDbContext : DbContext
         NpgsqlConnection.GlobalTypeMapper.MapEnum<TournamentStage>(TournamentStageEnum);
         NpgsqlConnection.GlobalTypeMapper.MapEnum<EventStatus>(EventStatusEnum);
         NpgsqlConnection.GlobalTypeMapper.MapEnum<MatchOutcome>(MatchOutcomeEnum);
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<OutcomeCondition>(OutcomeConditionEnum);
         base.OnConfiguring(optionsBuilder);
     }
 
@@ -70,6 +72,7 @@ public class TournamentsDbContext : DbContext
         modelBuilder.HasPostgresEnum<TournamentStage>(name: TournamentStageEnum);
         modelBuilder.HasPostgresEnum<EventStatus>(name: EventStatusEnum);
         modelBuilder.HasPostgresEnum<MatchOutcome>(name: MatchOutcomeEnum);
+        modelBuilder.HasPostgresEnum<OutcomeCondition>(name: OutcomeConditionEnum);
         modelBuilder.ApplyGlobalDbConfigurationsForAssembly(GetType().Assembly, SetIsDeletedQueryFilterMethod, SetIsTestQueryFilterMethod);
         EntityIndexesConfiguration.Configure(modelBuilder);
     }

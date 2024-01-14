@@ -2,10 +2,10 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Contracts;
+using Contracts.Avenue;
 using Data.Models;
 using Mapster;
-using Models;
-using Models.Avenue;
 
 public class AvenueMappingConfig : IRegister
 {

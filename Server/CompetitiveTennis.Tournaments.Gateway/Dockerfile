@@ -6,6 +6,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["CompetitiveTennis.Tournaments.Gateway/CompetitiveTennis.Tournaments.Gateway.csproj", "CompetitiveTennis.Tournaments.Gateway/"]
+COPY ["CompetitiveTennis.Tournaments.Contracts/CompetitiveTennis.Tournaments.Contracts.csproj", "CompetitiveTennis.Tournaments.Contracts/"]
 COPY ["CompetitiveTennis/CompetitiveTennis.csproj", "CompetitiveTennis/"]
 RUN dotnet restore "CompetitiveTennis.Tournaments.Gateway/CompetitiveTennis.Tournaments.Gateway.csproj"
 COPY . .

@@ -5,7 +5,7 @@ using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Account;
+using Contracts.Account;
 using Services.Interfaces;
 
 public class AccountsController : ApiController
@@ -27,7 +27,7 @@ public class AccountsController : ApiController
                 var accounts = await _accounts.GetAll();
                 return Ok(Result<IEnumerable<AccountOutputModel>>.SuccessWith(accounts));
             },
-            msgOnError: "An error occured during GET request for all accounts");
+            msgOnError: "An error occurred during GET request for all accounts");
     
     [HttpGet]
     [Route(Id)]
@@ -39,10 +39,23 @@ public class AccountsController : ApiController
                     return NotFound(Result<AccountOutputModel>.Failure($"Account {id} is missing"));
                 return Ok(Result<AccountOutputModel>.SuccessWith(account));
             },
-            msgOnError: $"An error occured during GET request for account: {id}");
+            msgOnError: $"An error occurred during GET request for account: {id}");
+    
+    [HttpGet]
+    [Route("{username}")]
+    public async Task<ActionResult<Result<AccountOutputModel>>> ByUsername(string username) 
+        => await SafeHandle(async () =>
+            {
+                var account = await _accounts.GetByUsernamme(username);
+                if (account == null)
+                    return NotFound(Result<AccountOutputModel>.Failure($"Account {username} is missing"));
+                return Ok(Result<AccountOutputModel>.SuccessWith(account));
+            },
+            msgOnError: $"An error occurred during GET request for account: {username}");
 
     [HttpPost]
     [Authorize]
+    [Route(nameof(Add))]
     public async Task<ActionResult> Add(AccountInputModel input)
         => await SafeHandle(async () =>
             {

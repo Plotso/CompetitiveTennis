@@ -2,11 +2,11 @@
 
 using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
+using Contracts.Participant;
 using Data.Models;
 using Exceptions;
 using Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Models.Participant;
 
 public class ParticipantsService : DeletableDataService<Participant>, IParticipantsService
 {
@@ -18,7 +18,16 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
     }
 
     public async Task<Participant?> GetInternal(int id)
-        => await All().FirstOrDefaultAsync(p => p.Id == id);
+        => await All()
+            .Include(p=> p.Players)
+            .ThenInclude(p => p.Account)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+    public IEnumerable<Participant> GetParticipantForTournament(int tournamentId)
+        => All()
+            .Include(p => p.Players)
+            .ThenInclude(p => p.Account)
+            .Where(p => p.TournamentId == tournamentId);
 
     public async Task<bool> IsParticipantFull(int id)
     {
@@ -114,11 +123,11 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
         if (string.IsNullOrWhiteSpace(userid))
             return false;
 
-        var team = await All().SingleOrDefaultAsync(t => t.Id == id);
-        if (team == null)
+        var participant = await All().SingleOrDefaultAsync(t => t.Id == id);
+        if (participant == null)
             return false;
 
-        await Delete(team, userid);
+        await Delete(participant, userid);
         return true;
     }
 
@@ -127,11 +136,17 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
         if (string.IsNullOrWhiteSpace(userid))
             return false;
 
-        var team = await All().SingleOrDefaultAsync(t => t.Id == id);
-        if (team == null)
+        var participant = await All().SingleOrDefaultAsync(t => t.Id == id);
+        if (participant == null)
             return false;
 
-        HardDelete(team);
+        var accountParticipants = Data.Set<AccountParticipant>().Where(ap => ap.ParticipantId == id);
+        foreach (var accountParticipant in accountParticipants)
+        {
+            Data.Remove(accountParticipant);
+        }
+
+        HardDelete(participant);
         _logger.LogInformation("Participant with id: {Id} has been permanently deleted by UserId: {Userid}", id, userid);
         await Data.SaveChangesAsync();
         return true;

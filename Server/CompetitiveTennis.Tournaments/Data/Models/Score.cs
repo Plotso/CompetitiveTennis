@@ -15,6 +15,8 @@ public class Score : BaseDeletableEntity<int>
     
     public EventStatus Status { get; set; }
     
+    public MatchOutcome? PointWinner { get; set; }
+    
     public int MatchId { get; set; }
     
     public Match Match { get; set; }

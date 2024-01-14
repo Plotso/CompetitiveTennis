@@ -26,17 +26,21 @@ public class ParticipantMatchConfiguration : IEntityTypeConfiguration<Participan
             .IsRequired();
 
         builder
-            .Property(t => t.CreatedOn)
+            .Property(pm => pm.Specifier)
+            .IsRequired();
+
+        builder
+            .Property(pm => pm.CreatedOn)
             .HasColumnType("timestamp")
             .IsRequired();
 
         builder
-            .Property(t => t.ModifiedOn)
+            .Property(pm => pm.ModifiedOn)
             .HasColumnType("timestamp")
             .IsRequired(false);
 
         builder
-            .Property(t => t.DeletedOn)
+            .Property(pm => pm.DeletedOn)
             .HasColumnType("timestamp")
             .IsRequired(false);
     }

@@ -36,5 +36,12 @@ public class DataConstants
         public const string SurfaceEnum = "surface";
         public const string EventStatusEnum = "event_status";
         public const string MatchOutcomeEnum = "match_outcome";
+        public const string OutcomeConditionEnum = "outcome_condition";
+    }
+
+    public class ParticipantSpecifiers
+    {
+        public const string Home = nameof(Home);
+        public const string Away = nameof(Away);
     }
 }

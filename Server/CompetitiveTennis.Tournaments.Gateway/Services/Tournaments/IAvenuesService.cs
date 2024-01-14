@@ -1,8 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Services.Tournaments;
 
 using CompetitiveTennis.Models;
-using Models;
-using Models.Avenue;
+using Contracts;
+using Contracts.Avenue;
 using Refit;
 
 public interface IAvenuesService

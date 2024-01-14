@@ -1,10 +1,10 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Controllers;
 
 using CompetitiveTennis.Models;
+using Contracts;
+using Contracts.Participant;
+using Contracts.Tournament;
 using Microsoft.AspNetCore.Mvc;
-using Models;
-using Models.Participant;
-using Models.Tournament;
 using Services.Tournaments;
 
 public class TournamentsController : BaseGatewayController
@@ -38,7 +38,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var tournament = await _tournaments.ById(id);
                 return Ok(tournament);
-            }, $"An error occured during GET request for tournament: {id}");
+            }, $"An error occurred during GET request for tournament: {id}");
     
     [HttpGet]
     [Route(nameof(Search))]
@@ -50,7 +50,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var tournaments = await _tournaments.Search(query);
                 return Ok(tournaments);
-            }, $"An error occured during tournaments search with query: {query}");
+            }, $"An error occurred during tournaments search with query: {query}");
     
     [HttpPost]
     [Route(nameof(Add))]
@@ -64,7 +64,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var tournamentId = await _tournaments.Create(input);
                 return Ok(tournamentId);
-            }, $"An error occured during Create request for tournament. Request: {input}");
+            }, $"An error occurred during Create request for tournament. Request: {input}");
     
     [HttpPut]
     [Route($"{nameof(Edit)}/{Id}")]
@@ -79,7 +79,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var result = await _tournaments.Edit(id, input);
                 return Ok(result);
-            }, $"An error occured during Edit request for tournament: {id}. Request: {input}");
+            }, $"An error occurred during Edit request for tournament: {id}. Request: {input}");
     
     [HttpPut]
     [Route(nameof(ChangeAvenue))]
@@ -94,7 +94,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var result = await _tournaments.ChangeAvenue(tournamentId, newAvenueId);
                 return Ok(result);
-            }, $"An error occured during ChangeAvenue request for tournament: {tournamentId}, newAvenueId: {newAvenueId}");
+            }, $"An error occurred during ChangeAvenue request for tournament: {tournamentId}, newAvenueId: {newAvenueId}");
     
     [HttpDelete]
     [Route(Id)]
@@ -108,7 +108,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var result = await _tournaments.Delete(id);
                 return Ok(result);
-            }, $"An error occured during Delete request for tournament: {id}");
+            }, $"An error occurred during Delete request for tournament: {id}");
     
     [HttpPost]
     [Route(nameof(AddGuest))]
@@ -122,7 +122,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var result = await _tournaments.AddGuest(input);
                 return Ok(result);
-            }, $"An error occured during AddGuest request for tournament. Request: {input}");
+            }, $"An error occurred during AddGuest request for tournament. Request: {input}");
     
     [HttpPost]
     [Route(nameof(ParticipateSingle))]
@@ -136,7 +136,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var result = await _tournaments.ParticipateSingle(input);
                 return Ok(result);
-            }, $"An error occured during ParticipateSingle request for tournament. Request: {input}");
+            }, $"An error occurred during ParticipateSingle request for tournament. Request: {input}");
     
     [HttpPost]
     [Route(nameof(ParticipateDoubles))]
@@ -150,7 +150,21 @@ public class TournamentsController : BaseGatewayController
             {
                 var result = await _tournaments.ParticipateDoubles(input);
                 return Ok(result);
-            }, $"An error occured during ParticipateDoubles request for tournament. Request: {input}");
+            }, $"An error occurred during ParticipateDoubles request for tournament. Request: {input}");
+    
+    [HttpPost]
+    [Route(nameof(AddSinglesParticipant))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AddSinglesParticipant(AccountParticipantInputModel input) 
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var result = await _tournaments.AddSinglesParticipant(input);
+                return Ok(result);
+            }, $"An error occurred during AddSinglesParticipant request for tournament. Request: {input}");
     
     [HttpPost]
     [Route(nameof(AddAccountToParticipant))]
@@ -164,7 +178,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var result = await _tournaments.AddAccountToParticipant(tournamentId, participantId, accountId);
                 return Ok(result);
-            }, $"An error occured during AddAccountToParticipant request for tournament: {tournamentId}, participant: {participantId}, account : {accountId}");
+            }, $"An error occurred during AddAccountToParticipant request for tournament: {tournamentId}, participant: {participantId}, account : {accountId}");
     
     [HttpPost]
     [Route(nameof(RemoveAccountFromParticipant))]
@@ -178,7 +192,7 @@ public class TournamentsController : BaseGatewayController
             {
                 var result = await _tournaments.RemoveAccountFromParticipant(tournamentId, participantId, accountId);
                 return Ok(result);
-            }, $"An error occured during RemoveAccountFromParticipant request for tournament: {tournamentId}, participant: {participantId}, account : {accountId}");
+            }, $"An error occurred during RemoveAccountFromParticipant request for tournament: {tournamentId}, participant: {participantId}, account : {accountId}");
     
     [HttpPost]
     [Route(nameof(RemoveParticipantFromTournament))]
@@ -192,5 +206,20 @@ public class TournamentsController : BaseGatewayController
             {
                 var result = await _tournaments.RemoveParticipantFromTournament(tournamentId, participantId);
                 return Ok(result);
-            }, $"An error occured during RemoveParticipantFromTournament request for tournament: {tournamentId}, participant: {participantId}");
+            }, $"An error occurred during RemoveParticipantFromTournament request for tournament: {tournamentId}, participant: {participantId}");
+    
+    
+    [HttpPost]
+    [Route(nameof(GenerateTournamentDraw))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GenerateTournamentDraw(int tournamentId)
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var result = await _tournaments.GenerateTournamentDraw(tournamentId);
+                return Ok(result);
+            }, $"An error occurred during GenerateTournamentDraw request for tournament: {tournamentId}");
 }

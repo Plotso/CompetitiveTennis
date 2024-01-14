@@ -1,9 +1,12 @@
 using CompetitiveTennis.Extensions;
 using CompetitiveTennis.Services.Interfaces;
+using CompetitiveTennis.Tournaments.Configurations;
 using CompetitiveTennis.Tournaments.Data;
 using CompetitiveTennis.Tournaments.SerializerOptions;
 using CompetitiveTennis.Tournaments.Services;
+using CompetitiveTennis.Tournaments.Services.BL;
 using CompetitiveTennis.Tournaments.Services.Interfaces;
+using CompetitiveTennis.Tournaments.Services.Interfaces.BL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,15 +15,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddWebService<TournamentsDbContext>(builder.Configuration, builder.Environment, swaggerEnabled: true,
         enableLegacyTimestampBehaviour: true, dataSourceDelegate: null)
-    .AddTransient<IAccountsService, AccountsService>()
-    .AddTransient<IAvenuesService, AvenuesService>()
-    .AddTransient<ITournamentsService, TournamentsService>()
-    .AddTransient<IParticipantsService, ParticipantsService>()
-    .AddTransient<ITeamsService, TeamsService>()
-    .AddTransient<IMatchesService, MatchesService>()
-    .AddTransient<IScoresService, ScoresService>()
+    .AddScoped<IAccountsService, AccountsService>()
+    .AddScoped<IAvenuesService, AvenuesService>()
+    .AddScoped<ITournamentsService, TournamentsService>()
+    .AddScoped<IParticipantsService, ParticipantsService>()
+    .AddScoped<ITeamsService, TeamsService>()
+    .AddScoped<IMatchesService, MatchesService>()
+    .AddScoped<IScoresService, ScoresService>()
     .AddTransient<IDataSeeder, TournamentDataSeeder>()
-    .AddSingleton<ISerializerOptions, SerializerOptions>();
+    .AddSingleton<ISerializerOptions, SerializerOptions>()
+    .AddScoped<ITournamentDrawGenerator, TournamentDrawGenerator>()
+    .Configure<TournamentCreationConfiguration>(builder.Configuration.GetSection(nameof(TournamentCreationConfiguration)))
+    ;
 /*
 .AddNpgsqlDataSource(builder.Configuration.GetConnectionString("DefaultConnection"), sourceBuilder =>
 {

@@ -1,8 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces;
 
 using CompetitiveTennis.Data;
+using Contracts.Score;
 using Data.Models;
-using Models.Score;
 
 public interface IScoresService : IDataService<Score>
 {

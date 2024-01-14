@@ -37,15 +37,15 @@ public class IdentityService : IIdentityService
             : Result<User>.Failure(identityResult.Errors.Select(e => e.Description));
     }
 
-    public async Task<Result<UserOutputModel>> Login(UserInputModel userInput)
+    public async Task<Result<FullUserOutputModel>> Login(UserInputModel userInput)
     {
         var user = await GetUser(userInput);
         if (user == null)
-            return InvalidErrorMessage;
+            return Result<FullUserOutputModel>.Failure(new [] {InvalidErrorMessage});
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, userInput.Password);
         if (!passwordValid)
-            return InvalidErrorMessage;
+            return Result<FullUserOutputModel>.Failure(new [] {InvalidErrorMessage});
 
         var roles = await _userManager.GetRolesAsync(user);
         var isAdministrator = roles.Any(r => r == Constants.AdministratorRoleName);
@@ -54,7 +54,8 @@ public class IdentityService : IIdentityService
         await _userManager.UpdateAsync(user);
         var token = _tokenGenerator.GenerateToken(user, roles);
 
-        return new UserOutputModel(token, user.UserName ?? user.Email, isAdministrator);
+        return Result<FullUserOutputModel>.SuccessWith(new FullUserOutputModel(token, user.Email, user.UserName, user.FirstName, user.LastName,
+            isAdministrator));
     }
 
     public async Task<Result> ChangePassword(string userId, ChangePasswordInputModel changePasswordInput)

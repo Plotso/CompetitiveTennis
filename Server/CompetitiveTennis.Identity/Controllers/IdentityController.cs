@@ -1,6 +1,7 @@
 ﻿namespace CompetitiveTennis.Identity.Controllers;
 
 using CompetitiveTennis.Controllers;
+using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ public class IdentityController : ApiController
 
     [HttpPost]
     [Route(nameof(Register))]
-    public async Task<ActionResult<UserOutputModel>> Register(RegisterInputModel input)
+    public async Task<ActionResult<Result<FullUserOutputModel>>> Register(RegisterInputModel input)
     {
         var result = await _identity.Register(input);
         var userInputModel = result.IsSuccess
@@ -36,10 +37,10 @@ public class IdentityController : ApiController
 
     [HttpPost]
     [Route(nameof(Login))]
-    public async Task<ActionResult<UserOutputModel>> Login(UserInputModel input)
+    public async Task<ActionResult<Result<FullUserOutputModel>>> Login(UserInputModel input)
     {
         var result = await _identity.Login(input);
-        return result.IsSuccess ? result.Data : BadRequest(result.Errors);
+        return result.IsSuccess ? result : Result<FullUserOutputModel>.Failure(result.Errors);
     }
 
     [HttpPut]

@@ -1,9 +1,9 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Services.Tournaments;
 
 using CompetitiveTennis.Models;
-using Models;
-using Models.Participant;
-using Models.Tournament;
+using Contracts;
+using Contracts.Participant;
+using Contracts.Tournament;
 using Refit;
 
 public interface ITournamentsService
@@ -12,7 +12,7 @@ public interface ITournamentsService
     Task<Result<IEnumerable<TournamentOutputModel>>> All();
 
     [Get("/Tournaments/{id}")]
-    Task<Result<TournamentOutputModel>> ById(int id);
+    Task<Result<SlimTournamentOutputModel>> ById(int id);
 
     [Get("/Tournaments/Search")]
     Task<Result<SearchOutputModel<TournamentOutputModel>>> Search([Query] TournamentQuery query);
@@ -38,6 +38,9 @@ public interface ITournamentsService
     [Post("/Tournaments/ParticipateDoubles")]
     Task<Result> ParticipateDoubles(MultiParticipantInputModel input);
 
+    [Post("/Tournaments/AddSinglesParticipant")]
+    Task<Result> AddSinglesParticipant(AccountParticipantInputModel input);
+
     [Post("/Tournaments/AddAccountToParticipant")]
     Task<Result> AddAccountToParticipant(int tournamentId, int participantId, int accountId);
 
@@ -46,4 +49,7 @@ public interface ITournamentsService
     
     [Post("/Tournaments/RemoveParticipantFromTournament")]
     Task<Result> RemoveParticipantFromTournament(int tournamentId, int participantId);
+    
+    [Post("/Tournaments/GenerateTournamentDraw")]
+    Task<Result> GenerateTournamentDraw(int tournamentId);
 }

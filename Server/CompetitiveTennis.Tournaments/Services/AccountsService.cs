@@ -1,14 +1,13 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services;
 
 using CompetitiveTennis.Data;
+using Contracts.Account;
 using Data.Models;
 using Exceptions;
 using Interfaces;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using Models.Account;
-using Models.Avenue;
 using static ServiceConstants;
 
 public class AccountsService : DataService<Account>, IAccountsService
@@ -28,6 +27,15 @@ public class AccountsService : DataService<Account>, IAccountsService
     public async Task<AccountOutputModel> GetById(int id)
         => await All()
             .Where(a => a.Id == id)
+            .Include(a => a.Participations)
+            .ThenInclude(p => p.Participant)
+            .Include(a => a.OrganisedTournaments)
+            .ProjectToType<AccountOutputModel>()
+            .SingleOrDefaultAsync();
+
+    public async Task<AccountOutputModel> GetByUsernamme(string username)
+        => await All()
+            .Where(a => a.Username == username)
             .Include(a => a.Participations)
             .ThenInclude(p => p.Participant)
             .Include(a => a.OrganisedTournaments)
@@ -78,7 +86,7 @@ public class AccountsService : DataService<Account>, IAccountsService
         catch (Exception e)
         {
             throw new InvalidOperationException(
-                $"An error occured during {nameof(UpdatePlayerRating)} execution for userId: {userId}. Error: {e.Message} ");
+                $"An error occurred during {nameof(UpdatePlayerRating)} execution for userId: {userId}. Error: {e.Message} ");
         }
     }
 

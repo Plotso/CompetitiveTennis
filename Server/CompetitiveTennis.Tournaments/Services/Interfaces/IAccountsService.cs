@@ -1,16 +1,15 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces;
 
-using System.Collections;
 using CompetitiveTennis.Data;
+using Contracts.Account;
 using Data.Models;
 using Exceptions;
-using Models;
-using Models.Account;
 
 public interface IAccountsService : IDataService<Account>
 {
     Task<IEnumerable<AccountOutputModel>> GetAll();
     Task<AccountOutputModel> GetById(int id);
+    Task<AccountOutputModel> GetByUsernamme(string username);
     Task<IEnumerable<Account>> GetMultiple(IEnumerable<int> ids);
     Task<Account?> GetByUserId(string userId);
     Task<Account?> GetInternal(int id);
