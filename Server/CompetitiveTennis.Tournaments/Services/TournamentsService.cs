@@ -54,7 +54,14 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             .EnrichTournamentQueryData()
             .EnrichWithMatches()
             .SingleOrDefaultAsync());
-            
+
+    public async Task<string> GetOrganiserUsername(int id) 
+        => await AllAsNoTracking()
+            .Include(t => t.Organiser)
+            .Where(t => t.Id == id)
+            .Select(t => t.Organiser.Username)
+            .FirstOrDefaultAsync();
+
 
     public async Task<bool> IsAccountPresentInAnyParticipant(int accountId, int tournamentId)
     {

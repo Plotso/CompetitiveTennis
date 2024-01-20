@@ -19,4 +19,5 @@ public record MatchShortOutputModel(
     int? AwayPredecesorMatchId,
     ParticipantInfo? HomeParticipant,
     ParticipantInfo? AwayParticipant,
-    IEnumerable<ScoreShortOutputModel> Scores);
+    IEnumerable<ScoreShortOutputModel> Scores,
+    int TournamentId);

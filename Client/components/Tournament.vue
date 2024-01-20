@@ -346,6 +346,7 @@ const generateDraw = async (tournamentId: number) => {
       <table class="table is-striped is-fullwidth">
         <thead>
           <tr>
+            <th></th>
             <th>Start Date</th>
             <th>Match Id</th>
             <th>Stage</th>
@@ -357,6 +358,13 @@ const generateDraw = async (tournamentId: number) => {
         <tbody>
           <tr v-for="match in tournament.matches" :key="match.id">
             <td>
+              
+            <NuxtLink :to="`/matches/${match.id}`" class="custom-link has-text-weight-semibold">
+              Details
+            </NuxtLink>
+            </td>
+            <td>
+              
               {{ new Date(match.startDate).toLocaleDateString(undefined, options).replace(' at', '') }}
             </td>
             <td>{{ match.id }}</td>

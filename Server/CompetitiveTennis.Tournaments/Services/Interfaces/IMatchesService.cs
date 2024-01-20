@@ -11,6 +11,8 @@ public interface IMatchesService : IDataService<Match>
     Task<IEnumerable<MatchOutputModel>> GetAll();
     
     Task<MatchOutputModel> Get(int id);
+
+    Task<int?> GetTournamentIdForMatch(int matchId);
     
     Task<Match> GetInternal(int id);
 

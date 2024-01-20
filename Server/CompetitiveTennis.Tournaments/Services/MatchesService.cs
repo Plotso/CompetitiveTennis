@@ -30,10 +30,17 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
     public async Task<MatchOutputModel> Get(int id)
         => await All()
             .Where(m => m.Id == id)
-            //.Include(m => m.Scores)  ToDo: Verify if Include is needed
-            //.Include(m => m.Participants)
+            .Include(m => m.Scores)
+            .Include(m => m.Participants)
             .ProjectToType<MatchOutputModel>()
             .SingleOrDefaultAsync();
+
+    public async Task<int?> GetTournamentIdForMatch(int matchId) 
+        => await All()
+            .Where(m => m.Id == matchId)
+            .Select(m => m.TournamentId)
+            .SingleOrDefaultAsync();
+
 
     public async Task<Match> GetInternal(int id)
         => await All().Where(m => m.Id == id).SingleOrDefaultAsync();

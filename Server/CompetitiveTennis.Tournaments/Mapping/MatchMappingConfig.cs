@@ -1,9 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments.Mapping;
 
-using Contracts.Account;
 using Contracts.Match;
 using Contracts.Participant;
-using Contracts.Team;
 using Data.Models;
 using Mapster;
 

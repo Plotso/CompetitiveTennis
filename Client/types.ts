@@ -269,6 +269,7 @@ export namespace Auth {
     homeParticipant: ParticipantInfo;
     awayParticipant: ParticipantInfo;
     scores: ScoreShortOutputModel[];
+    tournamentId: number;
   }
   
   export interface ScoreShortOutputModel {
