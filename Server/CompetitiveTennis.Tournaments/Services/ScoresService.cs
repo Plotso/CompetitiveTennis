@@ -38,6 +38,7 @@ public class ScoresService : DeletableDataService<Score>, IScoresService
         score.Participant1Points = inputModel.Participant1Points;
         score.Participant2Points = inputModel.Participant2Points;
         score.Status = inputModel.Status;
+        score.PointWinner = inputModel.PointWinner;
 
         await SaveAsync(score);
         return true;

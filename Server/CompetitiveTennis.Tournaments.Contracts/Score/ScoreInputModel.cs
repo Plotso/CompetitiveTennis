@@ -24,4 +24,7 @@ public record ScoreInputModel
     [Required]
     [Range(1, int.MaxValue)]
     public int MatchId { get; set; }
+    
+    [Required]
+    public MatchOutcome PointWinner { get; set; }
 }
