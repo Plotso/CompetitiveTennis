@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {MatchShortOutputModel, Result} from "types"
+import MatchOverview from "~/components/MatchOverview.vue";
 const route = useRoute();
 const config = useRuntimeConfig();
 
@@ -31,11 +32,13 @@ if(error && error.statusCode == 404)
 </script>
 
 <template>
-    <div v-if="pending">
+    <div v-if="pending" class="view-window">
         <Loading></Loading>
     </div>
-    <div v-else>        
-        <Match :data="data" :organiserUsername="tournamentOrganiserUsername.data.value.data" v-if="data"></Match>
+    <div v-else class="view-window">        
+        <MatchTournamentHeader :tournamentId="data?.data.tournamentId"></MatchTournamentHeader>
+        <MatchOverview :data="data" :organiserUsername="tournamentOrganiserUsername.data.value.data" v-if="data"></MatchOverview>
+        <MatchScoreOverview :data="data" :organiserUsername="tournamentOrganiserUsername.data.value.data" v-if="data"></MatchScoreOverview>
     </div>
 </template>
 

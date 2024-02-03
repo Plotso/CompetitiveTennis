@@ -122,8 +122,6 @@ const formatEventStatus = (status: EventStatus) => {
         </div>
       </div>
 
-      <div>show score</div>
-
       <div v-if="isAuthorized" class="buttons is-centered">
 
         <p>

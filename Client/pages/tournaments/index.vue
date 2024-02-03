@@ -175,11 +175,11 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
     <div class="view-window">
         <Banner title="All Tournaments">            
             <div>
-                <hr>
                 <div v-if="user.username" class="buttons is-centered">
-                    <NuxtLink to="/tournaments/create" class="button is-primary">Create Tournament</NuxtLink>
-                </div>
                 <hr>
+                    <NuxtLink to="/tournaments/create" class="button is-primary">Create Tournament</NuxtLink>
+                <hr>
+                </div>
             </div>
         </Banner>
     <div v-if="pending">

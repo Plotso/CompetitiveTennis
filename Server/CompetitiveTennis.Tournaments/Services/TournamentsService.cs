@@ -55,6 +55,12 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             .EnrichWithMatches()
             .SingleOrDefaultAsync());
 
+    public async Task<string> GetTournamentName(int id)
+        => await AllAsNoTracking()
+            .Where(t => t.Id == id)
+            .Select(t => t.Title)
+            .FirstOrDefaultAsync();
+
     public async Task<string> GetOrganiserUsername(int id) 
         => await AllAsNoTracking()
             .Include(t => t.Organiser)

@@ -48,7 +48,7 @@ public static class MatchInfoProvider
 
         var playerNames = string.Join(" ,",
             participantShortOutputModel.Players.Select(p =>
-                $"{p.FirstName} {p.LastName} ({p.Username} | {p.PlayerRating})"));
+                $"{p.FirstName} {p.LastName} ({p.Username} | {p.PlayerRating})"));  //ToDo: Revise those brackets styling since this results in Odd results on FE
         return participantShortOutputModel.IsGuest ? $"{participantShortOutputModel.Name}, {playerNames}" : playerNames;
     }
 }

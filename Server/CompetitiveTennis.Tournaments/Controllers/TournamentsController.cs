@@ -64,10 +64,22 @@ public class TournamentsController : ApiController
                     return NotFound(Result<SlimTournamentOutputModel>.Failure($"Tournament {id} does not exist"));
                 return Ok(Result<SlimTournamentOutputModel>.SuccessWith(TournamentInfoProvider.GetTournamentInfo(tournament)));
             },
-            msgOnError: $"An error occurred during GET request for tournament: {id}");[HttpGet]
+            msgOnError: $"An error occurred during GET request for tournament: {id}");
     
     [HttpGet]
-    [Route(nameof(GetOrganiserUsername))]
+    [Route($"{nameof(GetTournamentName)}/{Id}")]
+    public async Task<ActionResult<string>> GetTournamentName(int id)
+        => await SafeHandle(async () =>
+            {
+                var tournamentName = await _tournaments.GetTournamentName(id);
+                if (tournamentName == null)
+                    return NotFound(Result<string>.Failure($"Tournament {id} does not exist"));
+                return Ok(Result<string>.SuccessWith(tournamentName));
+            },
+            msgOnError: $"An error occurred during GET request for tournament name for tournament: {id}");
+    
+    [HttpGet]
+    [Route($"{nameof(GetOrganiserUsername)}/{Id}")]
     public async Task<ActionResult<string>> GetOrganiserUsername(int id)
         => await SafeHandle(async () =>
             {
