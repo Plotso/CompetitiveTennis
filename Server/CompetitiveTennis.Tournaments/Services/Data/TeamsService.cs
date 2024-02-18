@@ -1,9 +1,9 @@
-﻿namespace CompetitiveTennis.Tournaments.Services;
+﻿namespace CompetitiveTennis.Tournaments.Services.Data;
 
 using CompetitiveTennis.Data;
 using Contracts.Team;
-using Data.Models;
-using Interfaces;
+using CompetitiveTennis.Tournaments.Data.Models;
+using Interfaces.Data;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 

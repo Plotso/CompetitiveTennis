@@ -1,9 +1,9 @@
-﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces;
+﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces.Data;
 
 using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
 using Contracts.Match;
-using Data.Models;
+using CompetitiveTennis.Tournaments.Data.Models;
 using Models.Match;
 
 public interface IMatchesService : IDataService<Match>

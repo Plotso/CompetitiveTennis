@@ -1,16 +1,16 @@
-﻿namespace CompetitiveTennis.Tournaments.Services;
+﻿namespace CompetitiveTennis.Tournaments.Services.Data;
 
 using System.Text.Json;
 using CompetitiveTennis.Data;
-using Contracts.Avenue;
-using Data.Models;
 using Exceptions;
+using Contracts.Avenue;
+using CompetitiveTennis.Tournaments.Data.Models;
 using Extensions;
-using Interfaces;
+using SerializerOptions;
+using Interfaces.Data;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using SerializerOptions;
 
 public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
 {

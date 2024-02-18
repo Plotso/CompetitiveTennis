@@ -3,9 +3,8 @@
 using Contracts.Account;
 using Contracts.Match;
 using Contracts.Participant;
-using Contracts.Tournament;
-using Data;
 using Models;
+using Tournaments.Data;
 
 public static class MatchInfoProvider
 {

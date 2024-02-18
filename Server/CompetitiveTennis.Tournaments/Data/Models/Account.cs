@@ -1,6 +1,5 @@
 ﻿namespace CompetitiveTennis.Tournaments.Data.Models;
 
-using System.Collections.ObjectModel;
 using CompetitiveTennis.Data.Models;
 
 public class Account : BaseDeletableEntity<int>

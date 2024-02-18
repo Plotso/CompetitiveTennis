@@ -1,6 +1,6 @@
 ﻿namespace CompetitiveTennis.Tournaments.Extensions;
 
-using Configurations;using Data.Configurations;
+using Configurations;
 
 public static class TournamentCreationConfigurationExtensions
 {

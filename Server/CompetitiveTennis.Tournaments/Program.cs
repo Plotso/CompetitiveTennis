@@ -3,10 +3,10 @@ using CompetitiveTennis.Services.Interfaces;
 using CompetitiveTennis.Tournaments.Configurations;
 using CompetitiveTennis.Tournaments.Data;
 using CompetitiveTennis.Tournaments.SerializerOptions;
-using CompetitiveTennis.Tournaments.Services;
 using CompetitiveTennis.Tournaments.Services.BL;
-using CompetitiveTennis.Tournaments.Services.Interfaces;
+using CompetitiveTennis.Tournaments.Services.Data;
 using CompetitiveTennis.Tournaments.Services.Interfaces.BL;
+using CompetitiveTennis.Tournaments.Services.Interfaces.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

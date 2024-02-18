@@ -1,8 +1,8 @@
-﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces;
+﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces.Data;
 
 using CompetitiveTennis.Data;
 using Contracts.Participant;
-using Data.Models;
+using CompetitiveTennis.Tournaments.Data.Models;
 
 public interface IParticipantsService : IDataService<Participant>
 {

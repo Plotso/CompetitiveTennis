@@ -3,7 +3,6 @@
 using System.Reflection;
 using CompetitiveTennis.Data.Configuration;
 using CompetitiveTennis.Data.Models.Interfaces;
-using Data;
 using Microsoft.EntityFrameworkCore;
 
 public static class ModelBuilderExtensions

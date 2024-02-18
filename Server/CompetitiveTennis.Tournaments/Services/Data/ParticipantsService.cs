@@ -1,11 +1,11 @@
-﻿namespace CompetitiveTennis.Tournaments.Services;
+﻿namespace CompetitiveTennis.Tournaments.Services.Data;
 
 using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
-using Contracts.Participant;
-using Data.Models;
 using Exceptions;
-using Interfaces;
+using Contracts.Participant;
+using CompetitiveTennis.Tournaments.Data.Models;
+using Interfaces.Data;
 using Microsoft.EntityFrameworkCore;
 
 public class ParticipantsService : DeletableDataService<Participant>, IParticipantsService

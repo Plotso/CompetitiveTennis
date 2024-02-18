@@ -1,10 +1,10 @@
-﻿namespace CompetitiveTennis.Tournaments.Services;
+﻿namespace CompetitiveTennis.Tournaments.Services.Data;
 
 using CompetitiveTennis.Data;
-using Contracts.Account;
-using Data.Models;
 using Exceptions;
-using Interfaces;
+using Contracts.Account;
+using CompetitiveTennis.Tournaments.Data.Models;
+using Interfaces.Data;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;

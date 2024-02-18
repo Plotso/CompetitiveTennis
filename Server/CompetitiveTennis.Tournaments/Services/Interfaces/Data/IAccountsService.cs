@@ -1,9 +1,9 @@
-﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces;
+﻿namespace CompetitiveTennis.Tournaments.Services.Interfaces.Data;
 
 using CompetitiveTennis.Data;
-using Contracts.Account;
-using Data.Models;
 using Exceptions;
+using Contracts.Account;
+using CompetitiveTennis.Tournaments.Data.Models;
 
 public interface IAccountsService : IDataService<Account>
 {

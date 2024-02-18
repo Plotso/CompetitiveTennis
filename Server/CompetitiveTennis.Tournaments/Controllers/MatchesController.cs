@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Match;
 using Services;
-using Services.Interfaces;
+using Services.Interfaces.Data;
 
 public class MatchesController : ApiController
 {
@@ -50,7 +50,7 @@ public class MatchesController : ApiController
             {
                 var tournamentId = await _matches.GetTournamentIdForMatch(id);
                 if (tournamentId == null)
-                    return NotFound(Result<MatchShortOutputModel>.Failure($"Match {id} does not exist"));
+                    return NotFound(Result.Failure($"Match {id} does not exist"));
                 
                 var tournament = await _tournaments.Get(tournamentId.Value);
                 var match = MatchInfoProvider.GetMatchInfoFromTournament(tournament, id);
@@ -65,7 +65,7 @@ public class MatchesController : ApiController
             {
                 var tournamentId = await _matches.GetTournamentIdForMatch(id);
                 if (tournamentId == null)
-                    return NotFound(Result<MatchShortOutputModel>.Failure($"Match {id} does not exist"));
+                    return NotFound(Result.Failure($"Match {id} does not exist"));
                 var tournamentOrganiserUsername = await _tournaments.GetOrganiserUsername(tournamentId.Value);
                 return Ok(Result<string>.SuccessWith(tournamentOrganiserUsername));
             },

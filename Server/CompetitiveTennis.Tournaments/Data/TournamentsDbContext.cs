@@ -1,6 +1,5 @@
 ﻿namespace CompetitiveTennis.Tournaments.Data;
 
-using System.Data.Common;
 using System.Reflection;
 using CompetitiveTennis.Data.Models.Enums;
 using CompetitiveTennis.Data.Models.Interfaces;

@@ -8,8 +8,8 @@ using Contracts.Avenue;
 using Contracts.Enums;
 using Contracts.Participant;
 using Contracts.Tournament;
-using Services.Interfaces;
-using Constants = CompetitiveTennis.Constants;
+using Services.Interfaces.Data;
+using Constants = Constants;
 
 public class TournamentDataSeeder : IDataSeeder
 {
