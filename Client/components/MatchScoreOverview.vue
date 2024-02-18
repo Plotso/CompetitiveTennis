@@ -76,7 +76,7 @@ const isActive = (tabName: string) => activeTab.value == tabName;
       <!-- Tabs for Summary and Point by Point -->
       <div class="tab-container">
         <button @click="setActiveTab('summary')" class="button">Summary</button>
-        <button @click="setActiveTab('point-by-point')" class="button" v-show="match.scores && match.scores.length > 0">Point by Point</button>
+        <button @click="setActiveTab('point-by-point')" class="button" v-show="match.matchPeriods && match.matchPeriods.length > 0">Point by Point</button>
       </div>
 
       <!-- Summary View -->

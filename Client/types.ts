@@ -74,6 +74,12 @@ export namespace Auth {
     Ended,
   }
 
+  export enum EventActor {
+    Unknown,
+    Home,
+    Away,
+  }
+
   export enum MatchOutcome {
     Unknown,
     Participant1Won,
@@ -249,7 +255,7 @@ export namespace Auth {
     status: EventStatus;
     outcome: MatchOutcome;
     outcomeCondition: OutcomeCondition | null;
-    scores: ScoreShortOutputModel[];
+    matchPeriods: MatchPeriodOutputModel[];
     participants: ParticipantShortOutputModel[];
   }
   
@@ -268,17 +274,25 @@ export namespace Auth {
     outcomeCondition: OutcomeCondition | null;
     homeParticipant: ParticipantInfo;
     awayParticipant: ParticipantInfo;
-    scores: ScoreShortOutputModel[];
+    matchPeriods: MatchPeriodOutputModel[];
     tournamentId: number;
+  }
+  
+  export interface MatchPeriodOutputModel {
+    id: number;
+    set: number;
+    game: number;
+    status: EventStatus;
+    winner: MatchOutcome;
+    server: EventActor;
+    scores: ScoreShortOutputModel[];
   }
   
   export interface ScoreShortOutputModel {
     id: number;
-    set: number;
-    game: number;
+    periodPointNumber: number;
     participant1Points: string;
     participant2Points: string;
-    status: EventStatus;
     pointWinner: MatchOutcome
   }
 

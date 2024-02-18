@@ -2,41 +2,43 @@
 
 using CompetitiveTennis.Data;
 using CompetitiveTennis.Tournaments.Data.Models;
+using Contracts.MatchPeriod;
 using Contracts.MatchPeriod.Score;
 using Interfaces.Data;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 
-public class ScoresService : DeletableDataService<Score>, IScoresService
+public class MatchPeriodsService : DeletableDataService<MatchPeriod>, IMatchPeriodsService
 {
     private readonly IMapper _mapper;
-    private readonly ILogger<ScoresService> _logger;
+    private readonly ILogger<MatchPeriodsService> _logger;
 
-    public ScoresService(DbContext db, IMapper mapper, ILogger<ScoresService> logger) : base(db)
+    public MatchPeriodsService(DbContext db, IMapper mapper, ILogger<MatchPeriodsService> logger) : base(db)
     {
         _mapper = mapper;
         _logger = logger;
     }
 
-    public async Task<int> Create(ScoreInputModel inputModel, MatchPeriod matchPeriod)
+    public async Task<int> Create(MatchPeriodInputModel inputModel, Match match)
     {
-        var score = _mapper.Map<Score>(inputModel);
-        score.MatchPeriod = matchPeriod;
+        var matchPeriod = _mapper.Map<MatchPeriod>(inputModel);
+        matchPeriod.Match = match;
 
-        await SaveAsync(score);
-        return score.Id;
+        await SaveAsync(matchPeriod);
+        return matchPeriod.Id;
     }
 
-    public async Task<bool> Update(int id, ScoreInputModel inputModel)
+    public async Task<bool> Update(int id, MatchPeriodInputModel inputModel)
     {
         var score = await All().SingleOrDefaultAsync(s => s.Id == id);
         if (score == null)
             return false;
 
-        score.PeriodPointNumber = inputModel.PeriodPointNumber;
-        score.Participant1Points = inputModel.Participant1Points;
-        score.Participant2Points = inputModel.Participant2Points;
-        score.PointWinner = inputModel.PointWinner;
+        score.Set = inputModel.Set;
+        score.Game = inputModel.Game;
+        score.Winner = inputModel.Winner;
+        score.Status = inputModel.Status;
+        score.Server = inputModel.Server;
 
         await SaveAsync(score);
         return true;
@@ -65,7 +67,7 @@ public class ScoresService : DeletableDataService<Score>, IScoresService
             return false;
 
         HardDelete(score);
-        _logger.LogInformation("Score with id: {Id} has been permanently deleted by UserId: {Userid}", id, userid);
+        _logger.LogInformation("MatchPeriod with id: {Id} has been permanently deleted by UserId: {Userid}", id, userid);
         await Data.SaveChangesAsync();
         return true;
     }

@@ -1,8 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Contracts.Match;
 
 using CompetitiveTennis.Data.Models.Enums;
+using MatchPeriod;
 using Participant;
-using Score;
 
 public record MatchOutputModel(
     int Id,
@@ -15,5 +15,5 @@ public record MatchOutputModel(
     string? Details,
     EventStatus Status,
     MatchOutcome Outcome,
-    IEnumerable<ScoreShortOutputModel> Scores,
+    IEnumerable<MatchPeriodOutputModel> MatchPeriods,
     IEnumerable<ParticipantShortOutputModel> Participants);

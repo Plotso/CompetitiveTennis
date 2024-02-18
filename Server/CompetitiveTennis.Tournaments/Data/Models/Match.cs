@@ -24,7 +24,7 @@ public class Match : BaseDeletableEntity<int>
     public int TournamentId { get; set; }
     
     public Tournament Tournament { get; set; }
-    public ICollection<Score> Scores { get; set; }
+    public ICollection<MatchPeriod> Periods { get; set; }
     
     public ICollection<ParticipantMatch> Participants { get; set; }
 }

@@ -1,14 +1,14 @@
-﻿namespace CompetitiveTennis.Tournaments.Contracts.Score;
+﻿namespace CompetitiveTennis.Tournaments.Contracts.MatchPeriod.Score;
 
 using System.ComponentModel.DataAnnotations;
-using Data.Models.Enums;
+using CompetitiveTennis.Data.Models.Enums;
 using static Constants;
 
 public record ScoreInputModel
 {
-    public short Set { get; set; }
-    
-    public short Game { get; set; }
+    [Required]
+    [Range(1, int.MaxValue)]
+    public int PeriodPointNumber { get; set; }
     
     [Required]
     [MaxLength(MaxScorePointsValueLength)]
@@ -17,14 +17,6 @@ public record ScoreInputModel
     [Required]
     [MaxLength(MaxScorePointsValueLength)]
     public string Participant2Points { get; set; }
-    
-    [Required]
-    public EventStatus Status { get; set; }
-    
-    [Required]
-    [Range(1, int.MaxValue)]
-    public int MatchId { get; set; }
-    
     [Required]
     public MatchOutcome PointWinner { get; set; }
 }

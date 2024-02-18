@@ -30,8 +30,9 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
     public async Task<MatchOutputModel> Get(int id)
         => await All()
             .Where(m => m.Id == id)
-            .Include(m => m.Scores)
             .Include(m => m.Participants)
+            .Include(m => m.Periods)
+            .ThenInclude(mp => mp.Scores)
             .ProjectToType<MatchOutputModel>()
             .SingleOrDefaultAsync();
 

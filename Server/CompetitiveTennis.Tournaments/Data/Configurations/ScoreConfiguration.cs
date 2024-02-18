@@ -14,36 +14,22 @@ public class ScoreConfiguration : IEntityTypeConfiguration<Score>
             .HasKey(s => s.Id);
 
         builder
-            .Property(s => s.Set)
-            .HasColumnType("smallint")
-            .IsRequired();
-
-        builder
-            .Property(s => s.Game)
-            .HasColumnType("smallint")
-            .IsRequired();
-
-        builder
             .Property(s => s.Participant1Points)
             .HasMaxLength(MaxScorePointsValueLength);
 
         builder
             .Property(s => s.Participant2Points)
             .HasMaxLength(MaxScorePointsValueLength);
-
-        builder
-            .Property(s => s.Status)
-            .HasColumnType(CustomDbTypes.EventStatusEnum)
-            .IsRequired();
+        
         builder
             .Property( m=> m.PointWinner)
             .HasColumnType(CustomDbTypes.MatchOutcomeEnum)
             .IsRequired(false);
 
         builder
-            .HasOne(s => s.Match)
+            .HasOne(s => s.MatchPeriod)
             .WithMany(m => m.Scores)
-            .HasForeignKey(s => s.MatchId)
+            .HasForeignKey(s => s.MatchPeriodId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
 
@@ -62,6 +48,6 @@ public class ScoreConfiguration : IEntityTypeConfiguration<Score>
             .HasColumnType("timestamp")
             .IsRequired(false);
             
-        builder.HasIndex(s => s.MatchId);
+        builder.HasIndex(s => s.MatchPeriodId);
     }
 }

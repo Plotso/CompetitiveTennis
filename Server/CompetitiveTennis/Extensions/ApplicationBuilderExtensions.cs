@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Middlewares;
 using Npgsql;
 using Services.Interfaces;
@@ -58,7 +59,15 @@ public static class ApplicationBuilderExtensions
         var serviceProvider = serviceScope.ServiceProvider;
 
         var db = serviceProvider.GetRequiredService<DbContext>();
-        db.Database.Migrate();
+        try
+        {
+            db.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger<DbContext>>();
+            logger.LogError(ex, "Failed to Migrate db.");
+        }
 
         using var connection = (NpgsqlConnection) db.Database.GetDbConnection();
         connection.Open();

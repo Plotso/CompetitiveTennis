@@ -37,7 +37,7 @@ public static class MatchInfoProvider
             matchOutput.Details, matchOutput.Status, matchOutput.Outcome, OutcomeCondition: null,
             homePredecesorMatch?.MatchId,
             awayPredecesorMatch?.MatchId,
-            homeParticipantInfo, awayParticipantInfo, matchOutput.Scores, outputModel.Id);
+            homeParticipantInfo, awayParticipantInfo, matchOutput.MatchPeriods, outputModel.Id);
     }
 
     private static string GetName(ParticipantShortOutputModel participantShortOutputModel)
