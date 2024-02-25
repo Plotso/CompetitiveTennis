@@ -285,6 +285,7 @@ export namespace Auth {
     status: EventStatus;
     winner: MatchOutcome;
     server: EventActor;
+    isTiebreak: boolean,
     scores: ScoreShortOutputModel[];
   }
   
