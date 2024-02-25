@@ -3,7 +3,7 @@
 using System.ComponentModel.DataAnnotations;
 using Data.Models.Enums;
 
-public class MatchPeriodInputModel
+public record MatchPeriodInputModel
 {
     public short Set { get; set; }
     
@@ -18,4 +18,6 @@ public class MatchPeriodInputModel
     
     public EventActor Server { get; set; }
     public MatchOutcome Winner { get; set; }
+    
+    public bool IsTiebreak { get; set; }
 }

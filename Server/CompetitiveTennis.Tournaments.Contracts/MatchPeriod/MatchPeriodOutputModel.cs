@@ -10,4 +10,5 @@ public record MatchPeriodOutputModel(
     EventStatus Status,
     MatchOutcome Winner,
     EventActor Server,
+    bool IsTiebreak,
     IEnumerable<ScoreShortOutputModel> Scores);

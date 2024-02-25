@@ -7,6 +7,7 @@ using Contracts.MatchPeriod.Score;
 
 public interface IMatchPeriodsService : IDataService<MatchPeriod>
 {
+    Task<MatchPeriod> GetInternal(int id);
     Task<int> Create(MatchPeriodInputModel inputModel, Match match);
     Task<bool> Update(int id, MatchPeriodInputModel inputModel);
     Task<bool> Delete(int id, string userid);

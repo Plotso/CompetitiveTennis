@@ -3,6 +3,7 @@
 using CompetitiveTennis.Models;
 using Contracts;
 using Contracts.Match;
+using Contracts.MatchPeriod;
 using Contracts.Tournament;
 using Microsoft.AspNetCore.Mvc;
 using Models.Match;
@@ -12,7 +13,7 @@ public class MatchesController : BaseGatewayController
 {
     private readonly IMatchesService _matches;
 
-    public MatchesController(IMatchesService matches, ITournamentsService tournamentsService, ILogger<MatchesController> logger) 
+    public MatchesController(IMatchesService matches, ILogger<MatchesController> logger) 
         : base(logger) 
         => _matches = matches;
 
@@ -26,7 +27,7 @@ public class MatchesController : BaseGatewayController
             {
                 var matches = await _matches.All();
                 return Ok(matches);
-            }, "An error occurred while trying to get all tournaments");
+            }, "An error occurred while trying to get all matches");
     
     [HttpGet]
     [Route(Id)]
@@ -39,7 +40,7 @@ public class MatchesController : BaseGatewayController
             {
                 var match = await _matches.ById(id);
                 return Ok(match);
-            }, $"An error occurred during GET request for tournament: {id}");
+            }, $"An error occurred during GET request for match: {id}");
     
     [HttpGet]
     [Route($"{nameof(GetOrganiserUsername)}/{Id}")]
@@ -62,9 +63,23 @@ public class MatchesController : BaseGatewayController
         => await SafeProcessRefitRequest(
             async () =>
             {
-                var tournaments = await _matches.Search(query);
-                return Ok(tournaments);
-            }, $"An error occurred during tournaments search with query: {query}");
+                var matches = await _matches.Search(query);
+                return Ok(matches);
+            }, $"An error occurred during matches search with query: {query}");
+    
+    [HttpPost]
+    [Route($"{nameof(AddPeriodInfo)}/{Id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> AddPeriodInfo(int id, [FromBody] IEnumerable<MatchPeriodInputModel> matchPeriodInputs)
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var result = await _matches.AddPeriodInfo(id, matchPeriodInputs);
+                return Ok(result);
+            }, $"An error occurred during AddPeriodInfo request for match {id}. Request: {matchPeriodInputs}");
     
     [HttpPost]
     [Route(nameof(Add))]
@@ -78,7 +93,7 @@ public class MatchesController : BaseGatewayController
             {
                 var tournamentId = await _matches.Create(input);
                 return Ok(tournamentId);
-            }, $"An error occurred during Create request for tournament. Request: {input}");
+            }, $"An error occurred during Create request for match. Request: {input}");
     
     [HttpPut]
     [Route($"{nameof(Edit)}/{Id}")]
@@ -93,7 +108,7 @@ public class MatchesController : BaseGatewayController
             {
                 var result = await _matches.Edit(id, input);
                 return Ok(result);
-            }, $"An error occurred during Edit request for tournament: {id}. Request: {input}");
+            }, $"An error occurred during Edit request for match: {id}. Request: {input}");
     
     [HttpDelete]
     [Route(Id)]
@@ -107,5 +122,5 @@ public class MatchesController : BaseGatewayController
             {
                 var result = await _matches.Delete(id);
                 return Ok(result);
-            }, $"An error occurred during Delete request for tournament: {id}");
+            }, $"An error occurred during Delete request for match: {id}");
 }

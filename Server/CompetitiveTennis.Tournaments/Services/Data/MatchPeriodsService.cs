@@ -3,7 +3,6 @@
 using CompetitiveTennis.Data;
 using CompetitiveTennis.Tournaments.Data.Models;
 using Contracts.MatchPeriod;
-using Contracts.MatchPeriod.Score;
 using Interfaces.Data;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +18,9 @@ public class MatchPeriodsService : DeletableDataService<MatchPeriod>, IMatchPeri
         _logger = logger;
     }
 
+    public async Task<MatchPeriod> GetInternal(int id)
+        => await All().Where(m => m.Id == id).SingleOrDefaultAsync();
+
     public async Task<int> Create(MatchPeriodInputModel inputModel, Match match)
     {
         var matchPeriod = _mapper.Map<MatchPeriod>(inputModel);
@@ -30,17 +32,18 @@ public class MatchPeriodsService : DeletableDataService<MatchPeriod>, IMatchPeri
 
     public async Task<bool> Update(int id, MatchPeriodInputModel inputModel)
     {
-        var score = await All().SingleOrDefaultAsync(s => s.Id == id);
-        if (score == null)
+        var matchPeriod = await All().SingleOrDefaultAsync(s => s.Id == id);
+        if (matchPeriod == null)
             return false;
 
-        score.Set = inputModel.Set;
-        score.Game = inputModel.Game;
-        score.Winner = inputModel.Winner;
-        score.Status = inputModel.Status;
-        score.Server = inputModel.Server;
+        matchPeriod.Set = inputModel.Set;
+        matchPeriod.Game = inputModel.Game;
+        matchPeriod.Winner = inputModel.Winner;
+        matchPeriod.Status = inputModel.Status;
+        matchPeriod.Server = inputModel.Server;
+        matchPeriod.IsTiebreak = inputModel.IsTiebreak;
 
-        await SaveAsync(score);
+        await SaveAsync(matchPeriod);
         return true;
     }
 
@@ -49,11 +52,11 @@ public class MatchPeriodsService : DeletableDataService<MatchPeriod>, IMatchPeri
         if (string.IsNullOrWhiteSpace(userid))
             return false;
 
-        var score = await All().SingleOrDefaultAsync(s => s.Id == id);
-        if (score == null)
+        var matchPeriod = await All().SingleOrDefaultAsync(s => s.Id == id);
+        if (matchPeriod == null)
             return false;
 
-        await Delete(score, userid);
+        await Delete(matchPeriod, userid);
         return true;
     }
 
@@ -62,11 +65,11 @@ public class MatchPeriodsService : DeletableDataService<MatchPeriod>, IMatchPeri
         if (string.IsNullOrWhiteSpace(userid))
             return false;
 
-        var score = await All().SingleOrDefaultAsync(s => s.Id == id);
-        if (score == null)
+        var matchPeriod = await All().SingleOrDefaultAsync(s => s.Id == id);
+        if (matchPeriod == null)
             return false;
 
-        HardDelete(score);
+        HardDelete(matchPeriod);
         _logger.LogInformation("MatchPeriod with id: {Id} has been permanently deleted by UserId: {Userid}", id, userid);
         await Data.SaveChangesAsync();
         return true;

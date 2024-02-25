@@ -3,6 +3,7 @@
 using CompetitiveTennis.Models;
 using Contracts;
 using Contracts.Match;
+using Contracts.MatchPeriod;
 using Contracts.Tournament;
 using Models.Match;
 using Refit;
@@ -18,6 +19,8 @@ public interface IMatchesService
     [Get("/Matches/GetOrganiserUsername/{id}")]
     Task<Result<string>> GetOrganiserUsername(int id);
 
+    [Post("/Matches/AddPeriodInfo/{id}")]
+    Task<Result> AddPeriodInfo(int id, [Body] IEnumerable<MatchPeriodInputModel> matchPeriodInputs);
 
     [Get("/Matches/Search")]
     Task<Result<SearchOutputModel<MatchShortOutputModel>>> Search([Query] TournamentQuery query);

@@ -17,6 +17,8 @@ public class MatchPeriod : BaseDeletableEntity<int>
     
     public int MatchId { get; set; }
     
+    public bool IsTiebreak { get; set; }
+    
     public Match Match { get; set; }
     
     public ICollection<Score> Scores { get; set; }

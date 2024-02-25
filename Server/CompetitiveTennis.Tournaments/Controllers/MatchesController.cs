@@ -4,6 +4,7 @@ using CompetitiveTennis.Controllers;
 using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
 using Contracts.Match;
+using Contracts.MatchPeriod;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Match;
@@ -70,6 +71,25 @@ public class MatchesController : ApiController
                 return Ok(Result<string>.SuccessWith(tournamentOrganiserUsername));
             },
             msgOnError: $"An error occurred during GET request for tournament organiser name for tournament: {id}");
+    
+    [HttpPost]
+    [Route($"{nameof(AddPeriodInfo)}/{Id}")]
+    [Authorize]
+    public async Task<ActionResult<Result>> AddPeriodInfo(int id, [FromBody] IEnumerable<MatchPeriodInputModel> matchPeriodInputs)
+        => await SafeHandle(async () =>
+            {
+                var tournamentId = await _matches.GetTournamentIdForMatch(id);
+                if (tournamentId == null)
+                    return NotFound(Result.Failure($"Match {id} does not exist"));
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId.Value);
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
+                    return Unauthorized(
+                        Result.Failure("Only admins and tournament organiser are allowed to update matches from respective tournament!"));
+
+                // ToDo: Add logic for handling scores
+                return Ok(Result.Success);
+            },
+            msgOnError: $"Unexpected error during AddScores for match {id}.");
 
     [HttpPost]
     [Route(nameof(Add))]

@@ -47,6 +47,10 @@ public class ScoreConfiguration : IEntityTypeConfiguration<Score>
             .Property(t => t.DeletedOn)
             .HasColumnType("timestamp")
             .IsRequired(false);
+        
+        builder
+            .HasIndex(s => new {s.MatchPeriodId, s.Participant1Points, s.Participant2Points, s.PeriodPointNumber})
+            .IsUnique();
             
         builder.HasIndex(s => s.MatchPeriodId);
     }
