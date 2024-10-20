@@ -6,7 +6,6 @@ using Contracts.Match;
 using Contracts.MatchPeriod;
 using Contracts.Tournament;
 using Microsoft.AspNetCore.Mvc;
-using Models.Match;
 using Services.Tournaments;
 
 public class MatchesController : BaseGatewayController

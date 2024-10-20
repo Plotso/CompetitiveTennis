@@ -5,7 +5,6 @@ using CompetitiveTennis.Data.Models.Enums;
 using Contracts.Match;
 using CompetitiveTennis.Tournaments.Data;
 using CompetitiveTennis.Tournaments.Data.Models;
-using Models.Match;
 using Interfaces.Data;
 using Mapster;
 using MapsterMapper;

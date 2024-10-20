@@ -84,7 +84,7 @@ export namespace Auth {
     Unknown,
     Participant1Won,
     Participant2Won,
-    Draw,
+    Draw
   }
 
   export enum OutcomeCondition {
@@ -295,6 +295,29 @@ export namespace Auth {
     participant1Points: string;
     participant2Points: string;
     pointWinner: MatchOutcome
+  }
+
+  export interface MatchPeriodInputModel {
+    set: number;
+    game: number;
+    status: EventStatus;
+    matchId: number;
+    server: EventActor;
+    winner: MatchOutcome;
+    isTiebreak: boolean;
+    scores: ScoreInputModel[];
+  }
+  
+  export interface ScoreInputModel {
+    periodPointNumber: number;
+    participant1Points: string;
+    participant2Points: string;
+    pointWinner: MatchOutcome;
+  }
+
+  export interface MatchOutcomeInputModel {
+    outcomeCondition: OutcomeCondition | null;
+    matchPeriods: MatchPeriodInputModel[];
   }
 
   export interface CourtsInfo {

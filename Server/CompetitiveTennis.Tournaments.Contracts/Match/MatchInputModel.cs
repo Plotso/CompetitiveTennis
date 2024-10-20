@@ -1,4 +1,4 @@
-﻿namespace CompetitiveTennis.Tournaments.Models.Match;
+﻿namespace CompetitiveTennis.Tournaments.Contracts.Match;
 
 using System.ComponentModel.DataAnnotations;
 using CompetitiveTennis.Data.Models.Enums;

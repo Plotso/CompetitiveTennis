@@ -2,6 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Data.Models.Enums;
+using Score;
 
 public record MatchPeriodInputModel
 {
@@ -20,4 +21,6 @@ public record MatchPeriodInputModel
     public MatchOutcome Winner { get; set; }
     
     public bool IsTiebreak { get; set; }
+    
+    public IEnumerable<ScoreInputModel> Scores { get; set; }
 }

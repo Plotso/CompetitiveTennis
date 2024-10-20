@@ -4,7 +4,6 @@ using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
 using Contracts.Match;
 using CompetitiveTennis.Tournaments.Data.Models;
-using Models.Match;
 
 public interface IMatchesService : IDataService<Match>
 {

@@ -5,7 +5,6 @@ using Contracts;
 using Contracts.Match;
 using Contracts.MatchPeriod;
 using Contracts.Tournament;
-using Models.Match;
 using Refit;
 
 public interface IMatchesService

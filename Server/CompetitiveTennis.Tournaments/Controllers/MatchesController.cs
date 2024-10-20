@@ -7,7 +7,6 @@ using Contracts.Match;
 using Contracts.MatchPeriod;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Match;
 using Services;
 using Services.Interfaces.Data;
 

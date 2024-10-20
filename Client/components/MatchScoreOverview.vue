@@ -65,6 +65,17 @@ const setActiveTab = (newActiveTab: string) => {
 
 const isActive = (tabName: string) => activeTab.value == tabName;
 
+
+const isMatchPeriodInputModalOpen = ref(false);
+
+const openMatchPeriodInputModal = () => {
+  isMatchPeriodInputModalOpen.value = true;
+};
+
+const closeMatchPeriodInputModal = () => {
+  isMatchPeriodInputModalOpen.value = false;
+};
+
 </script>
 
 <template>
@@ -72,6 +83,7 @@ const isActive = (tabName: string) => activeTab.value == tabName;
   <br>
   <br>
   <div class="container">
+    <NuxtLink :to="`/tournaments/${match.tournamentId}`" class="custom-link has-text-weight-semibold">Go back to tournament</NuxtLink>
     <div class="score-overview">
       <!-- Tabs for Summary and Point by Point -->
       <div class="tab-container">
@@ -93,9 +105,19 @@ const isActive = (tabName: string) => activeTab.value == tabName;
 
       <div class="box">
         Insert scores here
+        <button class="button is-primary"  @click="openMatchPeriodInputModal()">
+        Add Match Period Info
+        </button>
       </div>
     </div>
   </div>
+  <MatchPeriodInputModal
+:isOpen="isMatchPeriodInputModalOpen"
+:matchId="mData.data.id"
+:homeParticipantName="mData.data.homeParticipant.name"
+:awayParticipantName="mData.data.awayParticipant.name"
+@close="closeMatchPeriodInputModal()"
+/>
 </template>
 
 <style scoped>
