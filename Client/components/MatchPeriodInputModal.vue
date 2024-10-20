@@ -31,12 +31,12 @@ const hideErrorNotification = () => {
 }
 
 const includeScores = ref(false)
-const matchPeriods = ref<MatchPeriodInputModel[]>([
+const matchPeriods = props.existingMatchPeriods ? ref(props.existingMatchPeriods) : ref<MatchPeriodInputModel[]>([
   { set: 1, game: 1, status: EventStatus.NotStarted, matchId: props.matchId, server: EventActor.Unknown, winner: MatchOutcome.Unknown, isTiebreak: false, scores: [] }
-])
+]);
 
-const selectedSet = ref(1); // Index of currently selected set
-const selectedGame = ref(1);
+const selectedSet = ref(matchPeriods ? 1 : 0); // Index of currently selected set
+const selectedGame = ref(matchPeriods ? 1 : 0);
 
 // Computed property to filter sets
 const setsForMatch = computed(() => {

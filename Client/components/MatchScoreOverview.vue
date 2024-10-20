@@ -116,6 +116,7 @@ const closeMatchPeriodInputModal = () => {
 :matchId="mData.data.id"
 :homeParticipantName="mData.data.homeParticipant.name"
 :awayParticipantName="mData.data.awayParticipant.name"
+:existingMatchPeriods="mData.data.matchPeriods"
 @close="closeMatchPeriodInputModal()"
 />
 </template>
