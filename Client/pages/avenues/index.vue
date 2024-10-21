@@ -84,14 +84,8 @@ const getDistinctCourtTypes = (avenue: AvenueOutputModel): CourtType[] => {
                                 </span>
                             </div>
                         </td>
-                        <td>
-                            <a href="/" class="button is-primary">
-                                Participate
-                            </a>
-                        </td>
                         <hr>
                     </tr>
-                    <!-- Add more tournament rows here -->
                 </tbody>
             </table>
 

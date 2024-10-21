@@ -164,7 +164,7 @@ const addMatchPeriods = async () => {
       close();
     } else {
       if (response.status == 401) {
-        errorNotification.value = `User not authorized to add participants to match`
+        errorNotification.value = `User not authorized to enter match score`
       }
       else {
         errorNotification.value = `An error occurred during match period input information for match ${props.matchId}. Code: ${response.status}`

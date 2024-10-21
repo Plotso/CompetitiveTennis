@@ -105,9 +105,11 @@ const closeMatchPeriodInputModal = () => {
 
       <div class="box">
         Insert scores here
-        <button class="button is-primary"  @click="openMatchPeriodInputModal()">
+        <div v-if="isAuthorized">
+          <button class="button is-primary"  @click="openMatchPeriodInputModal()">
         Add Match Period Info
         </button>
+        </div>
       </div>
     </div>
   </div>
