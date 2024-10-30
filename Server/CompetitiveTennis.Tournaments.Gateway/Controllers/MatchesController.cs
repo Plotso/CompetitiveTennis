@@ -80,6 +80,34 @@ public class MatchesController : BaseGatewayController
                 return Ok(result);
             }, $"An error occurred during AddPeriodInfo request for match {id}. Request: {matchPeriodInputs}");
     
+    [HttpDelete]
+    [Route($"{nameof(DeleteMatchPeriods)}/{Id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteMatchPeriods(int id)
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var result = await _matches.DeleteMatchPeriods(id);
+                return Ok(result);
+            }, $"An error occurred during DeleteMatchPeriods request for match {id}.");
+    
+    [HttpDelete]
+    [Route($"{nameof(DeleteMatchPeriodsAfterSetAndGameInclusive)}/{Id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteMatchPeriodsAfterSetAndGameInclusive(int id, int set, int game)
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var result = await _matches.DeleteMatchPeriodsAfterSetAndGameInclusive(id, set, game);
+                return Ok(result);
+            }, $"An error occurred during DeleteMatchPeriodsAfterSetAndGameInclusive request for match {id}. Set: {set}, Game: {game}.");
+    
     [HttpPost]
     [Route(nameof(Add))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<int>))]

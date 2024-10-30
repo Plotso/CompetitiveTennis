@@ -55,6 +55,24 @@ public class ScoresService : DeletableDataService<Score>, IScoresService
         return true;
     }
 
+    public async Task<bool> DeletePermanentlyForMatchPeriodId(int matchPeriodId, string userid)
+    {
+        if (string.IsNullOrWhiteSpace(userid))
+            return false;
+
+        var scores = await All().Where(s => s.MatchPeriodId == matchPeriodId).ToListAsync();
+        if (scores == null || scores.Count == 0)
+            return false;
+
+        foreach (var score in scores)
+        {
+            HardDelete(score);
+            _logger.LogInformation("Score with id: {Id} has been permanently deleted by UserId: {Userid}", score.Id, userid);
+        }
+        await Data.SaveChangesAsync();
+        return true;
+    }
+
     public async Task<bool> DeletePermanently(int id, string userid)
     {
         if (string.IsNullOrWhiteSpace(userid))

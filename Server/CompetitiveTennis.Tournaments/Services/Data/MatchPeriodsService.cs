@@ -19,7 +19,31 @@ public class MatchPeriodsService : DeletableDataService<MatchPeriod>, IMatchPeri
     }
 
     public async Task<MatchPeriod> GetInternal(int id)
-        => await All().Where(m => m.Id == id).SingleOrDefaultAsync();
+        => await All().SingleOrDefaultAsync(m => m.Id == id);
+
+    public async Task<int?> GetMatchPeriodId(int matchId, int setId, int gameId)
+    {
+        var matchPeriod = await AllAsNoTracking().SingleOrDefaultAsync(mp => mp.MatchId == matchId && mp.Set == setId && mp.Game == gameId);
+        return matchPeriod?.Id;
+    }
+
+    public async Task<IEnumerable<int>?> GetMatchPeriodsForMatch(int matchId)
+    {
+        var matchPeriods = await AllAsNoTracking().Where(mp => mp.MatchId == matchId).ToArrayAsync();
+        return matchPeriods.Any() ? matchPeriods.Select(mp => mp.Id) : null;
+    }
+
+    public async Task<IEnumerable<int>?> GetMatchPeriodsAfterGameAndSetInclusive(int matchId, int set, int game)
+    {
+        var matchPeriods = await AllAsNoTracking().Where(mp => mp.MatchId == matchId && IsApplicablePeriodAfter(set, game, mp)).ToArrayAsync();
+        return matchPeriods.Any() ? matchPeriods.Select(mp => mp.Id) : null;
+    }
+
+    private static bool IsApplicablePeriodAfter(int setId, int gameId, MatchPeriod mp) => IsBiggerGameInSetInclusive(setId, gameId, mp) || IsBiggerSet(setId, mp);
+
+    private static bool IsBiggerGameInSetInclusive(int setId, int gameId, MatchPeriod mp) => mp.Set == setId && mp.Game >= gameId;
+
+    private static bool IsBiggerSet(int setId, MatchPeriod mp) => mp.Set > setId;
 
     public async Task<int> Create(MatchPeriodInputModel inputModel, Match match)
     {
@@ -57,6 +81,24 @@ public class MatchPeriodsService : DeletableDataService<MatchPeriod>, IMatchPeri
             return false;
 
         await Delete(matchPeriod, userid);
+        return true;
+    }
+
+    public async Task<bool> DeletePermanentlyForMatchId(int matchId, string userid)
+    {
+        if (string.IsNullOrWhiteSpace(userid))
+            return false;
+
+        var matchPeriods = await All().Where(s => s.MatchId == matchId).ToListAsync();
+        if (matchPeriods == null || matchPeriods.Count == 0)
+            return false;
+
+        foreach (var matchPeriod in matchPeriods)
+        {
+            HardDelete(matchPeriod);
+            _logger.LogInformation("MatchPeriod with id: {Id} has been permanently deleted by UserId: {Userid}", matchPeriod.Id, userid);
+        }
+        await Data.SaveChangesAsync();
         return true;
     }
 

@@ -20,8 +20,11 @@ public class Result
     public static Result Success 
         => new(true, new List<string>(0));
     
+    public static Result Failure(ErrorInfo error) => Failure(error.ToString());
+    
     public static Result Failure(string error) => error;
-
+    public static Result Failure(IEnumerable<ErrorInfo> errors) 
+        => new(false, errors.Select(e => e.ToString()).ToList());
     public static Result Failure(IEnumerable<string> errors) 
         => new(false, errors.ToList());
 

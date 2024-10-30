@@ -8,6 +8,7 @@ using Contracts.MatchPeriod;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using Services.Interfaces.BL;
 using Services.Interfaces.Data;
 
 public class MatchesController : ApiController
@@ -17,6 +18,7 @@ public class MatchesController : ApiController
     private readonly ITournamentsService _tournaments;
     private readonly IParticipantsService _participants;
     private readonly ICurrentUserService _currentUser;
+    private readonly IMatchPeriodInfoManager _matchPeriodInfoManager;
 
     public MatchesController(
         IMatchesService matches,
@@ -24,6 +26,7 @@ public class MatchesController : ApiController
         ITournamentsService tournaments,
         IParticipantsService participants,
         ICurrentUserService currentUser,
+        IMatchPeriodInfoManager matchPeriodInfoManager,
         ILogger<MatchesController> logger) : base(logger)
     {
         _matches = matches;
@@ -31,6 +34,7 @@ public class MatchesController : ApiController
         _tournaments = tournaments;
         _participants = participants;
         _currentUser = currentUser;
+        _matchPeriodInfoManager = matchPeriodInfoManager;
     }
 
     [HttpGet]
@@ -85,10 +89,49 @@ public class MatchesController : ApiController
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update matches from respective tournament!"));
 
-                // ToDo: Add logic for handling scores
+                await _matchPeriodInfoManager.PersistPeriodInfoForMatch(id, matchPeriodInputs);
+                //ToDo: If match is ended, also recalculate ELO rating for each player
                 return Ok(Result.Success);
             },
-            msgOnError: $"Unexpected error during AddScores for match {id}.");
+            msgOnError: $"Unexpected error during {nameof(AddPeriodInfo)} for match {id}.");
+    
+    [HttpDelete]
+    [Route($"{nameof(DeleteMatchPeriods)}/{Id}")]
+    [Authorize]
+    public async Task<ActionResult<Result>> DeleteMatchPeriods(int id)
+        => await SafeHandle(async () =>
+            {
+                var tournamentId = await _matches.GetTournamentIdForMatch(id);
+                if (tournamentId == null)
+                    return NotFound(Result.Failure($"Match {id} does not exist"));
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId.Value);
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
+                    return Unauthorized(
+                        Result.Failure("Only admins and tournament organiser are allowed to update matches from respective tournament!"));
+
+                await _matchPeriodInfoManager.DeleteMatchPeriodsForMatch(id, _currentUser.UserId);
+                return Ok(Result.Success);
+            },
+            msgOnError: $"Unexpected error during {nameof(DeleteMatchPeriods)} for match {id}.");
+    
+    [HttpDelete]
+    [Route($"{nameof(DeleteMatchPeriodsAfterSetAndGameInclusive)}/{Id}")]
+    [Authorize]
+    public async Task<ActionResult<Result>> DeleteMatchPeriodsAfterSetAndGameInclusive(int id, int set, int game)
+        => await SafeHandle(async () =>
+            {
+                var tournamentId = await _matches.GetTournamentIdForMatch(id);
+                if (tournamentId == null)
+                    return NotFound(Result.Failure($"Match {id} does not exist"));
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId.Value);
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
+                    return Unauthorized(
+                        Result.Failure("Only admins and tournament organiser are allowed to update matches from respective tournament!"));
+
+                await _matchPeriodInfoManager.DeleteMatchPeriodsFromSetAndGameInclusive(id, _currentUser.UserId, set, game);
+                return Ok(Result.Success);
+            },
+            msgOnError: $"Unexpected error during {nameof(DeleteMatchPeriodsAfterSetAndGameInclusive)} for match {id}. Set: {set}, Game: {game}.");
 
     [HttpPost]
     [Route(nameof(Add))]
