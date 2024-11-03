@@ -40,7 +40,7 @@ const showDeleteButton = ref(false);
 console.log(props.existingMatchPeriods);
 const isInitialScoreInput = props.existingMatchPeriods == null || props.existingMatchPeriods.length == 0 ? true : false;
 
-const includeScores = ref(false)
+const includeScores = ref(true)
 const matchPeriods = props.existingMatchPeriods ? ref(props.existingMatchPeriods) : ref<MatchPeriodInputModel[]>([
   { set: 1, game: 1, status: EventStatus.NotStarted, matchId: props.matchId, server: EventActor.Unknown, winner: MatchOutcome.Unknown, isTiebreak: false, scores: [] }
 ]);
@@ -166,6 +166,12 @@ const hasInvalidScores = computed(() => {
     period.scores.some(score => !isScoreValid(score.participant1Points) || !isScoreValid(score.participant2Points))
   );
 });
+
+const isSettingsDropdownOpen = ref(false);
+
+const toggleSettingsDropdown = () => {
+  isSettingsDropdownOpen.value = !isSettingsDropdownOpen.value;
+};
 
 const addSet = () => {
   matchPeriods.value.push({
@@ -467,7 +473,7 @@ const deleteMathPeriodsAfterSetAndGameInclusive = async () => {
   }
 };
 
-const addMatchPeriods = async () => {
+const saveMatchPeriods = async () => {
   const participantInput: MatchOutcomeInputModel = {
     outcomeCondition: null,
     matchPeriods: matchPeriods.value
@@ -511,6 +517,24 @@ const addMatchPeriods = async () => {
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">Add Match Periods Info</p>
+        <!-- Configuration Icon and Dropdown -->
+        <div class="settings-wrapper">
+          <span class="icon settings-icon" @click="toggleSettingsDropdown">
+            <font-awesome-icon icon="fas fa-cog"/>
+          </span>
+          <div v-if="isSettingsDropdownOpen" class="settings-dropdown">
+            <label class="switch-label">
+              <input v-model="includeScores" type="checkbox" class="switch-checkbox" />
+              <span class="switch-slider"></span>
+              <span class="switch-text">Include Scores</span>
+            </label>
+            <label class="switch-label">
+              <input v-model="showDeleteButton" type="checkbox" class="switch-checkbox" />
+              <span class="switch-slider"></span>
+              <span class="switch-text">Delete Button</span>
+            </label>
+          </div>
+        </div>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <div class="notification is-danger" v-if="showErrorNotification">
@@ -519,22 +543,6 @@ const addMatchPeriods = async () => {
       </div>
       <section class="modal-card-body">
         <form @submit.prevent="">
-
-          <div class="field">
-            <label class="switch-label">
-              <input v-model="includeScores" type="checkbox" @click="includeScores = !includeScores"
-                class="switch-checkbox" />
-              <span class="switch-slider"></span>
-              <span class="switch-text">Include Scores</span>
-            </label>
-            <br>
-            <label class="switch-label">
-              <input v-model="showDeleteButton" type="checkbox" @click="showDeleteButton = !showDeleteButton"
-                class="switch-checkbox" />
-              <span class="switch-slider"></span>
-              <span class="switch-text">Delete Button</span>
-            </label>
-          </div>
 
           <div>
 
@@ -672,7 +680,7 @@ const addMatchPeriods = async () => {
                         <button v-if="canNextPointBeWinner" @click="addWinningPoint(selectedSet, selectedGame)" class="button is-rounded is-success">
                           Game
                         </button>
-                        <button @click="addScore(selectedSet, selectedGame)" class="button is-rounded">Add Score for Set
+                        <button @click="addScore(selectedSet, selectedGame)" class="button is-rounded" v-if="!canNextPointBeWinner || !canAddDeuceInSelectedSetAndGame">Add Score for Set
                           {{ selectedSet }}, Game {{ selectedGame }}</button>
                       </div>
                     </div>
@@ -705,8 +713,7 @@ const addMatchPeriods = async () => {
           <div class="field">
             <div class="control buttons is-centered">
               <button class="button is-primary is-rounded" type="submit"
-                :disabled="matchPeriods.length == 0 || hasInvalidScores" @click="addMatchPeriods">Add
-                MatchPeriods</button>
+                :disabled="matchPeriods.length == 0 || hasInvalidScores" @click="saveMatchPeriods">Save MatchPeriods</button>
             </div>
           </div>
         </form>
@@ -873,5 +880,72 @@ message="You are not authorized to execute the desired action!"
   margin-left: 10px;
   font-size: 1rem;
   font-weight: bold;
+}
+
+.settings-wrapper {
+  position: relative;
+  margin-left: auto;
+}
+
+.settings-icon {
+  cursor: pointer;
+}
+
+.settings-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  width: 200px;
+  z-index: 1;
+}
+
+/* Additional styles for the switch component */
+.switch-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.switch-checkbox {
+  display: none;
+}
+
+.switch-slider {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 20px;
+  transition: background-color 0.3s;
+}
+
+.switch-slider::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.switch-checkbox:checked + .switch-slider {
+  background-color: #4caf50;
+}
+
+.switch-checkbox:checked + .switch-slider::before {
+  transform: translateX(20px);
+}
+
+.switch-text {
+  margin-left: 10px;
+  font-size: 1rem;
 }
 </style>
