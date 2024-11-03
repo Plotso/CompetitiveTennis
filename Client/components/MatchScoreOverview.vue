@@ -37,6 +37,10 @@ const isAuthenticated = computed(() => {
   return authStore.user && authStore.user.username
 });
 
+
+const isUnauthorizedModalOpen = ref(false);
+const isConfirmationModalOpen = ref(false);
+
 const getScore = () => {
   // Format and return the match score
   // You can use match.scores to calculate the score
@@ -76,6 +80,42 @@ const closeMatchPeriodInputModal = () => {
   isMatchPeriodInputModalOpen.value = false;
 };
 
+const openConfirmationModal = () => {
+  isConfirmationModalOpen.value = true;
+};
+const closeConfirmationModal = () => {
+  isConfirmationModalOpen.value = false;
+};
+
+
+const closeUnathorizedModal = () => {
+  isUnauthorizedModalOpen.value = false;
+};
+
+
+const deleteScoresForMath = async () => {
+  try {
+    const response = await fetch(`${config.public.tournamentsBase}/Matches/DeleteMatchPeriods/${mData.value.data.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${authStore.token}`
+      }
+    });
+
+    if (response.ok) {       
+      await refreshNuxtData();
+    } else {
+      if(response.status == 401){
+        isUnauthorizedModalOpen.value = true;
+      }
+      console.error(`Failed to delete match periods for match ${mData.value.data.id}. Status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('An error occurred while delete scores for match', error);
+  }
+};
+
 </script>
 
 <template>
@@ -108,10 +148,35 @@ const closeMatchPeriodInputModal = () => {
         <div v-if="isAuthorized">
           <button class="button is-primary"  @click="openMatchPeriodInputModal()">
         Add Match Period Info
+
+        <form  @submit.prevent="openConfirmationModal" v-if="mData.data.matchPeriods"> 
+          
+          <div class="field">
+            <div class="control buttons is-centered">
+              <button class="button is-danger" type="submit">Delete Periods & Scores for Match</button>
+            </div>
+          </div>
+        </form>
         </button>
+
+        
         </div>
       </div>
     </div>
+    
+    <ConfirmationModal
+      :isOpen="isConfirmationModalOpen"
+      title="Confirmation"
+      message="Are you sure you want to delete all scores for the match?"
+      @confirm="deleteScoresForMath"
+      @close="closeConfirmationModal"
+    />
+    <DangerModal
+:isOpen="isUnauthorizedModalOpen"
+title="Unauthorized!"
+message="You are not authorized to execute the desired action!"
+@close="closeUnathorizedModal"
+/>
   </div>
   <MatchPeriodInputModal
 :isOpen="isMatchPeriodInputModalOpen"

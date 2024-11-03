@@ -285,7 +285,7 @@ export namespace Auth {
     status: EventStatus;
     winner: MatchOutcome;
     server: EventActor;
-    isTiebreak: boolean,
+    isTiebreak: boolean;
     scores: ScoreShortOutputModel[];
   }
   
@@ -294,7 +294,8 @@ export namespace Auth {
     periodPointNumber: number;
     participant1Points: string;
     participant2Points: string;
-    pointWinner: MatchOutcome
+    pointWinner: MatchOutcome,
+    isWinningPoint: boolean;
   }
 
   export interface MatchPeriodInputModel {
@@ -313,6 +314,7 @@ export namespace Auth {
     participant1Points: string;
     participant2Points: string;
     pointWinner: MatchOutcome;
+    isWinningPoint: boolean;
   }
 
   export interface MatchOutcomeInputModel {
