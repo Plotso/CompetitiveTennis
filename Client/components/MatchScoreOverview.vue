@@ -148,16 +148,16 @@ const deleteScoresForMath = async () => {
         <div v-if="isAuthorized">
           <button class="button is-primary"  @click="openMatchPeriodInputModal()">
         Add Match Period Info
-
-        <form  @submit.prevent="openConfirmationModal" v-if="mData.data.matchPeriods"> 
-          
-          <div class="field">
-            <div class="control buttons is-centered">
-              <button class="button is-danger" type="submit">Delete Periods & Scores for Match</button>
-            </div>
-          </div>
-        </form>
         </button>
+
+<form  @submit.prevent="openConfirmationModal" v-if="mData.data.matchPeriods"> 
+  
+  <div class="field">
+    <div class="control buttons is-centered">
+      <button class="button is-danger" type="submit">Delete Periods & Scores for Match</button>
+    </div>
+  </div>
+</form>
 
         
         </div>

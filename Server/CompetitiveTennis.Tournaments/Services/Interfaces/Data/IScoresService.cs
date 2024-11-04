@@ -6,6 +6,7 @@ using Contracts.MatchPeriod.Score;
 
 public interface IScoresService : IDataService<Score>
 {
+    Task<bool> HasScoreForMatchPeriod(int matchPeriodId, int periodPointNumber);
     Task<int> Create(ScoreInputModel inputModel, MatchPeriod matchPeriod);
     Task<bool> Update(int id, ScoreInputModel inputModel);
     Task<bool> Delete(int id, string userid);

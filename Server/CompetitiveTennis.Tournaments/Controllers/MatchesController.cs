@@ -52,13 +52,15 @@ public class MatchesController : ApiController
     public async Task<ActionResult<MatchShortOutputModel>> ById(int id)
         => await SafeHandle(async () =>
             {
-                var tournamentId = await _matches.GetTournamentIdForMatch(id);
-                if (tournamentId == null)
+                var match = await _matches.Get(id);
+                if (match == null)
                     return NotFound(Result.Failure($"Match {id} does not exist"));
                 
-                var tournament = await _tournaments.Get(tournamentId.Value);
-                var match = MatchInfoProvider.GetMatchInfoFromTournament(tournament, id);
-                return Ok(Result<MatchShortOutputModel>.SuccessWith(match));
+                var tournament = await _tournaments.GetTournamentMatchFlowInfo(match.TournamentId);
+                if (tournament == null)
+                    return NotFound(Result.Failure($"Failed to retrieve tournament data for match {id}"));
+                var matchOutput = MatchInfoProvider.GetMatchInfoFromTournament(match, tournament);
+                return Ok(Result<MatchShortOutputModel>.SuccessWith(matchOutput));
             },
             msgOnError: $"An error occurred during GET request for match: {id}");
     

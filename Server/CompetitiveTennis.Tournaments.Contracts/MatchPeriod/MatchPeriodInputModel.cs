@@ -13,10 +13,6 @@ public record MatchPeriodInputModel
     [Required]
     public EventStatus Status { get; set; }
     
-    [Required]
-    [Range(1, int.MaxValue)]
-    public int MatchId { get; set; }
-    
     public EventActor Server { get; set; }
     public MatchOutcome Winner { get; set; }
     

@@ -35,7 +35,9 @@ public class MatchPeriodsService : DeletableDataService<MatchPeriod>, IMatchPeri
 
     public async Task<IEnumerable<int>?> GetMatchPeriodsAfterGameAndSetInclusive(int matchId, int set, int game)
     {
-        var matchPeriods = await AllAsNoTracking().Where(mp => mp.MatchId == matchId && IsApplicablePeriodAfter(set, game, mp)).ToArrayAsync();
+        var matchPeriods = await AllAsNoTracking()
+            .Where(mp => mp.MatchId == matchId && ((mp.Set == set && mp.Game >= game) || mp.Set > set))// IsApplicablePeriodAfter(set, game, mp))
+            .ToArrayAsync();
         return matchPeriods.Any() ? matchPeriods.Select(mp => mp.Id) : null;
     }
 

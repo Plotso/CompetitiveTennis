@@ -11,7 +11,8 @@ public class MatchMappingConfig : IRegister
     {
         config.NewConfig<Match, MatchOutputModel>()
             .Map(dest => dest.Participants,
-                src => MapParticipants(src));
+                src => MapParticipants(src))
+            .Map(dest => dest.MatchPeriods, src => src.Periods);
     }
 
     private List<ParticipantShortOutputModel> MapParticipants(Match source)

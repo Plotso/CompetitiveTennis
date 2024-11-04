@@ -8,13 +8,12 @@ using Tournaments.Data;
 
 public static class MatchInfoProvider
 {
-    public static MatchShortOutputModel? GetMatchInfoFromTournament(FullTournamentOutputModel outputModel, int matchId)
+    public static MatchShortOutputModel? GetMatchInfoFromTournament(MatchOutputModel matchOutput, TournamentMatchFlowInfo tournamentMatchFlowInfo)
     {
-        var matchOutput = outputModel.Matches.FirstOrDefault(m => m.Id == matchId);
         if (matchOutput == null)
             return null;
         
-        var predecesorMatchFlows = outputModel.MatchFlows.Where(mf => mf.SuccessorMatchId == matchOutput.Id);
+        var predecesorMatchFlows = tournamentMatchFlowInfo.MatchFlows.Where(mf => mf.SuccessorMatchId == matchOutput.Id);
         var homePredecesorMatch = predecesorMatchFlows.FirstOrDefault(mf => mf.IsHome);
         var awayPredecesorMatch = predecesorMatchFlows.FirstOrDefault(mf => !mf.IsHome);
 
@@ -37,7 +36,7 @@ public static class MatchInfoProvider
             matchOutput.Details, matchOutput.Status, matchOutput.Outcome, OutcomeCondition: null,
             homePredecesorMatch?.MatchId,
             awayPredecesorMatch?.MatchId,
-            homeParticipantInfo, awayParticipantInfo, matchOutput.MatchPeriods, outputModel.Id);
+            homeParticipantInfo, awayParticipantInfo, matchOutput.MatchPeriods, tournamentMatchFlowInfo.Id);
     }
 
     private static string GetName(ParticipantShortOutputModel participantShortOutputModel)

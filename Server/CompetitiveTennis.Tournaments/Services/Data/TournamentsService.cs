@@ -55,6 +55,13 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             .EnrichWithMatches()
             .SingleOrDefaultAsync());
 
+    public async Task<TournamentMatchFlowInfo> GetTournamentMatchFlowInfo(int id)
+        => _mapper.Map<TournamentMatchFlowInfo>(await All()
+            .Where(t => t.Id == id)
+            .Include(t => t.MatchFlows)
+            .Select(t => new {t.Id, t.MatchFlows})
+            .SingleOrDefaultAsync());
+
     public async Task<string> GetTournamentName(int id)
         => await AllAsNoTracking()
             .Where(t => t.Id == id)

@@ -6,6 +6,7 @@ using Participant;
 
 public record MatchOutputModel(
     int Id,
+    int TournamentId,
     DateTime StartDate,
     DateTime EndDate,
     short? MatchWonPoints,

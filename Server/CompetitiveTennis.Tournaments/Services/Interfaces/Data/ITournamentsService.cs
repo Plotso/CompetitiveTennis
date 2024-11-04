@@ -17,6 +17,7 @@ public interface ITournamentsService : IDataService<Tournament>
     Task<bool> HasTournamentAlreadyStarted(int tournamentId);
     
     Task<FullTournamentOutputModel> Get(int id);
+    Task<TournamentMatchFlowInfo> GetTournamentMatchFlowInfo(int id);
     Task<string> GetTournamentName(int id);
     Task<string> GetOrganiserUsername(int id);
     Task<FullTournamentOutputModel> GetForDrawGeneration(int id);

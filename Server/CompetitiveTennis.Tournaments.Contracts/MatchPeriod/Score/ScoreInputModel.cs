@@ -19,4 +19,6 @@ public record ScoreInputModel
     public string Participant2Points { get; set; }
     [Required]
     public MatchOutcome PointWinner { get; set; }
+    
+    public bool IsWinningPoint { get; set; }
 }

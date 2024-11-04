@@ -27,6 +27,14 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
             .ProjectToType<MatchOutputModel>().ToListAsync();
 
     public async Task<MatchOutputModel> Get(int id)
+        => _mapper.Map<MatchOutputModel>(await All()
+            .Where(a => a.Id == id)
+            .EnrichWithParticipants()
+            .Include(m => m.Periods)
+            .ThenInclude(mp => mp.Scores)
+            .SingleOrDefaultAsync());
+
+    public async Task<MatchOutputModel> GetOLD(int id)
         => await All()
             .Where(m => m.Id == id)
             .Include(m => m.Participants)

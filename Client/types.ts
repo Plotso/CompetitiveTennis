@@ -79,6 +79,11 @@ export namespace Auth {
     Home,
     Away,
   }
+  export enum MatchPeriodOutcome {
+    NoOutcome,
+    ParticipantOne,
+    ParticipantTwo
+  }
 
   export enum MatchOutcome {
     Unknown,
@@ -283,7 +288,7 @@ export namespace Auth {
     set: number;
     game: number;
     status: EventStatus;
-    winner: MatchOutcome;
+    winner: MatchPeriodOutcome;
     server: EventActor;
     isTiebreak: boolean;
     scores: ScoreShortOutputModel[];
@@ -294,7 +299,7 @@ export namespace Auth {
     periodPointNumber: number;
     participant1Points: string;
     participant2Points: string;
-    pointWinner: MatchOutcome,
+    pointWinner: MatchPeriodOutcome,
     isWinningPoint: boolean;
   }
 
@@ -302,7 +307,6 @@ export namespace Auth {
     set: number;
     game: number;
     status: EventStatus;
-    matchId: number;
     server: EventActor;
     winner: MatchOutcome;
     isTiebreak: boolean;

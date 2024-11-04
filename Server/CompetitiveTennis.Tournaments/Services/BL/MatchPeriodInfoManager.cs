@@ -61,6 +61,7 @@ public class MatchPeriodInfoManager : IMatchPeriodInfoManager
             
         var matchPeriod = await _matchPeriodsService.GetInternal(matchPeriodId!.Value);
         foreach (var score in matchPeriodInput.Scores)
-            await _scoresService.Create(score, matchPeriod);
+            if(!await _scoresService.HasScoreForMatchPeriod(matchPeriodId!.Value, score.PeriodPointNumber)) // User should delete scores and re-enter them, update on score is not supported
+                await _scoresService.Create(score, matchPeriod);
     }
 }

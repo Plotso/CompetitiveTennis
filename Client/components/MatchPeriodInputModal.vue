@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Result, MatchPeriodOutputModel, MatchPeriodInputModel, MatchOutcomeInputModel, EventStatus, EventActor, MatchOutcome, ScoreInputModel } from "@/types"
+import { Result, MatchPeriodOutputModel, MatchPeriodInputModel, MatchOutcomeInputModel, EventStatus, EventActor, MatchOutcome, MatchPeriodOutcome, ScoreInputModel, ScoreShortOutputModel } from "@/types"
 import { useAuthStore } from "~/stores/auth"
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -37,13 +37,25 @@ const isUnauthorizedModalOpen = ref(false);
 const isConfirmationModalOpen = ref(false);
 const showDeleteButton = ref(false);
 
-console.log(props.existingMatchPeriods);
 const isInitialScoreInput = props.existingMatchPeriods == null || props.existingMatchPeriods.length == 0 ? true : false;
 
 const includeScores = ref(true)
-const matchPeriods = props.existingMatchPeriods ? ref(props.existingMatchPeriods) : ref<MatchPeriodInputModel[]>([
-  { set: 1, game: 1, status: EventStatus.NotStarted, matchId: props.matchId, server: EventActor.Unknown, winner: MatchOutcome.Unknown, isTiebreak: false, scores: [] }
+const convertToEnumValues = (period) => ({
+  ...period,
+  status: EventStatus[period.status], // Convert to number for enum compatibility
+  server: EventActor[period.server],
+  winner: MatchPeriodOutcome[period.winner],
+  scores: period.scores.map((score: ScoreShortOutputModel) => ({
+    ...score,
+    pointWinner: MatchPeriodOutcome[score.pointWinner]
+  }))
+});
+
+const matchPeriods = props.existingMatchPeriods ? ref(props.existingMatchPeriods.map(convertToEnumValues)) : ref<MatchPeriodInputModel[]>([
+  { set: 1, game: 1, status: EventStatus.NotStarted, server: EventActor.Unknown, winner: MatchOutcome.Unknown, isTiebreak: false, scores: [] }
 ]);
+
+
 
 const selectedSet = ref(matchPeriods ? 1 : 0); // Index of currently selected set
 const selectedGame = ref(matchPeriods ? 1 : 0);
@@ -177,7 +189,6 @@ const addSet = () => {
   matchPeriods.value.push({
     set: selectedSet.value + 1,
     game: 1,
-    matchId: props.matchId,
     status: EventStatus.NotStarted,
     winner: MatchOutcome.Unknown,
     server: EventActor.Unknown,
@@ -235,8 +246,10 @@ const addDeuceScore = (set: number, game: number) => {
       ? MatchOutcome.Participant1Won 
       : MatchOutcome.Unknown;
 
-
+  console.log(lastScore.participant1Points);
+  console.log(lastScore.participant2Points);
   var deuceScore = getTheHigherScoreWithoutAdv(lastScore.participant1Points, lastScore.participant2Points);
+  console.log(deuceScore);
   
   matchPeriods.value[periodIndex].scores.push({
     periodPointNumber: pointsInPeriod + 1,
@@ -252,6 +265,7 @@ const getTheHigherScoreWithoutAdv = (participant1Points: string, participant2Poi
     // Return '40' if either participant's score is 'Adv'
     if(participant1Points == 'Adv' || participant1Points == 'Adv')
       return '40';      
+    
     // Convert scores to numbers and return the higher score
     return parseInt(participant1Points) >= parseInt(participant2Points) ? participant1Points : participant2Points;
 }
@@ -369,7 +383,6 @@ const addPeriod = () => {
   matchPeriods.value.push({
     set: selectedSet.value,
     game: matchPeriods.value.length ? matchPeriods.value[matchPeriods.value.length - 1].game + 1 : 1,
-    matchId: props.matchId,
     status: EventStatus.NotStarted,
     winner: MatchOutcome.Unknown,
     server: EventActor.Unknown,
@@ -393,7 +406,6 @@ const addGamePeriod = () => {
   matchPeriods.value.push({
     set: selectedSet.value,
     game: gamesForSelectedSet.value.length + 1,
-    matchId: props.matchId,
     status: EventStatus.NotStarted,
     winner: MatchOutcome.Unknown,
     server: server,
@@ -459,8 +471,7 @@ const deleteMathPeriodsAfterSetAndGameInclusive = async () => {
     });
 
     if (response.ok) {       
-      //await refreshNuxtData();
-      
+      await refreshNuxtData();
       router.push(`/matches/${props.matchId}`);
     } else {
       if(response.status == 401){
@@ -474,10 +485,6 @@ const deleteMathPeriodsAfterSetAndGameInclusive = async () => {
 };
 
 const saveMatchPeriods = async () => {
-  const participantInput: MatchOutcomeInputModel = {
-    outcomeCondition: null,
-    matchPeriods: matchPeriods.value
-  }
 
   console.log('addMatchPeriods called')
 

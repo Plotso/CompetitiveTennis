@@ -30,10 +30,10 @@ public interface IMatchesService
     [Put("/Matches/Edit/{id}")]
     Task<Result> Edit(int id, MatchInputModel input);
 
-    [Delete("/DeleteMatchPeriods/{id}")]
+    [Delete("/Matches/DeleteMatchPeriods/{id}")]
     Task<Result> DeleteMatchPeriods(int id);
 
-    [Delete("/DeleteMatchPeriods/{id}")]
+    [Delete("/Matches/DeleteMatchPeriodsAfterSetAndGameInclusive/{id}")]
     Task<Result> DeleteMatchPeriodsAfterSetAndGameInclusive(int id, int set, int game);
 
     [Delete("/Matches/{id}")]

@@ -23,4 +23,6 @@ public class Score : BaseDeletableEntity<int>
 //     public Match Match { get; set; }
     public int MatchPeriodId { get; set; }
     public MatchPeriod MatchPeriod { get; set; }
+    
+    public bool IsWinningPoint { get; set; }
 }

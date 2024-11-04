@@ -18,6 +18,9 @@ public class ScoresService : DeletableDataService<Score>, IScoresService
         _logger = logger;
     }
 
+    public async Task<bool> HasScoreForMatchPeriod(int matchPeriodId, int periodPointNumber) 
+        => await All().AnyAsync(s => s.MatchPeriodId == matchPeriodId && s.PeriodPointNumber == periodPointNumber);
+
     public async Task<int> Create(ScoreInputModel inputModel, MatchPeriod matchPeriod)
     {
         var score = _mapper.Map<Score>(inputModel);
