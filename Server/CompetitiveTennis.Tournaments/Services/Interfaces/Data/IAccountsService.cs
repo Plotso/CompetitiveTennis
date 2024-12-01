@@ -21,5 +21,8 @@ public interface IAccountsService : IDataService<Account>
     /// <exception cref="MissingEntryException">In case provided user cannot be located in the DB</exception>
     /// <exception cref="InvalidOperationException">Internal service or infrastructure error</exception>
     Task UpdatePlayerRating(string userId, int newRating);
+    /// <exception cref="MissingEntryException">In case provided user cannot be located in the DB</exception>
+    /// <exception cref="InvalidOperationException">Internal service or infrastructure error</exception>
+    Task UpdatePlayerRating(int accountId, int newRating);
     Task Create(AccountCreateInputModel createModel);
 }

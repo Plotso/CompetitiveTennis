@@ -19,6 +19,7 @@ public class MatchesController : ApiController
     private readonly IParticipantsService _participants;
     private readonly ICurrentUserService _currentUser;
     private readonly IMatchPeriodInfoManager _matchPeriodInfoManager;
+    private readonly IMatchOutcomeHandler _matchOutcomeHandler;
 
     public MatchesController(
         IMatchesService matches,
@@ -27,6 +28,7 @@ public class MatchesController : ApiController
         IParticipantsService participants,
         ICurrentUserService currentUser,
         IMatchPeriodInfoManager matchPeriodInfoManager,
+        IMatchOutcomeHandler matchOutcomeHandler,
         ILogger<MatchesController> logger) : base(logger)
     {
         _matches = matches;
@@ -35,6 +37,7 @@ public class MatchesController : ApiController
         _participants = participants;
         _currentUser = currentUser;
         _matchPeriodInfoManager = matchPeriodInfoManager;
+        _matchOutcomeHandler = matchOutcomeHandler;
     }
 
     [HttpGet]
@@ -80,7 +83,7 @@ public class MatchesController : ApiController
     [HttpPost]
     [Route($"{nameof(AddPeriodInfo)}/{Id}")]
     [Authorize]
-    public async Task<ActionResult<Result>> AddPeriodInfo(int id, [FromBody] IEnumerable<MatchPeriodInputModel> matchPeriodInputs)
+    public async Task<ActionResult<Result>> AddPeriodInfo(int id, [FromBody] MatchResultsInputModel matchResultsInputModel)
         => await SafeHandle(async () =>
             {
                 var tournamentId = await _matches.GetTournamentIdForMatch(id);
@@ -91,8 +94,9 @@ public class MatchesController : ApiController
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update matches from respective tournament!"));
 
-                await _matchPeriodInfoManager.PersistPeriodInfoForMatch(id, matchPeriodInputs);
-                //ToDo: If match is ended, also recalculate ELO rating for each player
+                await _matchPeriodInfoManager.PersistPeriodInfoForMatch(id, matchResultsInputModel.MatchPeriods);
+                // Update match status & calculate player ratings
+                await _matchOutcomeHandler.HandleMatchOutcome(id, matchResultsInputModel);
                 return Ok(Result.Success);
             },
             msgOnError: $"Unexpected error during {nameof(AddPeriodInfo)} for match {id}.");

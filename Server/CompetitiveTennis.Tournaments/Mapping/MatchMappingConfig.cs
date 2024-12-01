@@ -4,6 +4,7 @@ using Contracts.Match;
 using Contracts.Participant;
 using Data.Models;
 using Mapster;
+using Models.MatchOutcomeHandler.RatingCalculations;
 
 public class MatchMappingConfig : IRegister
 {
@@ -12,6 +13,10 @@ public class MatchMappingConfig : IRegister
         config.NewConfig<Match, MatchOutputModel>()
             .Map(dest => dest.Participants,
                 src => MapParticipants(src))
+            .Map(dest => dest.MatchPeriods, src => src.Periods);
+        config.NewConfig<Match, SlimMatchOutputModel>()
+            .Map(dest => dest.Participants,
+                src => MapParticipantsToParticipantRatingOutputModels(src))
             .Map(dest => dest.MatchPeriods, src => src.Periods);
     }
 
@@ -37,6 +42,23 @@ public class MatchMappingConfig : IRegister
             */
             
             var participantModel = participantMatch.Participant.Adapt<ParticipantShortOutputModel>();
+            participantModel = participantModel with {Specifier = participantMatch.Specifier};
+
+            participantModels.Add(participantModel);
+        }
+
+        return participantModels;
+    }
+
+    private List<ParticipantRatingOutputModel> MapParticipantsToParticipantRatingOutputModels(Match source)
+    {
+        if (source.Participants == null)
+            return null;
+        var participantModels = new List<ParticipantRatingOutputModel>();
+
+        foreach (var participantMatch in source.Participants)
+        {
+            var participantModel = participantMatch.Participant.Adapt<ParticipantRatingOutputModel>();
             participantModel = participantModel with {Specifier = participantMatch.Specifier};
 
             participantModels.Add(participantModel);

@@ -51,14 +51,24 @@ const convertToEnumValues = (period) => ({
   }))
 });
 
-const matchPeriods = props.existingMatchPeriods ? ref(props.existingMatchPeriods.map(convertToEnumValues)) : ref<MatchPeriodInputModel[]>([
+const matchPeriods = props.existingMatchPeriods && props.existingMatchPeriods.length > 0 ? ref(props.existingMatchPeriods.map(convertToEnumValues)) : ref<MatchPeriodInputModel[]>([
   { set: 1, game: 1, status: EventStatus.NotStarted, server: EventActor.Unknown, winner: MatchOutcome.Unknown, isTiebreak: false, scores: [] }
 ]);
 
 
-
+const matchWinner = ref<MatchOutcome|null>(null); // Stores the winner (Participant1 or Participant2)
 const selectedSet = ref(matchPeriods ? 1 : 0); // Index of currently selected set
 const selectedGame = ref(matchPeriods ? 1 : 0);
+
+const matchWinnerName = computed(() => {
+  if(matchWinner.value == null)
+    return "Unknown";
+  if(matchWinner.value === MatchOutcome.Participant1Won)
+    return props.homeParticipantName;
+  if(matchWinner.value === MatchOutcome.Participant2Won)
+    return props.awayParticipantName;
+  return "Tie";
+})
 
 // Computed property to filter sets
 const setsForMatch = computed(() => {
@@ -179,11 +189,78 @@ const hasInvalidScores = computed(() => {
   );
 });
 
+const areAllPeriodsEnded = computed(() => {
+  return matchPeriods.value.every(period => period.status === EventStatus.Ended);
+});
+
+
 const isSettingsDropdownOpen = ref(false);
 
 const toggleSettingsDropdown = () => {
   isSettingsDropdownOpen.value = !isSettingsDropdownOpen.value;
 };
+const isMatchWinnerModalOpen = ref(false);
+const openMatchWinnerModal = () => {
+  if (areAllPeriodsEnded.value) {
+    // Calculate the winner based on scores
+    matchWinner.value = calculateMatchWinner();
+    isMatchWinnerModalOpen.value = true;
+  }
+  else {
+    saveMatchPeriods(false)
+  }
+};
+
+const handleConfirmWinner = () => {
+  saveMatchPeriods(true); // Save scores and finalize the match
+};
+
+const handleSaveScores = () => {
+  saveMatchPeriods(false); // Save scores without finalizing the match
+};
+
+
+const closeMatchWinnerModal = () => {
+  isMatchWinnerModalOpen.value = false;
+};
+
+const calculateMatchWinner = (): MatchOutcome => {
+  const setsWon = { Participant1: 0, Participant2: 0 };
+
+  // Iterate through each set
+  setsForMatch.value.forEach(setNumber => {
+    let gamesWonInSet = { Participant1: 0, Participant2: 0 };
+
+    // Filter games for the current set
+    const gamesInSet = matchPeriods.value.filter(period => period.set === setNumber);
+
+    // Count games won by each participant in the set
+    gamesInSet.forEach(game => {
+      if (game.winner === MatchOutcome.Participant1Won) {
+        gamesWonInSet.Participant1++;
+      } else if (game.winner === MatchOutcome.Participant2Won) {
+        gamesWonInSet.Participant2++;
+      }
+    });
+
+    // Determine the set winner
+    if (gamesWonInSet.Participant1 > gamesWonInSet.Participant2) {
+      setsWon.Participant1++;
+    } else if (gamesWonInSet.Participant2 > gamesWonInSet.Participant1) {
+      setsWon.Participant2++;
+    }
+  });
+
+  // Determine the match winner based on sets won
+  if (setsWon.Participant1 > setsWon.Participant2) {
+    return MatchOutcome.Participant1Won;
+  } else if (setsWon.Participant2 > setsWon.Participant1) {
+    return MatchOutcome.Participant2Won;
+  } else {
+    return MatchOutcome.Draw; // Handle tie if applicable
+  }
+};
+
 
 const addSet = () => {
   matchPeriods.value.push({
@@ -484,7 +561,7 @@ const deleteMathPeriodsAfterSetAndGameInclusive = async () => {
   }
 };
 
-const saveMatchPeriods = async () => {
+const saveMatchPeriods = async (isEnded = false) => {
 
   console.log('addMatchPeriods called')
 
@@ -495,7 +572,10 @@ const saveMatchPeriods = async () => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${authStore.token}`
       },
-      body: JSON.stringify(matchPeriods.value),
+      body: JSON.stringify({
+        matchPeriods: matchPeriods.value,
+        isEnded, // Add the isFinished property
+      }),
     });
 
     if (response.ok) {
@@ -602,7 +682,7 @@ const saveMatchPeriods = async () => {
                   <!-- Second row for inputs -->
                   <div class="input-fields">
                     <!-- Status Select -->
-                    <div class="field">
+                    <div class="select field is-rounded has-custom-icon">
                       <select v-model="matchPeriods[getPeriodIndex].status" required>
                         <option :value="EventStatus.NotStarted">Not Started</option>
                         <option :value="EventStatus.InProgress">In Progress</option>
@@ -611,7 +691,7 @@ const saveMatchPeriods = async () => {
                     </div>
 
                     <!-- Server Select -->
-                    <div class="field">
+                    <div class="select field is-rounded has-custom-icon">
                       <select v-model="matchPeriods[getPeriodIndex].server"
                         :disabled="selectedGame > 1 && matchPeriods[getPeriodIndex].server !== EventActor.Unknown"
                         required>
@@ -622,7 +702,7 @@ const saveMatchPeriods = async () => {
                     </div>
 
                     <!-- Winner Select -->
-                    <div class="field">
+                    <div class="select field is-rounded has-custom-icon">
                       <select v-model="matchPeriods[getPeriodIndex].winner" required>
                         <option :value="MatchOutcome.Unknown">Unknown</option>
                         <option :value="MatchOutcome.Participant1Won">{{ homeParticipantName ?? "Home" }}</option>
@@ -632,7 +712,7 @@ const saveMatchPeriods = async () => {
 
                     <!-- Is Tiebreak Checkbox -->
                     <div class="field">
-                      <input v-model="matchPeriods[getPeriodIndex].isTiebreak" type="checkbox" />
+                      <input v-model="matchPeriods[getPeriodIndex].isTiebreak" type="checkbox" class="modern-checkbox"/>
                     </div>
                   </div>
                 </div>
@@ -720,7 +800,7 @@ const saveMatchPeriods = async () => {
           <div class="field">
             <div class="control buttons is-centered">
               <button class="button is-primary is-rounded" type="submit"
-                :disabled="matchPeriods.length == 0 || hasInvalidScores" @click="saveMatchPeriods">Save MatchPeriods</button>
+                :disabled="matchPeriods.length == 0 || hasInvalidScores" @click="openMatchWinnerModal">Save MatchPeriods</button>
             </div>
           </div>
         </form>
@@ -737,6 +817,17 @@ const saveMatchPeriods = async () => {
       @confirm="deleteMathPeriodsAfterSetAndGameInclusive"
       @close="closeConfirmationModal"
     />
+    <MatchWinnerModal
+  v-if="isMatchWinnerModalOpen"
+  :isOpen="isMatchWinnerModalOpen"
+  :title="'Match Winner Confirmation'"
+  :message="`${matchWinnerName} would be the outcome of the match if submitted with current scores. If the match will have more points to be played/added, or the output of the game is an extraordinary case, please select 'Save Scores Without Finalizing'. This will allow to manually add winner later. If the winner seems wrongs, click Cancel and revise the scores.`"
+  :winner="matchWinnerName"
+  @confirm-winner="handleConfirmWinner"
+  @save-scores="handleSaveScores"
+  @close="closeMatchWinnerModal"
+/>
+
     <DangerModal
 :isOpen="isUnauthorizedModalOpen"
 title="Unauthorized!"
@@ -955,4 +1046,33 @@ message="You are not authorized to execute the desired action!"
   margin-left: 10px;
   font-size: 1rem;
 }
+
+.modern-checkbox {
+  width: 25px;
+  height: 25px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modern-checkbox:checked {
+  background-color: #00d1b2;
+  border-color: #00d1b2;
+  position: relative;
+}
+
+.modern-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 </style>

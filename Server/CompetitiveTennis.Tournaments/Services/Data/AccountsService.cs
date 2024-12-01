@@ -90,6 +90,28 @@ public class AccountsService : DataService<Account>, IAccountsService
         }
     }
 
+    public async Task UpdatePlayerRating(int accountId, int newRating)
+    {
+        try
+        {
+            var account = await All().SingleOrDefaultAsync(a => a.Id == accountId);
+            if (account == null)
+                throw new MissingEntryException($"Cannot update rating for non-existing account. AccountId: {accountId}");
+
+            account.PlayerRating = newRating;
+            await SaveAsync(account);
+        }
+        catch (MissingEntryException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException(
+                $"An error occurred during {nameof(UpdatePlayerRating)} execution for accountId: {accountId}. Error: {e.Message} ");
+        }
+    }
+
     public async Task Create(AccountCreateInputModel createModel)
     {
         var existingAccount = await GetByUserId(createModel.UserId);

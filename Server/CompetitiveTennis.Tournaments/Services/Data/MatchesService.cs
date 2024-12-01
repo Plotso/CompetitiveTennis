@@ -9,6 +9,7 @@ using Interfaces.Data;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Models.MatchOutcomeHandler.RatingCalculations;
 
 public class MatchesService : DeletableDataService<Match>, IMatchesService
 {
@@ -27,7 +28,15 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
             .ProjectToType<MatchOutputModel>().ToListAsync();
 
     public async Task<MatchOutputModel> Get(int id)
-        => _mapper.Map<MatchOutputModel>(await All()
+        => _mapper.Map<MatchOutputModel>(await AllAsNoTracking()
+            .Where(a => a.Id == id)
+            .EnrichWithParticipants()
+            .Include(m => m.Periods)
+            .ThenInclude(mp => mp.Scores)
+            .SingleOrDefaultAsync());
+
+    public async Task<SlimMatchOutputModel> GetForRatingCalculations(int id)
+        => _mapper.Map<SlimMatchOutputModel>(await AllAsNoTracking()
             .Where(a => a.Id == id)
             .EnrichWithParticipants()
             .Include(m => m.Periods)
@@ -52,6 +61,14 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
 
     public async Task<Match> GetInternal(int id)
         => await All().Where(m => m.Id == id).SingleOrDefaultAsync();
+    public async Task<MatchOutcome?> GetMatchOutcome(int id)
+        => await AllAsNoTracking().Where(m => m.Id == id).Select(m => m.Outcome).FirstOrDefaultAsync();
+
+    public async Task<bool?> IsDoubles(int id)
+    {
+        var matchTournamentTypeInfo = await AllAsNoTracking().Where(m => m.Id == id).Include(m => m.Tournament).Select(m => new {m.Id, m.Tournament.Type}).FirstOrDefaultAsync();
+        return matchTournamentTypeInfo?.Type == TournamentType.Doubles;
+    }
 
     public async Task<int> CreateEmptyMatch(MatchInputModel input, Tournament tournament)
     {

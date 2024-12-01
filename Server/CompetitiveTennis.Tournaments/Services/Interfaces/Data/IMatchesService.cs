@@ -4,16 +4,20 @@ using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
 using Contracts.Match;
 using CompetitiveTennis.Tournaments.Data.Models;
+using Models.MatchOutcomeHandler.RatingCalculations;
 
 public interface IMatchesService : IDataService<Match>
 {
     Task<IEnumerable<MatchOutputModel>> GetAll();
     
     Task<MatchOutputModel> Get(int id);
+    Task<SlimMatchOutputModel> GetForRatingCalculations(int id);
 
     Task<int?> GetTournamentIdForMatch(int matchId);
-    
+
     Task<Match> GetInternal(int id);
+    Task<MatchOutcome?> GetMatchOutcome(int id);
+    Task<bool?> IsDoubles(int id);
 
     /// <summary>
     /// Create empty match without competitors with the goal for them to be populated on later stage

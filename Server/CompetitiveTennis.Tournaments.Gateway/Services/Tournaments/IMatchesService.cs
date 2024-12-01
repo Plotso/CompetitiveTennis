@@ -19,7 +19,7 @@ public interface IMatchesService
     Task<Result<string>> GetOrganiserUsername(int id);
 
     [Post("/Matches/AddPeriodInfo/{id}")]
-    Task<Result> AddPeriodInfo(int id, [Body] IEnumerable<MatchPeriodInputModel> matchPeriodInputs);
+    Task<Result> AddPeriodInfo(int id, [Body] MatchResultsInputModel matchResultsInputModel);
 
     [Get("/Matches/Search")]
     Task<Result<SearchOutputModel<MatchShortOutputModel>>> Search([Query] TournamentQuery query);

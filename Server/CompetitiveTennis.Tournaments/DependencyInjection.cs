@@ -22,10 +22,13 @@ public static class DependencyInjection
     public static IServiceCollection AddBLServices(this IServiceCollection serviceCollection)
         => serviceCollection
             .AddScoped<IMatchPeriodInfoManager, MatchPeriodInfoManager>()
-            .AddScoped<ITournamentDrawGenerator, TournamentDrawGenerator>();
+            .AddScoped<IMatchOutcomeHandler, MatchOutcomeHandler>()
+            .AddScoped<ITournamentDrawGenerator, TournamentDrawGenerator>()
+            .AddScoped<IRatingCalculator, RatingCalculator>();
 
     public static IServiceCollection AddConfigurations(this IServiceCollection serviceCollection,
         IConfiguration configuration)
-        => serviceCollection.Configure<TournamentCreationConfiguration>(
-            configuration.GetSection(nameof(TournamentCreationConfiguration)));
+        => serviceCollection
+            .Configure<TournamentCreationConfiguration>(configuration.GetSection(nameof(TournamentCreationConfiguration)))
+            .Configure<RatingCalculatorConfiguration>(configuration.GetSection(nameof(RatingCalculatorConfiguration)));
 }

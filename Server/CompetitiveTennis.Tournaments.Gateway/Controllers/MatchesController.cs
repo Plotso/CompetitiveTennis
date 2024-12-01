@@ -72,13 +72,13 @@ public class MatchesController : BaseGatewayController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> AddPeriodInfo(int id, [FromBody] IEnumerable<MatchPeriodInputModel> matchPeriodInputs)
+    public async Task<IActionResult> AddPeriodInfo(int id, [FromBody] MatchResultsInputModel matchResultsInputModel)
         => await SafeProcessRefitRequest(
             async () =>
             {
-                var result = await _matches.AddPeriodInfo(id, matchPeriodInputs);
+                var result = await _matches.AddPeriodInfo(id, matchResultsInputModel);
                 return Ok(result);
-            }, $"An error occurred during AddPeriodInfo request for match {id}. Request: {matchPeriodInputs}");
+            }, $"An error occurred during AddPeriodInfo request for match {id}. Request: {matchResultsInputModel}");
     
     [HttpDelete]
     [Route($"{nameof(DeleteMatchPeriods)}/{Id}")]

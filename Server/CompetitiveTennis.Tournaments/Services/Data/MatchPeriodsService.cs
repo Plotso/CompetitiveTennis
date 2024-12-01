@@ -72,6 +72,7 @@ public class MatchPeriodsService : DeletableDataService<MatchPeriod>, IMatchPeri
         await SaveAsync(matchPeriod);
         return true;
     }
+    
 
     public async Task<bool> Delete(int id, string userid)
     {

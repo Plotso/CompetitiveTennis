@@ -58,6 +58,8 @@ public class MatchPeriodInfoManager : IMatchPeriodInfoManager
         var matchPeriodId = await _matchPeriodsService.GetMatchPeriodId(match.Id, matchPeriodInput.Set, matchPeriodInput.Game);
         if (matchPeriodId is null)
             matchPeriodId = await _matchPeriodsService.Create(matchPeriodInput, match);
+        else
+            await _matchPeriodsService.Update(matchPeriodId.Value, matchPeriodInput);
             
         var matchPeriod = await _matchPeriodsService.GetInternal(matchPeriodId!.Value);
         foreach (var score in matchPeriodInput.Scores)
