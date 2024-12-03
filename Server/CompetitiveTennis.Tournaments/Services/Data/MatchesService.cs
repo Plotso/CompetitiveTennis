@@ -61,6 +61,19 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
 
     public async Task<Match> GetInternal(int id)
         => await All().Where(m => m.Id == id).SingleOrDefaultAsync();
+
+    /// <summary>
+    /// Check whether match status is != NotStarted or whether it has any period scores
+    /// </summary>
+    public async Task<bool?> HasMatchStarted(int id)
+    {
+        var match = await AllAsNoTracking()
+            .Where(m => m.Id == id)
+            .Include(m => m.Periods)
+            .SingleOrDefaultAsync();
+        return match != null && (match.Status != EventStatus.NotStarted || match.Periods.Any());
+    }
+
     public async Task<MatchOutcome?> GetMatchOutcome(int id)
         => await AllAsNoTracking().Where(m => m.Id == id).Select(m => m.Outcome).FirstOrDefaultAsync();
 
@@ -117,6 +130,9 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         await Data.SaveChangesAsync();
         return matchFlow.Id;
     }
+    
+    public async Task<MatchFlow?> GetMatchFlow(int matchId) 
+        => await Data.Set<MatchFlow>().AsNoTracking().Where(m => m.MatchId == matchId).FirstOrDefaultAsync();
 
     public async Task<bool> UpdateParticipant(int id, Participant newParticipant, bool isHome)
     {
@@ -199,6 +215,18 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
             return false;
 
         match.Outcome = outcome;
+        await SaveAsync(match);
+        return true;
+    }
+
+    public async Task<bool> UpdateOutcomeWithCondition(int id, MatchOutcome? outcome, OutcomeCondition? condition)
+    {
+        var match = await All().SingleOrDefaultAsync(m => m.Id == id);
+        if (match == null)
+            return false;
+
+        match.Outcome = outcome;
+        match.OutcomeCondition = condition;
         await SaveAsync(match);
         return true;
     }

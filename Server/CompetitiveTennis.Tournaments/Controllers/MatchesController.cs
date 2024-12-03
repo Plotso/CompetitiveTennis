@@ -93,13 +93,43 @@ public class MatchesController : ApiController
                 if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update matches from respective tournament!"));
+                
+                var isInvalidChangeOfWinnerOperation = await _matchOutcomeHandler.IsChangeOfWinnerForMatchWithAlreadyStartedSuccessorMatch(id, matchResultsInputModel);
+                if (isInvalidChangeOfWinnerOperation)
+                    return new ForbidResult("Changing of scores leading to change of the winner of a match are not allowed after the respective winner already started the successor match (next stage of the tournament)!");
 
                 await _matchPeriodInfoManager.PersistPeriodInfoForMatch(id, matchResultsInputModel.MatchPeriods);
-                // Update match status & calculate player ratings
+                // Update match status, calculate player ratings & update participant for successor match id
                 await _matchOutcomeHandler.HandleMatchOutcome(id, matchResultsInputModel);
                 return Ok(Result.Success);
             },
             msgOnError: $"Unexpected error during {nameof(AddPeriodInfo)} for match {id}.");
+    
+    
+    
+    [HttpPost]
+    [Route($"{nameof(UpdateMatchOutcomeDueToCustomCondition)}/{Id}")]
+    [Authorize]
+    public async Task<ActionResult<Result>> UpdateMatchOutcomeDueToCustomCondition(int id, [FromBody] MatchCustomConditionResultInputModel matchCustomConditionResultInput)
+        => await SafeHandle(async () =>
+            {
+                var tournamentId = await _matches.GetTournamentIdForMatch(id);
+                if (tournamentId == null)
+                    return NotFound(Result.Failure($"Match {id} does not exist"));
+                var isCurrentUserOrganiser = await IsCurrentUserOrganiser(tournamentId.Value);
+                if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
+                    return Unauthorized(
+                        Result.Failure("Only admins and tournament organiser are allowed to update matches from respective tournament!"));
+                
+                var isInvalidChangeOfWinnerOperation = await _matchOutcomeHandler.IsChangeOfWinnerForMatchWithAlreadyStartedSuccessorMatch(id, matchCustomConditionResultInput.MatchOutcome);
+                if (isInvalidChangeOfWinnerOperation)
+                    return new ForbidResult("Changes to the winner of a match are not allowed after the respective winner already started the successor match (next stage of the tournament)!");
+
+                // Update match status, calculate player ratings & update participant for successor match id
+                await _matchOutcomeHandler.HandleMatchOutcome(id, matchCustomConditionResultInput);
+                return Ok(Result.Success);
+            },
+            msgOnError: $"Unexpected error during {nameof(UpdateMatchOutcomeDueToCustomCondition)} for match {id}.");
     
     [HttpDelete]
     [Route($"{nameof(DeleteMatchPeriods)}/{Id}")]

@@ -21,6 +21,10 @@ public interface IMatchesService
     [Post("/Matches/AddPeriodInfo/{id}")]
     Task<Result> AddPeriodInfo(int id, [Body] MatchResultsInputModel matchResultsInputModel);
 
+    [Post("/Matches/UpdateMatchOutcomeDueToCustomCondition/{id}")]
+    Task<Result> UpdateMatchOutcomeDueToCustomCondition(int id,
+        [Body] MatchCustomConditionResultInputModel matchCustomConditionResultInput);
+
     [Get("/Matches/Search")]
     Task<Result<SearchOutputModel<MatchShortOutputModel>>> Search([Query] TournamentQuery query);
     

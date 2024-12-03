@@ -80,6 +80,21 @@ public class MatchesController : BaseGatewayController
                 return Ok(result);
             }, $"An error occurred during AddPeriodInfo request for match {id}. Request: {matchResultsInputModel}");
     
+    
+    [HttpPost]
+    [Route($"{nameof(UpdateMatchOutcomeDueToCustomCondition)}/{Id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateMatchOutcomeDueToCustomCondition(int id, [FromBody] MatchCustomConditionResultInputModel matchCustomConditionResultInput)
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var result = await _matches.UpdateMatchOutcomeDueToCustomCondition(id, matchCustomConditionResultInput);
+                return Ok(result);
+            }, $"An error occurred during {nameof(UpdateMatchOutcomeDueToCustomCondition)} request for match {id}. Request: {matchCustomConditionResultInput}");
+
     [HttpDelete]
     [Route($"{nameof(DeleteMatchPeriods)}/{Id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result))]

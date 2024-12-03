@@ -25,6 +25,8 @@ public class RatingCalculator : IRatingCalculator
     {
         if(matchResult == null || matchResult.Participants.IsNullOrEmpty())
             throw new ArgumentException("Match participants must not be null or empty in order to Calculate new ratings");
+        if(matchResult.Outcome == MatchOutcome.NoOutcome) // cannot calculate ratings when the winner of the match is unknown or it finished as a Tie
+            return Array.Empty<NewRatingPerAccount>(); 
         return isDoubles ? HandleDoublesRating(matchResult) : HandleSinglesRating(matchResult);
     }
 

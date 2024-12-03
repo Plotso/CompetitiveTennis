@@ -16,6 +16,10 @@ public interface IMatchesService : IDataService<Match>
     Task<int?> GetTournamentIdForMatch(int matchId);
 
     Task<Match> GetInternal(int id);
+    /// <summary>
+    /// Check whether match status is != NotStarted or whether it has any period scores
+    /// </summary>
+    Task<bool?> HasMatchStarted(int id);
     Task<MatchOutcome?> GetMatchOutcome(int id);
     Task<bool?> IsDoubles(int id);
 
@@ -27,6 +31,7 @@ public interface IMatchesService : IDataService<Match>
     Task<int> Create(MatchInputModel input, Tournament tournament, Participant homeParticipant, Participant awayParticipant);
 
     Task<int> AddMatchFlow(int tournamentId, int matchId, int successorMatchId, bool isWinnerHome);
+    Task<MatchFlow?> GetMatchFlow(int matchId);
 
     Task<bool> UpdateParticipant(int id, Participant newParticipant, bool isHome);
 
@@ -35,6 +40,7 @@ public interface IMatchesService : IDataService<Match>
     Task<bool> UpdateStatus(int id, EventStatus status);
 
     Task<bool> UpdateOutcome(int id, MatchOutcome? outcome);
+    Task<bool> UpdateOutcomeWithCondition(int id, MatchOutcome? outcome, OutcomeCondition? condition);
 
     Task<bool> Update(int id, MatchInputModel inputModel);
 

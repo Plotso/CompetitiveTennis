@@ -5,6 +5,7 @@ using CompetitiveTennis.Tournaments.Contracts.MatchPeriod;
 
 public record SlimMatchOutputModel(
     int Id,
+    TournamentStage Stage,
     short? MatchWonPoints,
     short? SetWonPoints,
     short? GameWonPoints,
