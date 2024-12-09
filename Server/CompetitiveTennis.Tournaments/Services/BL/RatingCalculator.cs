@@ -111,7 +111,7 @@ public class RatingCalculator : IRatingCalculator
         => (int)(currentRating + KFactor * movMultiplier * (actualScore - expectedScore));
 
     // Calculates Margin of Victory multiplier
-    private double CalculateMarginOfVictory(TennisResultInfo homeResult, TennisResultInfo awayResult)
+    protected double CalculateMarginOfVictory(TennisResultInfo homeResult, TennisResultInfo awayResult)
     {
         var setMultiplier = CalculateSetMultiplier(homeResult.SetsWon, awayResult.SetsWon);
         var gameDifference = Math.Abs(homeResult.GamesWon - awayResult.GamesWon) / (double)GameDifferenceNormalizer;
@@ -121,7 +121,7 @@ public class RatingCalculator : IRatingCalculator
     }
 
     // Calculates set multiplier based on sets won
-    private double CalculateSetMultiplier(byte homeSetsWon, byte awaySetsWon)
+    protected double CalculateSetMultiplier(byte homeSetsWon, byte awaySetsWon)
     {
         var isBestOfFive = IsBestOfFive(homeSetsWon, awaySetsWon);
         var setDifference = Math.Abs(homeSetsWon - awaySetsWon);
@@ -152,7 +152,7 @@ public class RatingCalculator : IRatingCalculator
         return sumOfSets > 3 || sumOfSets == 3 && diffOfSets == 3;
     }
 
-    private NewRatingPerAccount[] DistributeDoublesRatingChanges(
+    protected NewRatingPerAccount[] DistributeDoublesRatingChanges(
         byte playersInTeam,
         int homeTeamOriginalRating,
         int awayTeamOriginalRating,

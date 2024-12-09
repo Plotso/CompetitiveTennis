@@ -21,4 +21,5 @@ public record MatchShortOutputModel(
     ParticipantInfo? HomeParticipant,
     ParticipantInfo? AwayParticipant,
     IEnumerable<MatchPeriodOutputModel> MatchPeriods,
-    int TournamentId);
+    int TournamentId,
+    MatchResultsOutputModel? Results = null);

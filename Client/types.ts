@@ -281,6 +281,7 @@ export namespace Auth {
     awayParticipant: ParticipantInfo;
     matchPeriods: MatchPeriodOutputModel[];
     tournamentId: number;
+    results: MatchResultsOutputModel | null
   }
   
   export interface MatchPeriodOutputModel {
@@ -426,3 +427,21 @@ export namespace Auth {
     page?: number;
     itemsPerPage?: number;
   }
+
+  export interface MatchCustomConditionResultInputModel {
+    outcomeCondition: OutcomeCondition;
+    matchOutcome: MatchOutcome;
+  }
+
+  export interface MatchResultsOutputModel {
+    setResults: SetResultOutput[];
+  }
+  
+  export interface SetResultOutput {
+    setNumber: number; // Using `number` since TypeScript does not have `sbyte` type
+    winner: MatchPeriodOutcome;
+    homeSideGamesWon: number; // Using `number` for `short`
+    awaySideGamesWon: number; // Using `number` for `short`
+  }
+  
+  

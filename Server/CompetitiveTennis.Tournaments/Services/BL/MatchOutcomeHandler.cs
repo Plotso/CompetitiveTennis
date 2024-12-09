@@ -31,7 +31,7 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
         if (matchResultsInputModel == null)
             return;
         var matchOutcome = GetMatchOutcome(matchResultsInputModel);
-        await _matchesService.UpdateOutcome(matchId, matchOutcome);
+        await _matchesService.UpdateOutcomeAndStatus(matchId, matchOutcome, status: matchResultsInputModel.IsEnded ? EventStatus.Ended : EventStatus.InProgress);
         if (matchResultsInputModel.IsEnded && !matchResultsInputModel.MatchPeriods.IsNullOrEmpty())
             await UpdateRatingsAndSuccessorMatchParticipants(matchId);
         
@@ -41,7 +41,7 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
     {
         if (matchCustomConditionResultInputModel == null)
             return;
-        await _matchesService.UpdateOutcomeWithCondition(matchId, matchCustomConditionResultInputModel.MatchOutcome, matchCustomConditionResultInputModel.OutcomeCondition);    
+        await _matchesService.UpdateOutcomeWithCondition(matchId, matchCustomConditionResultInputModel.MatchOutcome, matchCustomConditionResultInputModel.OutcomeCondition, status: EventStatus.Ended);    
         //ToDo: InDepth revise the code below
         await UpdateRatingsAndSuccessorMatchParticipants(matchId);
     }
@@ -66,11 +66,16 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
         var hasOutcomeChange = updatedMatchOutcome != oldOutcome;
         if (!hasOutcomeChange)
             return false;
+        return await HasSuccessorMatchStarted(matchId);
+    }
+
+    public async Task<bool> HasSuccessorMatchStarted(int matchId)
+    {
         var matchFlow = await _matchesService.GetMatchFlow(matchId);
         if (matchFlow is null) 
             return false;
         var hasSuccessorMatchStarted = await _matchesService.HasMatchStarted(matchFlow.SuccessorMatchId);
-        return hasOutcomeChange && hasSuccessorMatchStarted.HasValue && hasSuccessorMatchStarted.Value;
+        return hasSuccessorMatchStarted.HasValue && hasSuccessorMatchStarted.Value;
     }
 
     private async Task UpdateRatingsAndSuccessorMatchParticipants(int matchId)

@@ -219,7 +219,19 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         return true;
     }
 
-    public async Task<bool> UpdateOutcomeWithCondition(int id, MatchOutcome? outcome, OutcomeCondition? condition)
+    public async Task<bool> UpdateOutcomeAndStatus(int id, MatchOutcome? outcome, EventStatus status)
+    {
+        var match = await All().SingleOrDefaultAsync(m => m.Id == id);
+        if (match == null)
+            return false;
+
+        match.Outcome = outcome;
+        match.Status = status;
+        await SaveAsync(match);
+        return true;
+    }
+
+    public async Task<bool> UpdateOutcomeWithCondition(int id, MatchOutcome? outcome, OutcomeCondition? condition, EventStatus? status)
     {
         var match = await All().SingleOrDefaultAsync(m => m.Id == id);
         if (match == null)
@@ -227,6 +239,8 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
 
         match.Outcome = outcome;
         match.OutcomeCondition = condition;
+        if (status != null)
+            match.Status = status.Value;
         await SaveAsync(match);
         return true;
     }

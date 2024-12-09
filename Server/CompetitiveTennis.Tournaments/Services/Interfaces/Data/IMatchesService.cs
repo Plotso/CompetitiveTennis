@@ -40,7 +40,9 @@ public interface IMatchesService : IDataService<Match>
     Task<bool> UpdateStatus(int id, EventStatus status);
 
     Task<bool> UpdateOutcome(int id, MatchOutcome? outcome);
-    Task<bool> UpdateOutcomeWithCondition(int id, MatchOutcome? outcome, OutcomeCondition? condition);
+
+    Task<bool> UpdateOutcomeAndStatus(int id, MatchOutcome? outcome, EventStatus status);
+    Task<bool> UpdateOutcomeWithCondition(int id, MatchOutcome? outcome, OutcomeCondition? condition, EventStatus? status);
 
     Task<bool> Update(int id, MatchInputModel inputModel);
 

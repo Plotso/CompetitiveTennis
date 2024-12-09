@@ -16,5 +16,6 @@ public interface IMatchOutcomeHandler
     Task HandleMatchOutcome(int matchId, MatchCustomConditionResultInputModel matchCustomConditionResultInputModel);
 
     Task<bool> IsChangeOfWinnerForMatchWithAlreadyStartedSuccessorMatch(int matchId, MatchResultsInputModel matchResultsInputModel);
+    Task<bool> HasSuccessorMatchStarted(int matchId);
     Task<bool> IsChangeOfWinnerForMatchWithAlreadyStartedSuccessorMatch(int matchId, MatchOutcome updatedMatchOutcome);
 }

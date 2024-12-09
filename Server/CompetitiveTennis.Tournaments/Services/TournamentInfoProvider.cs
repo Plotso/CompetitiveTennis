@@ -12,16 +12,16 @@ public static class TournamentInfoProvider
     public static SlimTournamentOutputModel GetTournamentInfo(FullTournamentOutputModel outputModel)
     {
         var matches = new List<MatchShortOutputModel>();
-        foreach (var matchOuput in outputModel.Matches)
+        foreach (var matchOutput in outputModel.Matches)
         {
-            var predecesorMatchFlows = outputModel.MatchFlows.Where(mf => mf.SuccessorMatchId == matchOuput.Id);
+            var predecesorMatchFlows = outputModel.MatchFlows.Where(mf => mf.SuccessorMatchId == matchOutput.Id);
             var homePredecesorMatch = predecesorMatchFlows.FirstOrDefault(mf => mf.IsHome);
             var awayPredecesorMatch = predecesorMatchFlows.FirstOrDefault(mf => !mf.IsHome);
 
             var homeParticipant =
-                matchOuput.Participants.FirstOrDefault(p => p.Specifier == DataConstants.ParticipantSpecifiers.Home);
+                matchOutput.Participants.FirstOrDefault(p => p.Specifier == DataConstants.ParticipantSpecifiers.Home);
             var awayParticipant =
-                matchOuput.Participants.FirstOrDefault(p => p.Specifier == DataConstants.ParticipantSpecifiers.Away);
+                matchOutput.Participants.FirstOrDefault(p => p.Specifier == DataConstants.ParticipantSpecifiers.Away);
 
             var homeParticipantInfo = homeParticipant != null
                 ? new ParticipantInfo(homeParticipant.Id, homeParticipant.IsGuest, GetName(homeParticipant),
@@ -32,11 +32,11 @@ public static class TournamentInfoProvider
                     awayParticipant.Players, awayParticipant.Specifier, awayParticipant.Team)
                 : new ParticipantInfo(-2, true, $"Winner of match {awayPredecesorMatch?.MatchId}", new AccountShortOutputModel[0], DataConstants.ParticipantSpecifiers.Away, null);
 
-            matches.Add(new MatchShortOutputModel(matchOuput.Id, matchOuput.StartDate, matchOuput.MatchWonPoints,
-                matchOuput.SetWonPoints, matchOuput.GameWonPoints, matchOuput.Stage,
-                matchOuput.Details, matchOuput.Status, matchOuput.Outcome, OutcomeCondition: null, homePredecesorMatch?.MatchId,
+            matches.Add(new MatchShortOutputModel(matchOutput.Id, matchOutput.StartDate, matchOutput.MatchWonPoints,
+                matchOutput.SetWonPoints, matchOutput.GameWonPoints, matchOutput.Stage,
+                matchOutput.Details, matchOutput.Status, matchOutput.Outcome, OutcomeCondition: null, homePredecesorMatch?.MatchId,
                 awayPredecesorMatch?.MatchId,
-                homeParticipantInfo, awayParticipantInfo, matchOuput.MatchPeriods, outputModel.Id));
+                homeParticipantInfo, awayParticipantInfo, matchOutput.MatchPeriods, outputModel.Id, MatchInfoProvider.GetMatchResults(matchOutput.MatchPeriods)));
         }
 
         return new SlimTournamentOutputModel(outputModel.Id, outputModel.Title, outputModel.Rules,

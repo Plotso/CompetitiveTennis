@@ -1,9 +1,13 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services;
 
+using CompetitiveTennis.Data.Models.Enums;
 using Contracts.Account;
 using Contracts.Match;
+using Contracts.MatchPeriod;
 using Contracts.Participant;
+using Extensions;
 using Models;
+using Models.MatchOutcomeHandler;
 using Tournaments.Data;
 
 public static class MatchInfoProvider
@@ -36,7 +40,7 @@ public static class MatchInfoProvider
             matchOutput.Details, matchOutput.Status, matchOutput.Outcome, OutcomeCondition: null,
             homePredecesorMatch?.MatchId,
             awayPredecesorMatch?.MatchId,
-            homeParticipantInfo, awayParticipantInfo, matchOutput.MatchPeriods, tournamentMatchFlowInfo.Id);
+            homeParticipantInfo, awayParticipantInfo, matchOutput.MatchPeriods, tournamentMatchFlowInfo.Id, GetMatchResults(matchOutput.MatchPeriods));
     }
 
     private static string GetName(ParticipantShortOutputModel participantShortOutputModel)
@@ -49,4 +53,37 @@ public static class MatchInfoProvider
                 $"{p.FirstName} {p.LastName} ({p.Username} | {p.PlayerRating})"));  //ToDo: Revise those brackets styling since this results in Odd results on FE
         return participantShortOutputModel.IsGuest ? $"{participantShortOutputModel.Name}, {playerNames}" : playerNames;
     }
+
+    public static MatchResultsOutputModel? GetMatchResults(IEnumerable<MatchPeriodOutputModel> matchPeriods)
+    {
+        var periodsInfo = matchPeriods.Select(MatchPeriodShortInfo.FromMatchPeriodInput).ToArray();
+        if (periodsInfo.IsNullOrEmpty())
+            return null;
+        var periodsBySet = periodsInfo.GroupBy(mp => mp.Set)
+            .ToDictionary(grp => grp.Key, grp => grp.ToList());
+        
+        var sets = new List<SetResultOutput>(periodsBySet.Keys.Count);
+        sbyte setCounter = 1;
+        foreach (var setPeriods in periodsBySet)
+        {
+            var periodsPerGameInSet = setPeriods.Value.GroupBy(mp => mp.Game).ToDictionary(mpg => mpg.Key, mpg => mpg.ToList());
+            ushort homeSideGames = 0;
+            ushort awaySideGames = 0;
+            foreach (var gamePeriods in periodsPerGameInSet)
+            {
+                var homeSideWinCount = gamePeriods.Value.Count(mp => mp.Winner == MatchOutcome.ParticipantOne);
+                var awaySideWinCount = gamePeriods.Value.Count(mp => mp.Winner == MatchOutcome.ParticipantTwo);
+                if (homeSideWinCount > awaySideWinCount)
+                    homeSideGames++;
+                if(awaySideWinCount > homeSideWinCount)
+                    awaySideGames++;
+            }
+            sets.Add(new SetResultOutput(setCounter++, GetSetWinner(homeSideGames, awaySideGames), homeSideGames, awaySideGames));
+        }
+        return new MatchResultsOutputModel(sets);
+    }
+    
+    private static MatchOutcome GetSetWinner(ushort homeSideGames, ushort awaySideGames) 
+        => homeSideGames > awaySideGames ? MatchOutcome.ParticipantOne :
+            awaySideGames > homeSideGames ? MatchOutcome.ParticipantTwo : MatchOutcome.NoOutcome;
 }

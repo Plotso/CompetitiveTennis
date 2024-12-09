@@ -145,6 +145,9 @@ public class MatchesController : ApiController
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update matches from respective tournament!"));
 
+                var hasSuccessorMatchStarted = await _matchOutcomeHandler.HasSuccessorMatchStarted(id);
+                if (hasSuccessorMatchStarted)
+                    return new ForbidResult("Deletion of match periods is not allowed after match has finished and the respective winner already started the successor match (next stage of the tournament)!");
                 await _matchPeriodInfoManager.DeleteMatchPeriodsForMatch(id, _currentUser.UserId);
                 return Ok(Result.Success);
             },
@@ -163,6 +166,11 @@ public class MatchesController : ApiController
                 if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
                         Result.Failure("Only admins and tournament organiser are allowed to update matches from respective tournament!"));
+                
+                
+                var hasSuccessorMatchStarted = await _matchOutcomeHandler.HasSuccessorMatchStarted(id);
+                if (hasSuccessorMatchStarted)
+                    return new ForbidResult("Deletion of match periods is not allowed after match has finished and the respective winner already started the successor match (next stage of the tournament)!");
 
                 await _matchPeriodInfoManager.DeleteMatchPeriodsFromSetAndGameInclusive(id, _currentUser.UserId, set, game);
                 return Ok(Result.Success);

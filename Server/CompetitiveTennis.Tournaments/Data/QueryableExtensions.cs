@@ -9,7 +9,9 @@ public static class QueryableExtensions
         => tournaments
             .Include(t => t.MatchFlows)
             .Include(t => t.Matches)
-            .ThenInclude(m => m.Participants );
+            .ThenInclude(m => m.Participants )
+            .Include(t => t.Matches)
+            .ThenInclude(m => m.Periods );
     public static IQueryable<Tournament> EnrichTournamentQueryData(this IQueryable<Tournament> tournaments)
         => tournaments
             .Include(t => t.Avenue)

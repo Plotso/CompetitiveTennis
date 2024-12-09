@@ -7,4 +7,6 @@ public record MatchPeriodShortInfo(short Set, short Game, EventStatus Status, Ma
 {
     public static MatchPeriodShortInfo FromMatchPeriodInput(MatchPeriodInputModel matchPeriodInputModel) 
         => new MatchPeriodShortInfo(matchPeriodInputModel.Set, matchPeriodInputModel.Game, matchPeriodInputModel.Status, matchPeriodInputModel.Winner);
+    public static MatchPeriodShortInfo FromMatchPeriodInput(MatchPeriodOutputModel matchPeriodOutputModel) 
+        => new MatchPeriodShortInfo(matchPeriodOutputModel.Set, matchPeriodOutputModel.Game, matchPeriodOutputModel.Status, matchPeriodOutputModel.Winner);
 }
