@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { Surface, TournamentType, Result, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchShortOutputModel, EventStatus } from "@/types"
+import { Surface, TournamentType, Result, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchShortOutputModel, EventStatus, MatchPeriodOutcome } from "@/types"
 import { useAuthStore } from "~/stores/auth"
 const props = defineProps({
   data: { type: Object as PropType<Result<MatchShortOutputModel>>, required: true },
@@ -60,19 +60,32 @@ const awayPlayerRanking = computed(() => {
 });
 
 const getScore = () => {
-  // Format and return the match score
-  // You can use match.scores to calculate the score
-  return '0-0'
+  var matchValue = match.value;
+  if(!matchValue || !matchValue.results || !matchValue.results.setResults || matchValue.results.setResults.length == 0)
+    return "";
+  var result = matchValue.results.setResults.reduce(
+    (result, set) => {
+      if (set.winner === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantOne]) {
+        result.participant1Wins++;
+      } else if (set.winner === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantTwo]) {
+        result.participant2Wins++;
+      }
+      return result;
+    },
+    { participant1Wins: 0, participant2Wins: 0 } // Initial accumulator
+  );
+  return `${result.participant1Wins}:${result.participant2Wins}`
 };
 const formatEventStatus = (status: EventStatus) => {
+  console.log(status)
   switch(status) {
-    case EventStatus.NotStarted: {
+    case EventStatus[EventStatus.NotStarted]: {
       return "Not Started";
     }
-    case EventStatus.InProgress: {
+    case EventStatus[EventStatus.InProgress]: {
       return "Ongoing";
     }
-    case EventStatus.Ended: {
+    case EventStatus[EventStatus.Ended]: {
       return "Ended";
     }
     default: {
