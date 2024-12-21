@@ -301,10 +301,10 @@ const generateDraw = async (tournamentId: number) => {
     <div class="box">
       <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-users" /> Participants </h2>
       <div class="has-text-centered" v-if="isAuthorized && !hasTournamentStarted">
-        <div class="buttons is-centered">
-          <button class="button" @click="openAddGuestModal">
-            Add Guest
-          </button>
+          <ParticipateButton          
+          :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+          button-label="Add Guest"
+          @participate="openAddGuestModal()"/>
         
           <ParticipateButton v-if="tournament.type == 'Singles'"
           :has-max-participants="tournament.participants.length === tournament.maxParticipants"

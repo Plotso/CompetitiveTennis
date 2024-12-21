@@ -202,6 +202,9 @@ public class TournamentsController : ApiController
                     Logger.LogInformation($"An attempt to add guest to an ongoing tournament has been made. TournamentId: {input.TournamentId}. Endpoint: {nameof(AddGuest)}. Input: {input}");
                     return BadRequest(Result.Failure($"Cannot add guest to an ongoing tournament. Tournament {input.TournamentId}."));
                 }
+                if (tournament.Participants.Count == tournament.MaxParticipants)
+                    return BadRequest(Result.Failure(
+                        "Cannot add guest since tournament has already reached the max allowed number of participants"));
                 
                 var participantId = await _participants.Create(input, tournament, team);
                 return Ok(Result<int>.SuccessWith(participantId));
@@ -227,6 +230,9 @@ public class TournamentsController : ApiController
                 if (tournament.Type != TournamentType.Singles)
                     return BadRequest(
                         Result.Failure("Registration for doubles & teams tournaments are handled separately!"));
+                if (tournament.Participants.Count == tournament.MaxParticipants)
+                    return BadRequest(Result.Failure(
+                        $"Cannot participate since tournament has already reached the max allowed number of participants"));
                 
                 var currentAccount = await _accounts.GetByUserId(_currentUser.UserId);
                 if (await _tournaments.IsAccountPresentInAnyParticipant(currentAccount.Id, input.TournamentId))
@@ -254,6 +260,9 @@ public class TournamentsController : ApiController
                     Logger.LogInformation($"An attempt to participate in an ongoing tournament has been made. TournamentId: {input.ParticipantInfo.TournamentId}. Endpoint: {nameof(ParticipateDoubles)}. Input: {input}");
                     return BadRequest(Result.Failure($"Cannot participate in an ongoing tournament. Tournament {input.ParticipantInfo.TournamentId}."));
                 }
+                if (tournament.Participants.Count == tournament.MaxParticipants)
+                    return BadRequest(Result.Failure(
+                        $"Cannot participate since tournament has already reached the max allowed number of participants"));
                 if (tournament.Type != TournamentType.Doubles)
                     return BadRequest(
                         Result.Failure("Registration for singles & teams tournaments are handled separately!"));
@@ -330,6 +339,9 @@ public class TournamentsController : ApiController
                     Logger.LogInformation($"An attempt to add a participant to an ongoing tournament has been made. TournamentId: {input.ParticipantInput.TournamentId}. Endpoint: {nameof(AddSinglesParticipant)}. Input: {input}");
                     return BadRequest(Result.Failure($"Cannot add a participant to an ongoing in an ongoing tournament. Tournament {input.ParticipantInput.TournamentId}."));
                 }
+                if (tournament.Participants.Count == tournament.MaxParticipants)
+                    return BadRequest(Result.Failure(
+                        $"Cannot participate since tournament has already reached the max allowed number of participants"));
                 if (tournament.Type != TournamentType.Singles)
                     return BadRequest(
                         Result.Failure("Registration for doubles & teams tournaments are handled separately!"));
