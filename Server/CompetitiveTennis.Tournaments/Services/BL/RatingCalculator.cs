@@ -53,9 +53,11 @@ public class RatingCalculator : IRatingCalculator
 
         if (homeParticipant.IsGuest && awayParticipant.IsGuest)
             return Array.Empty<NewRatingPerAccount>();
-        return homeParticipant.IsGuest ?
-            new NewRatingPerAccount[] { new(awayParticipant.Players.Single().Id, awayNewRating) } :
-            new NewRatingPerAccount[] {new(homeParticipant.Players.Single().Id, homeNewRating), new(awayParticipant.Players.Single().Id, awayNewRating)};
+        if (homeParticipant.IsGuest)
+            return new NewRatingPerAccount[] {new(awayParticipant.Players.Single().Id, awayNewRating)};
+        if (awayParticipant.IsGuest)
+            return new NewRatingPerAccount[] {new(homeParticipant.Players.Single().Id, homeNewRating)};
+        return new NewRatingPerAccount[] {new(homeParticipant.Players.Single().Id, homeNewRating), new(awayParticipant.Players.Single().Id, awayNewRating)};
     }
 
     // Handles doubles match rating adjustments

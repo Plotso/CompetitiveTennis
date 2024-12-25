@@ -30,10 +30,11 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
     {
         if (matchResultsInputModel == null)
             return;
+        var previousMatchOutcome = await _matchesService.GetMatchOutcome(matchId);
         var matchOutcome = GetMatchOutcome(matchResultsInputModel);
         await _matchesService.UpdateOutcomeAndStatus(matchId, matchOutcome, status: matchResultsInputModel.IsEnded ? EventStatus.Ended : EventStatus.InProgress);
         if (matchResultsInputModel.IsEnded && !matchResultsInputModel.MatchPeriods.IsNullOrEmpty())
-            await UpdateRatingsAndSuccessorMatchParticipants(matchId);
+            await UpdateRatingsAndSuccessorMatchParticipants(matchId, previousMatchOutcome);
         
     }
 
@@ -41,9 +42,10 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
     {
         if (matchCustomConditionResultInputModel == null)
             return;
+        var previousMatchOutcome = await _matchesService.GetMatchOutcome(matchId);
         await _matchesService.UpdateOutcomeWithCondition(matchId, matchCustomConditionResultInputModel.MatchOutcome, matchCustomConditionResultInputModel.OutcomeCondition, status: EventStatus.Ended);    
         //ToDo: InDepth revise the code below
-        await UpdateRatingsAndSuccessorMatchParticipants(matchId);
+        await UpdateRatingsAndSuccessorMatchParticipants(matchId, previousMatchOutcome);
     }
 
     /// <summary>
@@ -78,17 +80,24 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
         return hasSuccessorMatchStarted.HasValue && hasSuccessorMatchStarted.Value;
     }
 
-    private async Task UpdateRatingsAndSuccessorMatchParticipants(int matchId)
+    private async Task UpdateRatingsAndSuccessorMatchParticipants(int matchId, MatchOutcome? previousOutcomeOfTheMatch)
     {
         var slimMatchOutputModel = await _matchesService.GetForRatingCalculations(matchId);
         var matchResultSummaryWithRatings = GetMatchResultSummaryWithRatings(slimMatchOutputModel);
         var isDoubles = await _matchesService.IsDoubles(matchId);
-        var updatedRating = _ratingCalculator.CalculateRatings(matchResultSummaryWithRatings, isDoubles: isDoubles ?? false);
-        foreach(var accountRating in updatedRating)
+        var hasOutcomeUpdate = !previousOutcomeOfTheMatch.HasValue || previousOutcomeOfTheMatch != matchResultSummaryWithRatings.Outcome;
+        var hasPreviousWinner = previousOutcomeOfTheMatch == MatchOutcome.ParticipantOne || previousOutcomeOfTheMatch == MatchOutcome.ParticipantTwo;
+        if(hasOutcomeUpdate && hasPreviousWinner)
         {
-            await _accountsService.UpdatePlayerRating(accountRating.AccountId, accountRating.NewRating);
-            await UpdateSuccessorMatchParticipant(matchId, slimMatchOutputModel, matchResultSummaryWithRatings);
+            //ToDo: Rollback player ratings
+            
+            //matchResultSummaryWithRatings = matchResultSummaryWithRatings with {Participants = UpdatedMatchParticipantRating()}
         }
+        var updatedRating = _ratingCalculator.CalculateRatings(matchResultSummaryWithRatings, isDoubles: isDoubles ?? false);
+        if (hasOutcomeUpdate) // prevent rating updates when same score is resubmitted multiple times
+            foreach(var accountRating in updatedRating)
+                await _accountsService.UpdatePlayerRating(accountRating.AccountId, accountRating.NewRating);
+        await UpdateSuccessorMatchParticipant(matchId, slimMatchOutputModel, matchResultSummaryWithRatings);
     }
 
     private async Task UpdateSuccessorMatchParticipant(int matchId, SlimMatchOutputModel slimMatchOutputModel,

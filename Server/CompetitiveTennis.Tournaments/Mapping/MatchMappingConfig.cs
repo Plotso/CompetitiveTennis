@@ -3,6 +3,7 @@
 using Contracts.Match;
 using Contracts.Participant;
 using Data.Models;
+using Extensions;
 using Mapster;
 using Models.MatchOutcomeHandler.RatingCalculations;
 
@@ -50,20 +51,13 @@ public class MatchMappingConfig : IRegister
         return participantModels;
     }
 
-    private List<ParticipantRatingOutputModel> MapParticipantsToParticipantRatingOutputModels(Match source)
-    {
-        if (source.Participants == null)
-            return null;
-        var participantModels = new List<ParticipantRatingOutputModel>();
+    private List<ParticipantRatingOutputModel> MapParticipantsToParticipantRatingOutputModels(Match source) 
+        => source.Participants == null ?
+            null :
+            source.Participants.Select(participantMatch => new ParticipantRatingOutputModel(participantMatch.Participant.Id, participantMatch.Participant.IsGuest, participantMatch.Specifier, ConvertAccounts(participantMatch.Participant.Players))).ToList();
 
-        foreach (var participantMatch in source.Participants)
-        {
-            var participantModel = participantMatch.Participant.Adapt<ParticipantRatingOutputModel>();
-            participantModel = participantModel with {Specifier = participantMatch.Specifier};
-
-            participantModels.Add(participantModel);
-        }
-
-        return participantModels;
-    }
+    private static AccountRatingOutputModel[] ConvertAccounts(ICollection<AccountParticipant> participantAccounts) 
+        => participantAccounts.IsNullOrEmpty() ?
+            Array.Empty<AccountRatingOutputModel>() :
+            participantAccounts.Select(pa => new AccountRatingOutputModel(pa.Account.Id, pa.Account.PlayerRating)).ToArray();
 }

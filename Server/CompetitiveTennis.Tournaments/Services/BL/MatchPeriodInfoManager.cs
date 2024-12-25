@@ -58,7 +58,7 @@ public class MatchPeriodInfoManager : IMatchPeriodInfoManager
         var matchPeriodId = await _matchPeriodsService.GetMatchPeriodId(match.Id, matchPeriodInput.Set, matchPeriodInput.Game);
         if (matchPeriodId is null)
             matchPeriodId = await _matchPeriodsService.Create(matchPeriodInput, match);
-        else
+        else //ToDo: Maybe optimise this to only trigger DB update if there is change in the entry
             await _matchPeriodsService.Update(matchPeriodId.Value, matchPeriodInput);
             
         var matchPeriod = await _matchPeriodsService.GetInternal(matchPeriodId!.Value);
