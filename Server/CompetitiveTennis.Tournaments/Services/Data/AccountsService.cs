@@ -68,7 +68,7 @@ public class AccountsService : DataService<Account>, IAccountsService
     /// </summary>
     /// <exception cref="MissingEntryException">In case provided user cannot be located in the DB</exception>
     /// <exception cref="InvalidOperationException">Internal service or infrastructure error</exception>
-    public async Task UpdatePlayerRating(string userId, int newRating)
+    public async Task UpdatePlayerRating(string userId, int newRating, bool isDoubles)
     {
         try
         {
@@ -76,7 +76,10 @@ public class AccountsService : DataService<Account>, IAccountsService
             if (account == null)
                 throw new MissingEntryException($"Cannot update rating for non-existing account. UserId: {userId}");
 
-            account.PlayerRating = newRating;
+            if(isDoubles)
+                account.DoublesRating = newRating;
+            else
+                account.PlayerRating = newRating;
             await SaveAsync(account);
         }
         catch (MissingEntryException)
@@ -90,7 +93,7 @@ public class AccountsService : DataService<Account>, IAccountsService
         }
     }
 
-    public async Task UpdatePlayerRating(int accountId, int newRating)
+    public async Task UpdatePlayerRating(int accountId, int newRating, bool isDoubles)
     {
         try
         {
@@ -98,7 +101,10 @@ public class AccountsService : DataService<Account>, IAccountsService
             if (account == null)
                 throw new MissingEntryException($"Cannot update rating for non-existing account. AccountId: {accountId}");
 
-            account.PlayerRating = newRating;
+            if(isDoubles)
+                account.DoublesRating = newRating;
+            else
+                account.PlayerRating = newRating;
             await SaveAsync(account);
         }
         catch (MissingEntryException)

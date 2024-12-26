@@ -98,10 +98,10 @@ public class RatingCalculator : IRatingCalculator
             throw new ArgumentNullException($"{nameof(ParticipantRatingOutputModel)} cannot be null");
         if (participantRatingOutputModel.IsGuest)
             return participantRatingOutputModel.Players.Any()
-                ? ServiceConstants.DefaultPlayerRating + participantRatingOutputModel.Players.Sum(p => p.PlayerRating)
+                ? ServiceConstants.DefaultPlayerRating + participantRatingOutputModel.Players.Sum(p => p.DoublesPlayerRating)
                 : 2 * ServiceConstants.DefaultPlayerRating; // 2 guests case
         
-        return participantRatingOutputModel.Players.Sum(p => p.PlayerRating);
+        return participantRatingOutputModel.Players.Sum(p => p.DoublesPlayerRating);
     }
 
     // Calculates expected score

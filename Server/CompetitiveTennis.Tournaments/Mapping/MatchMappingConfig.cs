@@ -59,5 +59,5 @@ public class MatchMappingConfig : IRegister
     private static AccountRatingOutputModel[] ConvertAccounts(ICollection<AccountParticipant> participantAccounts) 
         => participantAccounts.IsNullOrEmpty() ?
             Array.Empty<AccountRatingOutputModel>() :
-            participantAccounts.Select(pa => new AccountRatingOutputModel(pa.Account.Id, pa.Account.PlayerRating)).ToArray();
+            participantAccounts.Select(pa => new AccountRatingOutputModel(pa.Account.Id, pa.Account.PlayerRating, pa.Account.DoublesRating)).ToArray();
 }

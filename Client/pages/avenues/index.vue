@@ -34,7 +34,7 @@ const getDistinctCourtTypes = (avenue: AvenueOutputModel): CourtType[] => {
 </script>
 <template>
     <div class="view-window">
-        <Banner title="All Avenues">
+        <Banner title="All Avenues" background-img="/imgs/avenues-banner.png">
             <div>
                 <div v-if="authStore.user.username" class="buttons is-centered">
                     <hr>

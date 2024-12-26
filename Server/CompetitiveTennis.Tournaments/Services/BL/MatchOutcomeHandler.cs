@@ -5,6 +5,7 @@ using Contracts.Match;
 using Extensions;
 using Interfaces.BL;
 using Interfaces.Data;
+using Models;
 using Models.MatchOutcomeHandler;
 using Models.MatchOutcomeHandler.RatingCalculations;
 using Tournaments.Data;
@@ -15,13 +16,15 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
     private readonly IRatingCalculator _ratingCalculator;
     private readonly IAccountsService _accountsService;
     private readonly IParticipantsService _participantsService;
+    private readonly ILogger<MatchOutcomeHandler> _logger;
 
-    public MatchOutcomeHandler(IMatchesService matchesService, IRatingCalculator ratingCalculator, IAccountsService accountsService, IParticipantsService participantsService)
+    public MatchOutcomeHandler(IMatchesService matchesService, IRatingCalculator ratingCalculator, IAccountsService accountsService, IParticipantsService participantsService, ILogger<MatchOutcomeHandler> logger)
     {
         _matchesService = matchesService;
         _ratingCalculator = ratingCalculator;
         _accountsService = accountsService;
         _participantsService = participantsService;
+        _logger = logger;
     }
     /// <summary>
     /// Update match outcome, recalculate player ratings & update participants for successor match
@@ -35,7 +38,8 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
         await _matchesService.UpdateOutcomeAndStatus(matchId, matchOutcome, status: matchResultsInputModel.IsEnded ? EventStatus.Ended : EventStatus.InProgress);
         if (matchResultsInputModel.IsEnded && !matchResultsInputModel.MatchPeriods.IsNullOrEmpty())
             await UpdateRatingsAndSuccessorMatchParticipants(matchId, previousMatchOutcome);
-        
+        if (!matchResultsInputModel.IsEnded && previousMatchOutcome != MatchOutcome.NoOutcome)
+            await RollbackPlayerRatings(matchId);
     }
 
     public async Task HandleMatchOutcome(int matchId, MatchCustomConditionResultInputModel matchCustomConditionResultInputModel)
@@ -87,17 +91,86 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
         var isDoubles = await _matchesService.IsDoubles(matchId);
         var hasOutcomeUpdate = !previousOutcomeOfTheMatch.HasValue || previousOutcomeOfTheMatch != matchResultSummaryWithRatings.Outcome;
         var hasPreviousWinner = previousOutcomeOfTheMatch == MatchOutcome.ParticipantOne || previousOutcomeOfTheMatch == MatchOutcome.ParticipantTwo;
-        if(hasOutcomeUpdate && hasPreviousWinner)
+        var ratingsRollback = false;
+        if(hasOutcomeUpdate && hasPreviousWinner && (isDoubles == null || !isDoubles.Value)) //sadly, for doubles matches new mechanism for rollbacks should be implemented
         {
             //ToDo: Rollback player ratings
-            
-            //matchResultSummaryWithRatings = matchResultSummaryWithRatings with {Participants = UpdatedMatchParticipantRating()}
+            var matchParticipantsInfo = await _matchesService.GetMatchParticipantsInfo(matchId);
+            if (!matchParticipantsInfo.IsNullOrEmpty())
+            {
+                matchResultSummaryWithRatings = matchResultSummaryWithRatings with
+                {
+                    Participants = RollbackMatchParticipantRatingInOutputModel(matchResultSummaryWithRatings.Participants, matchParticipantsInfo, isDoubles: isDoubles ?? false)
+                };
+
+                ratingsRollback = true;
+            }
         }
         var updatedRating = _ratingCalculator.CalculateRatings(matchResultSummaryWithRatings, isDoubles: isDoubles ?? false);
-        if (hasOutcomeUpdate) // prevent rating updates when same score is resubmitted multiple times
+        if (hasOutcomeUpdate || ratingsRollback) // prevent rating updates when same score is resubmitted multiple times
             foreach(var accountRating in updatedRating)
-                await _accountsService.UpdatePlayerRating(accountRating.AccountId, accountRating.NewRating);
+                await _accountsService.UpdatePlayerRating(accountRating.AccountId, accountRating.NewRating, isDoubles: isDoubles ?? false);
         await UpdateSuccessorMatchParticipant(matchId, slimMatchOutputModel, matchResultSummaryWithRatings);
+    }
+
+    private async Task RollbackPlayerRatings(int matchId)
+    {
+        var isDoubles = await _matchesService.IsDoubles(matchId);
+        if (isDoubles ?? false) //sadly, for doubles matches new mechanism for rollbacks should be implemented
+            return;
+        var matchParticipantsInfo = await _matchesService.GetMatchParticipantsInfo(matchId);
+        foreach (var participantRatingInfo in matchParticipantsInfo)
+        {
+            var participant = await _participantsService.GetInternal(participantRatingInfo.ParticipantId);
+            if (participant is not null)
+            {
+                if (participant.Players.Count() > 1) //abort since only singles should be updated
+                {
+                    _logger.LogError($"Aborting {nameof(RollbackPlayerRatings)} due to participant with more than 1 account linked to it. MatchId: {matchId}.");
+                    return;
+                }
+
+                var accountParticipant = participant.Players.FirstOrDefault();
+                if (accountParticipant is not null && participantRatingInfo.PrematchRating.HasValue)
+                {
+                    await _accountsService.UpdatePlayerRating(accountParticipant.Account.Id, participantRatingInfo.PrematchRating.Value, isDoubles: isDoubles ?? false);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Doubles are not supported for rating rollbacks at the moment due to approach limitations
+    /// </summary>
+    private IEnumerable<ParticipantRatingOutputModel> RollbackMatchParticipantRatingInOutputModel(IEnumerable<ParticipantRatingOutputModel> participants, IEnumerable<MatchParticipantRatingInfo> matchParticipantsInfo, bool isDoubles)
+    {
+        if (isDoubles || matchParticipantsInfo.IsNullOrEmpty() || participants.IsNullOrEmpty() || matchParticipantsInfo.Count() != participants.Count())
+            return participants;
+        
+        var result = new List<ParticipantRatingOutputModel>(participants.Count());
+        foreach (var participant in participants)
+        {
+            var matchParticipantInfo = matchParticipantsInfo.FirstOrDefault(mp => mp.ParticipantId == participant.Id);
+            if (matchParticipantInfo is null)
+                return participants;
+            var accounts = participant.Players;
+            if (!isDoubles && accounts.Count() > 1)
+            {
+                _logger.LogError($"Aborting {nameof(RollbackMatchParticipantRatingInOutputModel)} due to participant with more than 1 account linked to it. ParticipantId: {participant.Id}.");
+                return participants;
+            }
+            if (accounts.Count() == 1)
+            {
+                var accountInfo = accounts.Single();
+                var playersRating = isDoubles ? accountInfo.PlayerRating : matchParticipantInfo.PrematchRating;
+                var doublesRating = accountInfo.DoublesPlayerRating; //ToDo: This needs to be updated once rollback of doubles rating is supported
+                result.Add(participant with { Players = new[] { new AccountRatingOutputModel(accountInfo.Id, playersRating ?? accountInfo.PlayerRating, doublesRating ) } });
+            }
+            else
+                result.Add(participant);
+        }
+
+        return result;
     }
 
     private async Task UpdateSuccessorMatchParticipant(int matchId, SlimMatchOutputModel slimMatchOutputModel,
@@ -122,7 +195,7 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
 
     private MatchOutcome GetMatchOutcome(MatchResultsInputModel matchResultsInputModel)
     {
-        if (!matchResultsInputModel.IsEnded || matchResultsInputModel.MatchPeriods.IsNullOrEmpty())
+        if (!matchResultsInputModel.IsEnded || EnumerableExtensions.IsNullOrEmpty(matchResultsInputModel.MatchPeriods))
             return MatchOutcome.NoOutcome;
 
         var periodsInfo = matchResultsInputModel.MatchPeriods.Select(MatchPeriodShortInfo.FromMatchPeriodInput).ToArray();

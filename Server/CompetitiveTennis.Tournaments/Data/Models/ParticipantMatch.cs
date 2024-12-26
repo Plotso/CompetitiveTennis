@@ -10,4 +10,5 @@ public class ParticipantMatch : CompositeKeyDeletableEntity
     public Match Match { get; set; }
     
     public string Specifier { get; set; }
+    public int? PrematchRating { get; set; }
 }

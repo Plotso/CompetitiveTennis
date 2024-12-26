@@ -20,9 +20,9 @@ public interface IAccountsService : IDataService<Account>
     /// </summary>
     /// <exception cref="MissingEntryException">In case provided user cannot be located in the DB</exception>
     /// <exception cref="InvalidOperationException">Internal service or infrastructure error</exception>
-    Task UpdatePlayerRating(string userId, int newRating);
+    Task UpdatePlayerRating(string userId, int newRating, bool isDoubles);
     /// <exception cref="MissingEntryException">In case provided user cannot be located in the DB</exception>
     /// <exception cref="InvalidOperationException">Internal service or infrastructure error</exception>
-    Task UpdatePlayerRating(int accountId, int newRating);
+    Task UpdatePlayerRating(int accountId, int newRating, bool isDoubles);
     Task Create(AccountCreateInputModel createModel);
 }

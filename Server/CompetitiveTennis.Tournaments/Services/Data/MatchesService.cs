@@ -5,10 +5,12 @@ using CompetitiveTennis.Data.Models.Enums;
 using Contracts.Match;
 using CompetitiveTennis.Tournaments.Data;
 using CompetitiveTennis.Tournaments.Data.Models;
+using Extensions;
 using Interfaces.Data;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Models;
 using Models.MatchOutcomeHandler.RatingCalculations;
 
 public class MatchesService : DeletableDataService<Match>, IMatchesService
@@ -61,6 +63,18 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
 
     public async Task<Match> GetInternal(int id)
         => await All().Where(m => m.Id == id).SingleOrDefaultAsync();
+
+    public async Task<IEnumerable<MatchParticipantRatingInfo>> GetMatchParticipantsInfo(int matchId)
+    {
+        var match = await AllAsNoTracking()
+            .Where(m => m.Id == matchId)
+            .Include(m => m.Participants)
+            .SingleOrDefaultAsync();
+        if (match == null || match.Participants.IsNullOrEmpty())
+            return Array.Empty<MatchParticipantRatingInfo>();
+
+        return match.Participants.Select(mp => new MatchParticipantRatingInfo(match.Id, mp.ParticipantId, mp.PrematchRating, mp.Specifier));
+    }
 
     /// <summary>
     /// Check whether match status is != NotStarted or whether it has any period scores
@@ -136,7 +150,10 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
 
     public async Task<bool> UpdateParticipant(int id, Participant newParticipant, bool isHome)
     {
-        var match = await All().Include(m => m.Participants).SingleOrDefaultAsync(m => m.Id == id);
+        var match = await All()
+            .Include(m => m.Tournament)
+            .Include(m => m.Participants)
+            .SingleOrDefaultAsync(m => m.Id == id);
         if (match == null)
             return false;
 
@@ -154,7 +171,10 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
 
     public async Task<bool> UpdateParticipants(int id, Participant homeParticipant, Participant awayParticipant)
     {
-        var match = await All().Include(m => m.Participants).SingleOrDefaultAsync(m => m.Id == id);
+        var match = await All()
+            .Include(m => m.Tournament)
+            .Include(m => m.Participants)
+            .SingleOrDefaultAsync(m => m.Id == id);
         if (match == null)
             return false;
         
@@ -297,11 +317,19 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
 
     private async Task AddParticipant(Match match, Participant participant, string specifier)
     {
+        var prematchRating = match.Tournament.Type == TournamentType.Doubles ?
+            participant.Players.Sum(p => p.Account.DoublesRating) :  
+            participant.Players.Sum(p => p.Account.PlayerRating);
+
+        if (prematchRating == 0)
+            prematchRating = 1000;
+            
         var entities = new ParticipantMatch
         {
             Match = match,
             Participant = participant,
-            Specifier = specifier
+            Specifier = specifier,
+            PrematchRating = prematchRating
         };
         await Data.Set<ParticipantMatch>().AddAsync(entities);
     }

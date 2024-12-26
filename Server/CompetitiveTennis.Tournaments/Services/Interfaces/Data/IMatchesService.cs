@@ -4,6 +4,7 @@ using CompetitiveTennis.Data;
 using CompetitiveTennis.Data.Models.Enums;
 using Contracts.Match;
 using CompetitiveTennis.Tournaments.Data.Models;
+using Models;
 using Models.MatchOutcomeHandler.RatingCalculations;
 
 public interface IMatchesService : IDataService<Match>
@@ -16,6 +17,8 @@ public interface IMatchesService : IDataService<Match>
     Task<int?> GetTournamentIdForMatch(int matchId);
 
     Task<Match> GetInternal(int id);
+    
+    Task<IEnumerable<MatchParticipantRatingInfo>> GetMatchParticipantsInfo(int matchId);
     /// <summary>
     /// Check whether match status is != NotStarted or whether it has any period scores
     /// </summary>

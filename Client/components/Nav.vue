@@ -124,7 +124,7 @@ function linkClicked() {
   color: white
 }
 
-.user-link.transparent {
+.user-link {
   color: #00d1b2
 }
 

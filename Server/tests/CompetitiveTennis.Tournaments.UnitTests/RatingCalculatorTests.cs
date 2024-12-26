@@ -177,8 +177,8 @@ public class RatingCalculatorTests
             IsGuest: false,
             Players: new List<AccountRatingOutputModel>
             {
-                new(1, 1500),
-                new(2, 1500)
+                new(1, 1500, 1500),
+                new(2, 1500, 1500)
             }
         );
         var awayParticipant = new ParticipantRatingOutputModel(
@@ -187,8 +187,8 @@ public class RatingCalculatorTests
             IsGuest: false,
             Players: new List<AccountRatingOutputModel>
             {
-                new(3, 1400),
-                new(4, 1400)
+                new(3, 1400, 1400),
+                new(4, 1400, 1400)
             }
         ); 
         
@@ -219,14 +219,14 @@ public class RatingCalculatorTests
                     Id: 1,
                     Specifier: DataConstants.ParticipantSpecifiers.Home,
                     IsGuest: false,
-                    Players: new List<AccountRatingOutputModel> { new(1, 1600) }
+                    Players: new List<AccountRatingOutputModel> { new(1, 1600, 1600) }
                 ),
                 new 
                 (
                     Id: 2,
                     Specifier: DataConstants.ParticipantSpecifiers.Away,
                     IsGuest: false,
-                    Players: new List<AccountRatingOutputModel> { new(2, 1500) }
+                    Players: new List<AccountRatingOutputModel> { new(2, 1500, 1500) }
                 )
             }
         );
@@ -249,8 +249,8 @@ public class RatingCalculatorTests
                     IsGuest: false,
                     Players: new List<AccountRatingOutputModel>
                     {
-                        new(1, 1500),
-                        new(2, 1500)
+                        new(1, 1500, 1500),
+                        new(2, 1500, 1500)
                     }
                 ),
                 new 
@@ -260,8 +260,8 @@ public class RatingCalculatorTests
                     IsGuest: false,
                     Players: new List<AccountRatingOutputModel>
                     {
-                        new(3, 1400),
-                        new(4, 1400)
+                        new(3, 1400, 1400),
+                        new(4, 1400, 1400)
                     }
                 )
             }

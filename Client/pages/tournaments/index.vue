@@ -173,7 +173,7 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
 
 <template>
     <div class="view-window">
-        <Banner title="All Tournaments">            
+        <Banner title="All Tournaments" background-img="/imgs/ongoing-tournament-banner.png">            
             <div>
                 <div v-if="user.username" class="buttons is-centered">
                 <hr>

@@ -18,7 +18,7 @@ public class ParticipantsService : DeletableDataService<Participant>, IParticipa
     }
 
     public async Task<Participant?> GetInternal(int id)
-        => await All()
+        => await All()//ToDo: Decide whether we need to return tournament as well here
             .Include(p=> p.Players)
             .ThenInclude(p => p.Account)
             .FirstOrDefaultAsync(p => p.Id == id);
