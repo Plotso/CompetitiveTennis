@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: "default-transparent",
+});
 import { TournamentOutputModel, Result, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel, ParticipantShortOutputModel } from '@/types'; // Update the path as per your project setup
 import { storeToRefs } from 'pinia';
 import ParticipateDoublesModal from '~/components/ParticipateDoublesModal.vue';

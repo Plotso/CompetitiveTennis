@@ -1,8 +1,4 @@
 <script setup lang="ts">
-
-definePageMeta({
-  layout: "default-alt",
-});
 import {MatchShortOutputModel, Result} from "types"
 import MatchOverview from "~/components/MatchOverview.vue";
 const route = useRoute();

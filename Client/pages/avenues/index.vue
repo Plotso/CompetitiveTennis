@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: "default-transparent",
+});
 import { AvenueOutputModel, Result, Surface, CourtsInfo, CourtType } from '@/types';
 import { useAuthStore } from '@/stores/auth'
 const config = useRuntimeConfig();
