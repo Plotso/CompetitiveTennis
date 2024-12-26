@@ -115,6 +115,7 @@ const deleteScoresForMath = async () => {
     <NuxtLink :to="`/tournaments/${match.tournamentId}`" class="custom-link has-text-weight-semibold">Go back to tournament</NuxtLink>
     <div class="score-overview">
       <!-- Tabs for Summary and Point by Point -->
+       <hr>
       <div class="tab-container">
         <button @click="setActiveTab('summary')" :class="[{'is-active': isActive('summary')}, 'button']">Summary</button>
         <button @click="setActiveTab('point-by-point')" :class="[{'is-active': isActive('point-by-point')}, 'button']" v-show="match.matchPeriods && match.matchPeriods.length > 0">Point by Point</button>
