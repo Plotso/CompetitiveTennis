@@ -324,6 +324,10 @@ const cancel = () => {
 </template>
 
 <style scoped>
+
+.container {
+  padding-top: 7%;
+}
 .toggle-button {
   padding: 8px 12px;
   border: none;

@@ -26,6 +26,17 @@ const options: Intl.DateTimeFormatOptions = {
 
 const showLoadingModal = ref(false)
 
+
+const isMatchPeriodInputModalOpen = ref(false);
+
+const openMatchPeriodInputModal = () => {
+  isMatchPeriodInputModalOpen.value = true;
+};
+
+const closeMatchPeriodInputModal = () => {
+  isMatchPeriodInputModalOpen.value = false;
+};
+
 const startDate = computed(() => new Date(match.value.startDate).toLocaleDateString(undefined, options).replace(' at', ''));
 
 const isAuthorized = computed(() => {
@@ -138,7 +149,10 @@ const formatEventStatus = (status: EventStatus) => {
       <div v-if="isAuthorized" class="buttons is-centered">
 
         <p>
-          TODO: Add add/edit scores button
+          
+          <button class="button is-primary is-centered"  @click="openMatchPeriodInputModal()">
+        Add Match Period Info
+        </button>
         </p>
       </div>
 
@@ -147,6 +161,14 @@ const formatEventStatus = (status: EventStatus) => {
 
   <!--MODALS-->
   <LoadingModal :isOpen="showLoadingModal" />
+  <MatchPeriodInputModal
+:isOpen="isMatchPeriodInputModalOpen"
+:matchId="mData.data.id"
+:homeParticipantName="mData.data.homeParticipant.name"
+:awayParticipantName="mData.data.awayParticipant.name"
+:existingMatchPeriods="mData.data.matchPeriods"
+@close="closeMatchPeriodInputModal()"
+/>
 </template>
 
 <style scoped>
@@ -167,7 +189,6 @@ const formatEventStatus = (status: EventStatus) => {
 }
 
 .player-name {
-  
   font-weight: bold;
 }
 

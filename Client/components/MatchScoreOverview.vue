@@ -69,17 +69,6 @@ const setActiveTab = (newActiveTab: string) => {
 
 const isActive = (tabName: string) => activeTab.value == tabName;
 
-
-const isMatchPeriodInputModalOpen = ref(false);
-
-const openMatchPeriodInputModal = () => {
-  isMatchPeriodInputModalOpen.value = true;
-};
-
-const closeMatchPeriodInputModal = () => {
-  isMatchPeriodInputModalOpen.value = false;
-};
-
 const openConfirmationModal = () => {
   isConfirmationModalOpen.value = true;
 };
@@ -127,14 +116,13 @@ const deleteScoresForMath = async () => {
     <div class="score-overview">
       <!-- Tabs for Summary and Point by Point -->
       <div class="tab-container">
-        <button @click="setActiveTab('summary')" class="button">Summary</button>
-        <button @click="setActiveTab('point-by-point')" class="button" v-show="match.matchPeriods && match.matchPeriods.length > 0">Point by Point</button>
+        <button @click="setActiveTab('summary')" :class="[{'is-active': isActive('summary')}, 'button']">Summary</button>
+        <button @click="setActiveTab('point-by-point')" :class="[{'is-active': isActive('point-by-point')}, 'button']" v-show="match.matchPeriods && match.matchPeriods.length > 0">Point by Point</button>
       </div>
 
       <!-- Summary View -->
       <div v-if="isActive('summary')" class="summary-view">
-        <!-- Display summary table -->
-        Summary
+        <MatchScoreSummary :match="match"/>
       </div>
 
       <!-- Point by Point View -->
@@ -143,23 +131,22 @@ const deleteScoresForMath = async () => {
         Point by point
       </div>
 
-      <div class="box">
-        Insert scores here
+      <div class="box ">
+
         <div v-if="isAuthorized">
-          <button class="button is-primary"  @click="openMatchPeriodInputModal()">
-        Add Match Period Info
-        </button>
-
-<form  @submit.prevent="openConfirmationModal" v-if="mData.data.matchPeriods"> 
-  
-  <div class="field">
-    <div class="control buttons is-centered">
-      <button class="button is-danger" type="submit">Delete Periods & Scores for Match</button>
-    </div>
-  </div>
-</form>
-
-        
+          <!--
+          <button class="button is-primary is-centered"  @click="openMatchPeriodInputModal()">
+            Add Match Period Info
+          </button>
+          -->
+          <form  @submit.prevent="openConfirmationModal" v-if="mData.data.matchPeriods"> 
+            
+            <div class="field">
+              <div class="control buttons is-centered">
+                <button class="button is-danger" type="submit">Delete Periods & Scores for Match</button>
+              </div>
+            </div>
+          </form>        
         </div>
       </div>
     </div>
@@ -178,18 +165,15 @@ message="You are not authorized to execute the desired action!"
 @close="closeUnathorizedModal"
 />
   </div>
-  <MatchPeriodInputModal
-:isOpen="isMatchPeriodInputModalOpen"
-:matchId="mData.data.id"
-:homeParticipantName="mData.data.homeParticipant.name"
-:awayParticipantName="mData.data.awayParticipant.name"
-:existingMatchPeriods="mData.data.matchPeriods"
-@close="closeMatchPeriodInputModal()"
-/>
 </template>
 
 <style scoped>
-.container {}
+
+.button.is-active {
+  background-color: #00d1b2;
+  color: white;
+  border-color: #00d1b2;
+}
 
 .tab-container {
   /*text-align: center; */

@@ -31,7 +31,7 @@ if(error && error.statusCode == 404)
 }
 </script>
 
-<template>
+<template class="container">
     <div v-if="pending" class="view-window">
         <Loading></Loading>
     </div>
@@ -43,5 +43,7 @@ if(error && error.statusCode == 404)
 </template>
 
 <style scoped>
-
+.container {
+    padding-top: 5%;
+}
 </style>

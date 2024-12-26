@@ -28,7 +28,7 @@ const tournamentName = ref(data.value.data);
   <div class="container">
     <div class="tournament-header">
       <NuxtLink :to="`/tournaments/${tournamentId}`" class="tournament-header-item">
-        <h1 class="tournament-name"><font-awesome-icon icon="fa fa-trophy" /> : {{ tournamentName }}</h1>
+        <h1 class="tournament-name"><font-awesome-icon icon="fa fa-trophy" />  {{ tournamentName }}</h1>
       </NuxtLink>
       
     </div>
@@ -41,6 +41,7 @@ const tournamentName = ref(data.value.data);
 <style scoped>
 .container {
   margin-top: 20px;
+  padding-top: 3%;
 }
 
 .box {
