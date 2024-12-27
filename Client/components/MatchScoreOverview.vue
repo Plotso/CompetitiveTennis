@@ -121,15 +121,12 @@ const deleteScoresForMath = async () => {
         <button @click="setActiveTab('point-by-point')" :class="[{'is-active': isActive('point-by-point')}, 'button']" v-show="match.matchPeriods && match.matchPeriods.length > 0">Point by Point</button>
       </div>
 
-      <!-- Summary View -->
       <div v-if="isActive('summary')" class="summary-view">
         <MatchScoreSummary :match="match"/>
       </div>
 
-      <!-- Point by Point View -->
       <div v-else class="point-by-point-view">
-        <!-- Display point by point view for each set -->
-        Point by point
+        <MatchScorePointByPoint :match="match"/>
       </div>
 
       <div class="box ">

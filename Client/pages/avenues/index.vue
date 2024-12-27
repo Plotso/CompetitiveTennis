@@ -61,7 +61,7 @@ const getDistinctCourtTypes = (avenue: AvenueOutputModel): CourtType[] => {
                                     width="75" height="75">
                             </td>
                             <td>
-                                <NuxtLink :to="`/avenues/${avenue.id}`" class="has-text-weight-semibold">{{
+                                <NuxtLink :to="`/avenues/${avenue.id}`" class="custom-link has-text-weight-semibold">{{
                                     avenue.name }}</NuxtLink>
 
                                 <p class="mb-1">
