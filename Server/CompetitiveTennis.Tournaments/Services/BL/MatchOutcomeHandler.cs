@@ -36,7 +36,8 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
         var previousMatchOutcome = await _matchesService.GetMatchOutcome(matchId);
         var matchOutcome = GetMatchOutcome(matchResultsInputModel);
         await _matchesService.UpdateOutcomeAndStatus(matchId, matchOutcome, status: matchResultsInputModel.IsEnded ? EventStatus.Ended : EventStatus.InProgress);
-        if (matchResultsInputModel.IsEnded && !matchResultsInputModel.MatchPeriods.IsNullOrEmpty())
+        var hasSuccessorMatchEnded = await HasSuccessorMatchEnded(matchId); //If successor match has ended, player ratings should be adjusted since this will mess up everything afterwards
+        if (matchResultsInputModel.IsEnded && !matchResultsInputModel.MatchPeriods.IsNullOrEmpty() && !hasSuccessorMatchEnded)
             await UpdateRatingsAndSuccessorMatchParticipants(matchId, previousMatchOutcome);
         if (!matchResultsInputModel.IsEnded && previousMatchOutcome != MatchOutcome.NoOutcome)
             await RollbackPlayerRatings(matchId);
@@ -49,7 +50,9 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
         var previousMatchOutcome = await _matchesService.GetMatchOutcome(matchId);
         await _matchesService.UpdateOutcomeWithCondition(matchId, matchCustomConditionResultInputModel.MatchOutcome, matchCustomConditionResultInputModel.OutcomeCondition, status: EventStatus.Ended);    
         //ToDo: InDepth revise the code below
-        await UpdateRatingsAndSuccessorMatchParticipants(matchId, previousMatchOutcome);
+        var hasSuccessorMatchEnded = await HasSuccessorMatchEnded(matchId); //If successor match has ended, player ratings should be adjusted since this will mess up everything afterwards
+        if (hasSuccessorMatchEnded)
+            await UpdateRatingsAndSuccessorMatchParticipants(matchId, previousMatchOutcome);
     }
 
     /// <summary>
@@ -81,6 +84,15 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
         if (matchFlow is null) 
             return false;
         var hasSuccessorMatchStarted = await _matchesService.HasMatchStarted(matchFlow.SuccessorMatchId);
+        return hasSuccessorMatchStarted.HasValue && hasSuccessorMatchStarted.Value;
+    }
+
+    public async Task<bool> HasSuccessorMatchEnded(int matchId)
+    {
+        var matchFlow = await _matchesService.GetMatchFlow(matchId);
+        if (matchFlow is null) 
+            return false;
+        var hasSuccessorMatchStarted = await _matchesService.HasMatchEnded(matchFlow.SuccessorMatchId);
         return hasSuccessorMatchStarted.HasValue && hasSuccessorMatchStarted.Value;
     }
 

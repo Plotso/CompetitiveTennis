@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { Surface, TournamentType, Result, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchOutcome, EventStatus, MatchShortOutputModel, MatchPeriodOutcome } from "@/types"
+import { Surface, TournamentType, Result, TournamentStage, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchOutcome, EventStatus, MatchShortOutputModel, MatchPeriodOutcome } from "@/types"
 import {useAuthStore} from "~/stores/auth"
 const props = defineProps({
     data: {type: Object as PropType<Result<SlimTournamentOutputModel>>, required: true}
@@ -132,7 +132,9 @@ const hideRemoveParticipantErrorNotification = () => {
     showRemoveParticipantErrorNotification.value = false;
 }
 
-
+const isMatchWinner = (match: MatchShortOutputModel, side: 'home' | 'away') => {
+  return (side === 'home' && match.outcome === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantOne]) || (side === 'away' && match.outcome === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantTwo]);
+};
 
 
 const participate = async (tournamentId: number) => {
@@ -178,6 +180,18 @@ const participate = async (tournamentId: number) => {
   }
 }
 
+const getStageString = (stage: string) => {
+    switch(stage){
+        case "RoundOf16":
+            return "1/8 Final";
+        case "QuarterFinal":
+            return "1/4 Final";
+        case "SemiFinal":
+            return "Semi Final";
+        default:
+            return stage;
+    }
+}
 
 
 const generateDraw = async (tournamentId: number) => {
@@ -402,11 +416,11 @@ const generateDraw = async (tournamentId: number) => {
               {{ new Date(match.startDate).toLocaleDateString(undefined, options).replace(' at', '') }}
             </td>
             <td>{{ match.id }}</td>
-            <td>{{ match.stage }}</td>
-            <td>
+            <td>{{ getStageString(match.stage) }}</td>
+            <td :class="{ 'tournament-match-winner': isMatchWinner(match, 'home') }">
                 {{ match.homeParticipant?.name ?? "Unknown" }}
             </td>
-            <td>
+            <td :class="{ 'tournament-match-winner': isMatchWinner(match, 'away') }">
                 {{ match.awayParticipant?.name ?? "Unknown"}}</td>
             <td>
               <span v-if="match.status === EventStatus[EventStatus.NotStarted]"><font-awesome-icon icon="fa-solid fa-calendar-days" /> &nbsp</span>
@@ -485,5 +499,16 @@ const generateDraw = async (tournamentId: number) => {
 
 .remove-participant-button {
   font-size: x-small;
+}
+
+.custom-link {
+  text-decoration: underline;
+  color: #00d1b2 !important;
+}
+
+/* Winner styling */
+.tournament-match-winner {
+  font-weight: bold;
+  color: #00d1b2;
 }
 </style>

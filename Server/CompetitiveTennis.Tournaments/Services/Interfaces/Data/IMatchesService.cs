@@ -23,6 +23,7 @@ public interface IMatchesService : IDataService<Match>
     /// Check whether match status is != NotStarted or whether it has any period scores
     /// </summary>
     Task<bool?> HasMatchStarted(int id);
+    Task<bool?> HasMatchEnded(int id);
     Task<MatchOutcome?> GetMatchOutcome(int id);
     Task<bool?> IsDoubles(int id);
 

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { Surface, TournamentType, Result, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchShortOutputModel, EventStatus, MatchPeriodOutcome } from "@/types"
+import { Surface, TournamentType, Result, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchShortOutputModel, EventStatus, MatchPeriodOutcome, OutcomeCondition } from "@/types"
 import { useAuthStore } from "~/stores/auth"
+import MatchConditionalOutcomeModal from './MatchConditionalOutcomeModal.vue';
 const props = defineProps({
   data: { type: Object as PropType<Result<MatchShortOutputModel>>, required: true },
   organiserUsername: String
@@ -35,6 +36,17 @@ const openMatchPeriodInputModal = () => {
 
 const closeMatchPeriodInputModal = () => {
   isMatchPeriodInputModalOpen.value = false;
+};
+
+
+const isMatchConditionalOutcomeModalOpen = ref(false);
+
+const openMatchConditionalOutcomeModal = () => {
+  isMatchConditionalOutcomeModalOpen.value = true;
+};
+
+const closeMatchConditionalOutcomeModal = () => {
+  isMatchConditionalOutcomeModalOpen.value = false;
 };
 
 const startDate = computed(() => new Date(match.value.startDate).toLocaleDateString(undefined, options).replace(' at', ''));
@@ -105,6 +117,26 @@ const formatEventStatus = (status: EventStatus) => {
   }
 };
 
+const formatOutcomeCondition = (outcomeCondition: OutcomeCondition) => {
+  switch(outcomeCondition) {
+    case OutcomeCondition[OutcomeCondition.Points]: {
+      return "Points 🎾";
+    }
+    case OutcomeCondition[OutcomeCondition.Injury]: {
+      return "Injury 🤕";
+    }
+    case OutcomeCondition[OutcomeCondition.Disqualification]: {
+      return "Disqualification 🧑‍⚖️";
+    }
+    case OutcomeCondition[OutcomeCondition.Withdrawal]: {
+      return "Player Withdrawal 🏳️";
+    }
+    default: {
+      return "Unknown"
+    }
+  }
+};
+
 </script>
 
 <template>
@@ -134,6 +166,8 @@ const formatEventStatus = (status: EventStatus) => {
             {{ getScore() }}
           </p>
           <p class="event-status is-size-4 is-uppercase is-size-4-mobile">{{ formatEventStatus(match.status) }}</p>
+          
+          <p class="outcome-condition is-size-7" v-if="match.outcomeCondition">- {{ formatOutcomeCondition(match.outcomeCondition) }} -</p>
         </div>
 
         <!-- Away Player -->
@@ -148,11 +182,14 @@ const formatEventStatus = (status: EventStatus) => {
 
       <div v-if="isAuthorized" class="buttons is-centered">
 
-        <p>
-          
+        <p>          
           <button class="button is-primary is-centered"  @click="openMatchPeriodInputModal()">
-        Add Match Period Info
-        </button>
+            Add Match Period Info
+          </button>
+
+          <button class="button is-primary is-centered" @click="openMatchConditionalOutcomeModal()">
+          Add Conditional Outcome
+          </button>
         </p>
       </div>
 
@@ -168,6 +205,13 @@ const formatEventStatus = (status: EventStatus) => {
 :awayParticipantName="mData.data.awayParticipant.name"
 :existingMatchPeriods="mData.data.matchPeriods"
 @close="closeMatchPeriodInputModal()"
+/>
+  <MatchConditionalOutcomeModal
+:isOpen="isMatchConditionalOutcomeModalOpen"
+:matchId="mData.data.id"
+:home-side-name="mData.data.homeParticipant.name"
+:away-side-name="mData.data.awayParticipant.name"
+@close="closeMatchConditionalOutcomeModal()"
 />
 </template>
 

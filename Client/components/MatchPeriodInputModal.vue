@@ -95,6 +95,10 @@ const gamesForSelectedSet = computed(() => {
     }));
 });
 
+const sortedScoresForGame = (gameInfo) => {
+  return gameInfo.scores.sort((a, b) => a.periodPointNumber - b.periodPointNumber);
+}
+
 
 const canAddDeuceInSelectedSetAndGame = computed(() => {
   // Find the current period for the selected set and game
@@ -322,6 +326,7 @@ const addDeuceScore = (set: number, game: number) => {
     : lastPointWinner === MatchOutcome.Participant2Won 
       ? MatchOutcome.Participant1Won 
       : MatchOutcome.Unknown;
+      //ToDo: This code here is incorrect when player is returning from more than 1 point down
 
   console.log(lastScore.participant1Points);
   console.log(lastScore.participant2Points);
@@ -722,7 +727,7 @@ const saveMatchPeriods = async (isEnded = false) => {
                 <div class="field">
 
                   <div v-show="includeScores">
-                    <div v-for="(score, scoreIndex) in gameInfo.scores" :key="scoreIndex" class="score-row">
+                    <div v-for="(score, scoreIndex) in sortedScoresForGame(gameInfo)" :key="scoreIndex" class="score-row">
                       <div class="score-points-wrapper">
                         <div class="score-points">
                           <!-- Input for Participant 1 Points with validation -->
@@ -823,6 +828,7 @@ const saveMatchPeriods = async (isEnded = false) => {
   :title="'Match Winner Confirmation'"
   :message="`${matchWinnerName} would be the outcome of the match if submitted with current scores. If the match will have more points to be played/added, or the output of the game is an extraordinary case, please select 'Save Scores Without Finalizing'. This will allow to manually add winner later. If the winner seems wrongs, click Cancel and revise the scores.`"
   :winner="matchWinnerName"
+  :is-scores-input="true"
   @confirm-winner="handleConfirmWinner"
   @save-scores="handleSaveScores"
   @close="closeMatchWinnerModal"

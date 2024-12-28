@@ -16,5 +16,6 @@ public record MatchOutputModel(
     string? Details,
     EventStatus Status,
     MatchOutcome Outcome,
+    OutcomeCondition OutcomeCondition,
     IEnumerable<MatchPeriodOutputModel> MatchPeriods,
     IEnumerable<ParticipantShortOutputModel> Participants);

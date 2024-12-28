@@ -37,7 +37,7 @@ public static class MatchInfoProvider
 
         return new MatchShortOutputModel(matchOutput.Id, matchOutput.StartDate, matchOutput.MatchWonPoints,
             matchOutput.SetWonPoints, matchOutput.GameWonPoints, matchOutput.Stage,
-            matchOutput.Details, matchOutput.Status, matchOutput.Outcome, OutcomeCondition: null,
+            matchOutput.Details, matchOutput.Status, matchOutput.Outcome, OutcomeCondition: matchOutput.OutcomeCondition,
             homePredecesorMatch?.MatchId,
             awayPredecesorMatch?.MatchId,
             homeParticipantInfo, awayParticipantInfo, matchOutput.MatchPeriods, tournamentMatchFlowInfo.Id, GetMatchResults(matchOutput.MatchPeriods));

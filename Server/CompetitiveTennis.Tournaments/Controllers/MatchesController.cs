@@ -96,7 +96,8 @@ public class MatchesController : ApiController
                 
                 var isInvalidChangeOfWinnerOperation = await _matchOutcomeHandler.IsChangeOfWinnerForMatchWithAlreadyStartedSuccessorMatch(id, matchResultsInputModel);
                 if (isInvalidChangeOfWinnerOperation)
-                    return new ForbidResult("Changing of scores leading to change of the winner of a match are not allowed after the respective winner already started the successor match (next stage of the tournament)!");
+                    return BadRequest(Result.Failure(
+                        "Changing of scores leading to change of the winner of a match are not allowed after the respective winner already started the successor match (next stage of the tournament)!"));
 
                 await _matchPeriodInfoManager.PersistPeriodInfoForMatch(id, matchResultsInputModel.MatchPeriods);
                 // Update match status, calculate player ratings & update participant for successor match id
@@ -123,7 +124,8 @@ public class MatchesController : ApiController
                 
                 var isInvalidChangeOfWinnerOperation = await _matchOutcomeHandler.IsChangeOfWinnerForMatchWithAlreadyStartedSuccessorMatch(id, matchCustomConditionResultInput.MatchOutcome);
                 if (isInvalidChangeOfWinnerOperation)
-                    return new ForbidResult("Changes to the winner of a match are not allowed after the respective winner already started the successor match (next stage of the tournament)!");
+                    return BadRequest(Result.Failure(
+                        "Changing of scores leading to change of the winner of a match are not allowed after the respective winner already started the successor match (next stage of the tournament)!"));
 
                 // Update match status, calculate player ratings & update participant for successor match id
                 await _matchOutcomeHandler.HandleMatchOutcome(id, matchCustomConditionResultInput);

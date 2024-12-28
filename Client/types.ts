@@ -430,7 +430,7 @@ export namespace Auth {
 
   export interface MatchCustomConditionResultInputModel {
     outcomeCondition: OutcomeCondition;
-    matchOutcome: MatchOutcome;
+    matchOutcome: MatchPeriodOutcome;
   }
 
   export interface MatchResultsOutputModel {

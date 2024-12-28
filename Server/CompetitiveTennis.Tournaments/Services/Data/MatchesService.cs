@@ -88,6 +88,15 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         return match != null && (match.Status != EventStatus.NotStarted || match.Periods.Any());
     }
 
+    public async Task<bool?> HasMatchEnded(int id)
+    {
+        var match = await AllAsNoTracking()
+            .Where(m => m.Id == id)
+            .Include(m => m.Periods)
+            .SingleOrDefaultAsync();
+        return match != null && (match.Status == EventStatus.Ended);
+    }
+
     public async Task<MatchOutcome?> GetMatchOutcome(int id)
         => await AllAsNoTracking().Where(m => m.Id == id).Select(m => m.Outcome).FirstOrDefaultAsync();
 

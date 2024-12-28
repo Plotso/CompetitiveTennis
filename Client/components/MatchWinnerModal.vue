@@ -15,7 +15,7 @@
                 <div class="buttons">
             <slot name="actions">
                 <button class="button is-success is-responsive is-centered" @click="emitConfirmWinner">Confirm Match Outcome is {{ winner }}</button>
-                <button class="button is-info is-responsive is-centered" @click="emitSaveScores">The game is not finished but still send scores without match winner</button>
+                <button class="button is-info is-responsive is-centered" @click="emitSaveScores" v-if="isScoresInput">The game is not finished but still send scores without match winner</button>
                 <button class="button is-danger is-responsive is-centered" @click="close">Cancel</button>
             </slot>
         </div>
@@ -34,6 +34,7 @@ import { MatchOutcome } from '~/types';
     title: String,
     message: String,
     winner: String, // Optional prop to pass the match winner's name
+    isScoresInput: Boolean, // Optional prop to show/hide the scores input fields
   });
   
   const emitConfirmWinner = () => {
