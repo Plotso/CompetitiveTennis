@@ -2,6 +2,8 @@
 import { storeToRefs } from 'pinia';
 import { Surface, TournamentType, Result, TournamentStage, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchOutcome, EventStatus, MatchShortOutputModel, MatchPeriodOutcome } from "@/types"
 import {useAuthStore} from "~/stores/auth"
+import { useParticipantNameBuilder } from '~/composables/useParticipantNameBuilder'
+const { buildHomeParticipantName, buildAwayParticipantName } = useParticipantNameBuilder()
 const props = defineProps({
     data: {type: Object as PropType<Result<SlimTournamentOutputModel>>, required: true}
 })
@@ -418,10 +420,11 @@ const generateDraw = async (tournamentId: number) => {
             <td>{{ match.id }}</td>
             <td>{{ getStageString(match.stage) }}</td>
             <td :class="{ 'tournament-match-winner': isMatchWinner(match, 'home') }">
-                {{ match.homeParticipant?.name ?? "Unknown" }}
+                {{ buildHomeParticipantName(match, true, false) }}
             </td>
             <td :class="{ 'tournament-match-winner': isMatchWinner(match, 'away') }">
-                {{ match.awayParticipant?.name ?? "Unknown"}}</td>
+                {{ buildAwayParticipantName(match, true, false) }}
+            </td>
             <td>
               <span v-if="match.status === EventStatus[EventStatus.NotStarted]"><font-awesome-icon icon="fa-solid fa-calendar-days" /> &nbsp</span>
               <span v-if="match.status === EventStatus[EventStatus.InProgress]"><font-awesome-icon icon="fa-solid fa-hourglass-half" /> &nbsp</span>

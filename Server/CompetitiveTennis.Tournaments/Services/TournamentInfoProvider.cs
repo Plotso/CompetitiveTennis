@@ -24,11 +24,11 @@ public static class TournamentInfoProvider
                 matchOutput.Participants.FirstOrDefault(p => p.Specifier == DataConstants.ParticipantSpecifiers.Away);
 
             var homeParticipantInfo = homeParticipant != null
-                ? new ParticipantInfo(homeParticipant.Id, homeParticipant.IsGuest, GetName(homeParticipant),
+                ? new ParticipantInfo(homeParticipant.Id, homeParticipant.IsGuest, homeParticipant.Name,
                     homeParticipant.Players, homeParticipant.Specifier, homeParticipant.Team)
                 : new ParticipantInfo(-1, true, $"Winner of match {homePredecesorMatch?.MatchId}", new AccountShortOutputModel[0], DataConstants.ParticipantSpecifiers.Home, null);
             var awayParticipantInfo = awayParticipant != null
-                ? new ParticipantInfo(awayParticipant.Id, awayParticipant.IsGuest, GetName(awayParticipant),
+                ? new ParticipantInfo(awayParticipant.Id, awayParticipant.IsGuest, awayParticipant.Name,
                     awayParticipant.Players, awayParticipant.Specifier, awayParticipant.Team)
                 : new ParticipantInfo(-2, true, $"Winner of match {awayPredecesorMatch?.MatchId}", new AccountShortOutputModel[0], DataConstants.ParticipantSpecifiers.Away, null);
 
@@ -47,16 +47,5 @@ public static class TournamentInfoProvider
             outputModel.EndDate,
             outputModel.CreatedOn, outputModel.ModifiedOn, outputModel.Avenue, outputModel.Organiser,
             outputModel.Participants, matches);
-    }
-
-    private static string GetName(ParticipantShortOutputModel participantShortOutputModel)
-    {
-        if (participantShortOutputModel?.Players == null || !participantShortOutputModel.Players.Any())
-            return participantShortOutputModel.Name;
-
-        var playerNames = string.Join(" ,",
-            participantShortOutputModel.Players.Select(p =>
-                $"{p.FirstName} {p.LastName} ({p.Username} | {p.PlayerRating})"));
-        return participantShortOutputModel.IsGuest ? $"{participantShortOutputModel.Name}, {playerNames}" : playerNames;
     }
 }

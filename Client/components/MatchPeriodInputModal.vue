@@ -94,6 +94,19 @@ const gamesForSelectedSet = computed(() => {
       scores: period.scores,
     }));
 });
+// Function to filter games by a given set
+const gamesForCustomSet = (set: number) => {
+  return matchPeriods.value
+    .filter(period => period.set === set) // Filter by the currently selected set
+    .map(period => ({
+      game: period.game,
+      status: period.status,
+      server: period.server,
+      winner: period.winner,
+      isTiebreak: period.isTiebreak,
+      scores: period.scores,
+    }));
+};
 
 const sortedScoresForGame = (gameInfo) => {
   return gameInfo.scores.sort((a, b) => a.periodPointNumber - b.periodPointNumber);
@@ -266,19 +279,6 @@ const calculateMatchWinner = (): MatchOutcome => {
 };
 
 
-const addSet = () => {
-  matchPeriods.value.push({
-    set: selectedSet.value + 1,
-    game: 1,
-    status: EventStatus.NotStarted,
-    winner: MatchOutcome.Unknown,
-    server: EventActor.Unknown,
-    isTiebreak: false,
-    scores: [],
-  });
-  selectedSet.value = matchPeriods.value.length - 1; // Select the newly added set
-  selectedGame.value = 1;
-};
 
 const addScore = (set: number, game: number) => {
   //matchPeriods.value.find(mp => mp.set == set && mp.game == game)?.scores.push({participant1Points: '0', participant2Points:'0'})
@@ -495,6 +495,34 @@ const addGamePeriod = () => {
     scores: [],
   });
 }
+
+const addSet = () => {
+  
+  var sortedSets = setsForMatch.value.sort();
+  let lastSet =  sortedSets[sortedSets.length - 1];
+  var gamesForSet = gamesForCustomSet(lastSet);
+  let server = EventActor.Unknown;
+  if (gamesForSet.length && gamesForSet.length > 0) {
+    var previousGameInAnonymousArrayIndex = gamesForSet.length - 1;
+    var previousGameServer = gamesForSet[previousGameInAnonymousArrayIndex].server;
+    if (previousGameServer == EventActor.Home)
+      server = EventActor.Away;
+    if (previousGameServer == EventActor.Away)
+      server = EventActor.Home;
+  }
+  
+  matchPeriods.value.push({
+    set: lastSet + 1,
+    game: 1,
+    status: EventStatus.NotStarted,
+    winner: MatchOutcome.Unknown,
+    server: server,
+    isTiebreak: false,
+    scores: [],
+  });
+  selectedSet.value = lastSet + 1; // Select the newly added set
+  selectedGame.value = 1;
+};
 
 
 const isScoreValid = (scoreValue: string) => {

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
 import { MatchShortOutputModel } from '~/types';
+import { useParticipantNameBuilder } from '~/composables/useParticipantNameBuilder'
+const { buildHomeParticipantName, buildAwayParticipantName } = useParticipantNameBuilder()
 
 var props = defineProps({
     isOpen: { type: Boolean, required: true },
@@ -37,13 +39,13 @@ const getGamesWon = (match: MatchShortOutputModel|null, setNumber: number, side)
           <table class="table is-fullwidth no-borders">
             <tbody>
               <tr>
-                <td class="player-name">{{ match?.homeParticipant?.name ?? 'Player 1' }}</td>
+                <td class="player-name">{{ buildHomeParticipantName(match, false, false) }}</td>
                 <td v-for="set in setCount" :key="'home-' + set" class="games-won">
                   {{ getGamesWon(match, set, 'home') }}
                 </td>
               </tr>
               <tr>
-                <td class="player-name">{{ match?.awayParticipant?.name ?? 'Player 2' }}</td>
+                <td class="player-name">{{ buildAwayParticipantName(match, false, false) }}</td>
                 <td v-for="set in setCount" :key="'away-' + set" class="games-won">
                   {{ getGamesWon(match, set, 'away') }}
                 </td>
@@ -57,46 +59,6 @@ const getGamesWon = (match: MatchShortOutputModel|null, setNumber: number, side)
       </div>
     </div>
   </template>
-
-  <!--
-<template>
-    <div class="modal" :class="{ 'is-active': isOpen }">
-      <div class="modal-background" @click="closeModal"></div>
-      <div class="modal-card custom-modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Match Details</p>
-          <button class="delete" aria-label="close" @click="closeModal"></button>
-        </header>
-        <section class="modal-card-body">
-          <div class="player-names">
-            <span class="player">{{ match?.homeParticipant?.name ?? 'Player 1' }}</span>
-            <span class="vs">vs</span>
-            <span class="player">{{ match?.awayParticipant?.name ?? 'Player 2' }}</span>
-          </div>
-          <table class="table is-bordered is-fullwidth game-results-table">
-            <thead>
-              <tr>
-                <th>Set</th>
-                <th>{{ match?.homeParticipant?.name ?? 'Player 1' }}</th>
-                <th>{{ match?.awayParticipant?.name ?? 'Player 2' }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="set in match?.results?.setResults || []" :key="set.setNumber">
-                <td>{{ set.setNumber }}</td>
-                <td>{{ set.homeSideGamesWon }}</td>
-                <td>{{ set.awaySideGamesWon }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button is-link" @click="closeModal">Close</button>
-        </footer>
-      </div>
-    </div>
-  </template>
--->
 
 
 <style scoped>

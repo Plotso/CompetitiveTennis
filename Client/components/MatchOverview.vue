@@ -3,6 +3,8 @@ import { storeToRefs } from 'pinia';
 import { Surface, TournamentType, Result, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchShortOutputModel, EventStatus, MatchPeriodOutcome, OutcomeCondition } from "@/types"
 import { useAuthStore } from "~/stores/auth"
 import MatchConditionalOutcomeModal from './MatchConditionalOutcomeModal.vue';
+import { useParticipantNameBuilder } from '~/composables/useParticipantNameBuilder'
+const { buildHomeParticipantName, buildAwayParticipantName } = useParticipantNameBuilder()
 const props = defineProps({
   data: { type: Object as PropType<Result<MatchShortOutputModel>>, required: true },
   organiserUsername: String
@@ -150,7 +152,7 @@ const formatOutcomeCondition = (outcomeCondition: OutcomeCondition) => {
           <!--
             <img :src="homePlayerImage" alt="Home Player Image" />
             -->
-          <p class="player-name">{{ match.homeParticipant.name }}</p>
+          <p class="player-name">{{ buildHomeParticipantName(match, true, false) }}</p>
           <p class="player-ranking">{{ homePlayerRanking }}</p>
         </div>
 
@@ -175,7 +177,7 @@ const formatOutcomeCondition = (outcomeCondition: OutcomeCondition) => {
           <!--
           <img :src="awayPlayerImage" alt="Away Player Image" />
             -->
-          <p class="player-name">{{ match.awayParticipant.name }}</p>
+          <p class="player-name">{{ buildAwayParticipantName(match, true, false) }}</p>
           <p class="player-ranking">{{ awayPlayerRanking }}</p>
         </div>
       </div>
@@ -201,16 +203,16 @@ const formatOutcomeCondition = (outcomeCondition: OutcomeCondition) => {
   <MatchPeriodInputModal
 :isOpen="isMatchPeriodInputModalOpen"
 :matchId="mData.data.id"
-:homeParticipantName="mData.data.homeParticipant.name"
-:awayParticipantName="mData.data.awayParticipant.name"
+:homeParticipantName="buildHomeParticipantName(match, true, false)"
+:awayParticipantName="buildAwayParticipantName(match, true, false)"
 :existingMatchPeriods="mData.data.matchPeriods"
 @close="closeMatchPeriodInputModal()"
 />
   <MatchConditionalOutcomeModal
 :isOpen="isMatchConditionalOutcomeModalOpen"
 :matchId="mData.data.id"
-:home-side-name="mData.data.homeParticipant.name"
-:away-side-name="mData.data.awayParticipant.name"
+:home-side-name="buildHomeParticipantName(match, true, false)"
+:away-side-name="buildAwayParticipantName(match, true, false)"
 @close="closeMatchConditionalOutcomeModal()"
 />
 </template>

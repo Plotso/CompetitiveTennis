@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { defineProps } from 'vue';
 import { MatchShortOutputModel, MatchPeriodOutcome } from '~/types';
+import { useParticipantNameBuilder } from '~/composables/useParticipantNameBuilder'
+const { buildHomeParticipantName, buildAwayParticipantName } = useParticipantNameBuilder()
 
 const props = defineProps({
   match: { type: Object as PropType<MatchShortOutputModel | null>, required: true },
@@ -46,14 +48,14 @@ const showTableHead = false;
       <tbody>
         <!-- Home Player Row -->
         <tr>
-          <td :class="{ 'winner': isWinner('home') }">{{ match?.homeParticipant?.name ?? 'Player 1' }}</td>
+          <td :class="{ 'winner': isWinner('home') }">{{ buildHomeParticipantName(match, false, false) }}</td>
           <td class="sets-won has-text-weight-bold">{{ getTotalSetsWon('home') }}</td>
           <td v-for="set in setCount" :key="'home-' + set" class="game-score">{{ getGamesWon(set, 'home') }}</td>
         </tr>
 
         <!-- Away Player Row -->
         <tr>
-          <td :class="{ 'winner': isWinner('away') }">{{ match?.awayParticipant?.name ?? 'Player 2' }}</td>
+          <td :class="{ 'winner': isWinner('away') }">{{ buildAwayParticipantName(match, false, false) }}</td>
           <td class="sets-won has-text-weight-bold">{{ getTotalSetsWon('away') }}</td>
           <td v-for="set in setCount" :key="'away-' + set" class="game-score">{{ getGamesWon(set, 'away') }}</td>
         </tr>
