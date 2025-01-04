@@ -198,12 +198,62 @@ const hasWinnerInPeriod = computed(() => {
   return lastScore.isWinningPoint;
 });
 
+const canAddPointForPlayer1 = computed(() => {
+  const currentPeriod = matchPeriods.value.find(
+    (period) => period.set === selectedSet.value && period.game === selectedGame.value
+  );
 
+  if (!currentPeriod) return false;
+
+  const lastScore = currentPeriod.scores[currentPeriod.scores.length - 1];
+  if (!lastScore) return true;
+
+  const p1Points = lastScore.participant1Points;
+  const p2Points = lastScore.participant2Points;
+
+  if (canAddDeuceInSelectedSetAndGame.value && parseInt(p1Points) > parseInt(p2Points) && !canNextPointBeWinner.value) {
+    return p1Points !== 'Adv' && parseInt(p2Points) > 0;
+  }
+
+  if (canAddLoveInSelectedSetAndGame.value) {
+    return p1Points === '0';
+  }
+
+  var hasMorePointsThanOpponent = p1Points == 'Adv' || parseInt(p1Points) > parseInt(p2Points);
+  var isNextPointWinnerForPlayer = canNextPointBeWinner.value && hasMorePointsThanOpponent;
+  return !canAddDeuceInSelectedSetAndGame.value && !canAddLoveInSelectedSetAndGame.value && !isNextPointWinnerForPlayer;
+});
+
+const canAddPointForPlayer2 = computed(() => {
+  const currentPeriod = matchPeriods.value.find(
+    (period) => period.set === selectedSet.value && period.game === selectedGame.value
+  );
+
+  if (!currentPeriod) return false;
+
+  const lastScore = currentPeriod.scores[currentPeriod.scores.length - 1];
+  if (!lastScore) return true;
+
+  const p1Points = lastScore.participant1Points;
+  const p2Points = lastScore.participant2Points;
+
+  if (canAddDeuceInSelectedSetAndGame.value && parseInt(p2Points) > parseInt(p1Points) && !canNextPointBeWinner.value) {
+    return p2Points !== 'Adv' && parseInt(p1Points) > 0;
+  }
+
+  if (canAddLoveInSelectedSetAndGame.value) {
+    return p2Points === '0';
+  }
+
+  var hasMorePointsThanOpponent = p2Points == 'Adv' || parseInt(p2Points) > parseInt(p1Points);
+  var isNextPointWinnerForPlayer = canNextPointBeWinner.value && hasMorePointsThanOpponent;
+  return !canAddDeuceInSelectedSetAndGame.value && !canAddLoveInSelectedSetAndGame.value && !isNextPointWinnerForPlayer;
+});
 
 const hasInvalidScores = computed(() => {
-  return matchPeriods.value.some(period =>
-    period.scores.some(score => !isScoreValid(score.participant1Points) || !isScoreValid(score.participant2Points))
-  );
+  var hasInvalidTiebreak = matchPeriods.value.some(period => period.isTiebreak && period.scores.some(score => !isScoreValid(score.participant1Points, true) || !isScoreValid(score.participant2Points, true)));
+  var hasInvalidRegular = matchPeriods.value.some(period => !period.isTiebreak && period.scores.some(score => !isScoreValid(score.participant1Points, false) || !isScoreValid(score.participant2Points, false)));
+  return hasInvalidTiebreak || hasInvalidRegular;
 });
 
 const areAllPeriodsEnded = computed(() => {
@@ -455,8 +505,31 @@ const getScoreValue = (score: string): number => {
   return parseInt(score) || 0; // Convert score to number, default to 0 if invalid
 };
 
+const addPointForPlayer = (set: number, game: number, player: 'Participant1' | 'Participant2') => {
+  const periodIndex = matchPeriods.value.findIndex((period) => period.set === set && period.game === game);
+  if (periodIndex === -1) return;
 
+  const currentPeriod = matchPeriods.value[periodIndex];
+  const scoresInPeriod = currentPeriod.scores;
+  let lastHomeScore = '0';
+  let lastAwayScore = '0';
+  if(scoresInPeriod.length != 0)  {
+    const lastScore = scoresInPeriod[scoresInPeriod.length - 1];
+    lastHomeScore = lastScore.participant1Points;
+    lastAwayScore = lastScore.participant2Points;
+  }
 
+  const nextScore = getNextScore(player === 'Participant1' ? lastHomeScore : lastAwayScore, currentPeriod.isTiebreak);
+
+  const newScore = {
+    periodPointNumber: scoresInPeriod.length + 1,
+    participant1Points: player === 'Participant1' ? nextScore : lastHomeScore,
+    participant2Points: player === 'Participant2' ? nextScore : lastAwayScore,
+    pointWinner: player === 'Participant1' ? MatchOutcome.Participant1Won : MatchOutcome.Participant2Won,
+  };
+
+  scoresInPeriod.push(newScore);
+};
 
 
 const addPeriod = () => {
@@ -523,7 +596,11 @@ const addSet = () => {
 };
 
 
-const isScoreValid = (scoreValue: string) => {
+const isScoreValid = (scoreValue: string, isTiebreak: boolean) => {
+  if (isTiebreak) {
+    return !isNaN(parseInt(scoreValue));
+  }
+
   const validScores = ['0', '15', '30', '40', 'Adv'];
 
   return validScores.includes(scoreValue)
@@ -755,21 +832,23 @@ const saveMatchPeriods = async (isEnded = false) => {
                         <div class="score-points">
                           <!-- Input for Participant 1 Points with validation -->
                           <input v-model="score.participant1Points" class="participant-points"
-                            :class="{ 'invalid-score': !isScoreValid(score.participant1Points) }"
-                            :placeholder="homeParticipantName + 'Points'" />
+                            :class="{ 'invalid-score': !isScoreValid(score.participant1Points, gameInfo.isTiebreak) }"
+                            :placeholder="homeParticipantName + 'Points'"
+                            disabled />
 
                           <span class="dash">-</span>
 
                           <!-- Input for Participant 2 Points with validation -->
                           <input v-model="score.participant2Points" class="participant-points"
-                            :class="{ 'invalid-score': !isScoreValid(score.participant2Points) }"
-                            :placeholder="awayParticipantName + 'Points'" />
+                            :class="{ 'invalid-score': !isScoreValid(score.participant2Points, gameInfo.isTiebreak) }"
+                            :placeholder="awayParticipantName + 'Points'"
+                            disabled />
                         </div>
 
                         <!-- Point winner dropdown -->
                         <div class="point-winner">
                           <label>Point Winner:</label>
-                          <select v-model="score.pointWinner" required>
+                          <select v-model="score.pointWinner" required disabled>
                             <option :value="MatchOutcome.Unknown">Unknown</option>
                             <option :value="MatchOutcome.Participant1Won">{{ homeParticipantName ?? "Home" }}</option>
                             <option :value="MatchOutcome.Participant2Won">{{ awayParticipantName ?? "Away" }}</option>
@@ -779,8 +858,8 @@ const saveMatchPeriods = async (isEnded = false) => {
 
                       <!-- Validation message -->
                       <div class="validation-message"
-                        v-if="!isScoreValid(score.participant1Points) || !isScoreValid(score.participant2Points)">
-                        * Invalid score in {{ !isScoreValid(score.participant1Points) ? homeParticipantName ?? "Home" :
+                        v-if="!isScoreValid(score.participant1Points, gameInfo.isTiebreak) || !isScoreValid(score.participant2Points, gameInfo.isTiebreak)">
+                        * Invalid score in {{ !isScoreValid(score.participant1Points, gameInfo.isTiebreak) ? homeParticipantName ?? "Home" :
                           awayParticipantName ?? "Away" }}! Please use 0, 15, 30, 40, or Adv.
                       </div>
                     </div>
@@ -788,15 +867,13 @@ const saveMatchPeriods = async (isEnded = false) => {
                     <!-- Button to add score -->
                     <div v-if="!hasWinnerInPeriod">
                       <div class="control buttons is-centered">
+                        <button v-if="canAddPointForPlayer1" @click="addPointForPlayer(selectedSet, selectedGame, 'Participant1')" class="button is-rounded">Point {{ homeParticipantName }}</button>
                         <button v-if="canAddLoveInSelectedSetAndGame && !canNextPointBeWinner" @click="addLoveScore(selectedSet, selectedGame)" class="button is-rounded">Love</button>
                         <button v-if="canAddDeuceInSelectedSetAndGame" @click="addDeuceScore(selectedSet, selectedGame)" class="button is-rounded">Deuce</button>
+                        <button v-if="canAddPointForPlayer2" @click="addPointForPlayer(selectedSet, selectedGame, 'Participant2')" class="button is-rounded">Point {{ awayParticipantName }}</button>
                       </div>
-                      <div class="control buttons is-centered" >
-                        <button v-if="canNextPointBeWinner" @click="addWinningPoint(selectedSet, selectedGame)" class="button is-rounded is-success">
-                          Game
-                        </button>
-                        <button @click="addScore(selectedSet, selectedGame)" class="button is-rounded" v-if="!canNextPointBeWinner || !canAddDeuceInSelectedSetAndGame">Add Score for Set
-                          {{ selectedSet }}, Game {{ selectedGame }}</button>
+                      <div class="control buttons is-centered">
+                        <button v-if="canNextPointBeWinner" @click="addWinningPoint(selectedSet, selectedGame)" class="button is-rounded is-success">Game</button>
                       </div>
                     </div>
                     <div v-if="!isInitialScoreInput && hasWinnerInPeriod">
