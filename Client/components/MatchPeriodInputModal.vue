@@ -320,18 +320,9 @@ const addDeuceScore = (set: number, game: number) => {
 
   var sortedScores = scoresInPeriod.sort(s => s.periodPointNumber);
   var lastScore = sortedScores[sortedScores.length - 1];
-  var lastPointWinner = lastScore.pointWinner;
-  var nextPointWinner = lastPointWinner === MatchOutcome.Participant1Won 
-    ? MatchOutcome.Participant2Won 
-    : lastPointWinner === MatchOutcome.Participant2Won 
-      ? MatchOutcome.Participant1Won 
-      : MatchOutcome.Unknown;
-      //ToDo: This code here is incorrect when player is returning from more than 1 point down
+  var nextPointWinner = getNextPointWinnerForDeuce(lastScore);
 
-  console.log(lastScore.participant1Points);
-  console.log(lastScore.participant2Points);
   var deuceScore = getTheHigherScoreWithoutAdv(lastScore.participant1Points, lastScore.participant2Points);
-  console.log(deuceScore);
   
   matchPeriods.value[periodIndex].scores.push({
     periodPointNumber: pointsInPeriod + 1,
@@ -342,10 +333,18 @@ const addDeuceScore = (set: number, game: number) => {
 
 }
 
+const getNextPointWinnerForDeuce = (score: ScoreInputModel): MatchOutcome => {
+  if(score.participant1Points == 'Adv' || score.participant2Points == 'Adv')
+    return score.participant1Points == 'Adv' ? MatchOutcome.Participant1Won : MatchOutcome.Participant2Won;
+  if(score.participant1Points == score.participant2Points)
+    return MatchOutcome.Unknown;
+  return parseInt(score.participant1Points) >= parseInt(score.participant2Points) ? MatchOutcome.Participant2Won : MatchOutcome.Participant1Won
+}
+
 const getTheHigherScoreWithoutAdv = (participant1Points: string, participant2Points: string) =>
 {
     // Return '40' if either participant's score is 'Adv'
-    if(participant1Points == 'Adv' || participant1Points == 'Adv')
+    if(participant1Points == 'Adv' || participant2Points == 'Adv')
       return '40';      
     
     // Convert scores to numbers and return the higher score
@@ -375,7 +374,6 @@ const addLoveScore = (set: number, game: number) => {
     pointWinner: lastScore.participant1Points === '0' ? MatchOutcome.Participant2Won : MatchOutcome.Participant1Won,
   };
 
-  console.log(newScore);
   // Add the new score to the period
   scoresInPeriod.push(newScore);
 };
@@ -546,7 +544,6 @@ const closeUnathorizedModal = () => {
 };
 
 const deletePeriodsAfterSelected = () => {
-  console.log('Hello');
   if(selectedSet.value == 1 && selectedGame.value == 1) return;
 
   var selectedSetOriginalValue = selectedSet.value;
@@ -595,8 +592,6 @@ const deleteMathPeriodsAfterSetAndGameInclusive = async () => {
 };
 
 const saveMatchPeriods = async (isEnded = false) => {
-
-  console.log('addMatchPeriods called')
 
   try {
     const response = await fetch(`${config.public.tournamentsBase}/Matches/AddPeriodInfo/${props.matchId}`, {
