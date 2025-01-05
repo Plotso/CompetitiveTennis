@@ -20,12 +20,12 @@ public class AccountsService : DataService<Account>, IAccountsService
     }
 
     public async Task<IEnumerable<AccountOutputModel>> GetAll()
-        => await All()
+        => await AllAsNoTracking()
             .ProjectToType<AccountOutputModel>()
             .ToListAsync();
 
     public async Task<AccountOutputModel> GetById(int id)
-        => await All()
+        => await AllAsNoTracking()
             .Where(a => a.Id == id)
             .Include(a => a.Participations)
             .ThenInclude(p => p.Participant)
@@ -34,7 +34,7 @@ public class AccountsService : DataService<Account>, IAccountsService
             .SingleOrDefaultAsync();
 
     public async Task<AccountOutputModel> GetByUsernamme(string username)
-        => await All()
+        => await AllAsNoTracking()
             .Where(a => a.Username == username)
             .Include(a => a.Participations)
             .ThenInclude(p => p.Participant)
@@ -51,7 +51,7 @@ public class AccountsService : DataService<Account>, IAccountsService
     {
         try
         {
-            return await All()
+            return await AllAsNoTracking()
                 .Where(a => a.UserId == userId)
                 .Select(a => a.PlayerRating)
                 .SingleOrDefaultAsync();
@@ -120,7 +120,7 @@ public class AccountsService : DataService<Account>, IAccountsService
 
     public async Task Create(AccountCreateInputModel createModel)
     {
-        var existingAccount = await GetByUserId(createModel.UserId);
+        var existingAccount = await AllAsNoTracking().AnyAsync(a => a.UserId == createModel.UserId);
         if (existingAccount == null)
         {
             var account = new Account
