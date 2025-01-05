@@ -13,7 +13,7 @@ const authStore = useAuthStore();
         </Banner>
         <AuthHomeSection v-if="authStore.user.username"/>
         <PublicHomeSection v-else/>
-        <UpcomingCourses/>
+        <UpcomingTournaments/>
     </div>
 </template>
 

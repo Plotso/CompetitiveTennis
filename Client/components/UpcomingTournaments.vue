@@ -4,7 +4,7 @@
 
 <template>
     <div>
-        UPCOMING COURSES
+        UPCOMING Tournaments
     </div>
 </template>
 
