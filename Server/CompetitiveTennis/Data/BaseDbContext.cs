@@ -1,7 +1,5 @@
 ﻿namespace CompetitiveTennis.Data;
 
-using System.Reflection;
-using Configuration;
 using Microsoft.EntityFrameworkCore;
 using Models.Interfaces;
 

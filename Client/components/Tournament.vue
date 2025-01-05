@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { Surface, TournamentType, Result, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel } from "@/types"
+import { Surface, TournamentType, Result, TournamentStage, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchOutcome, EventStatus, MatchShortOutputModel, MatchPeriodOutcome } from "@/types"
 import {useAuthStore} from "~/stores/auth"
+import { useParticipantNameBuilder } from '~/composables/useParticipantNameBuilder'
+const { buildHomeParticipantName, buildAwayParticipantName } = useParticipantNameBuilder()
 const props = defineProps({
     data: {type: Object as PropType<Result<SlimTournamentOutputModel>>, required: true}
 })
@@ -25,10 +27,28 @@ const options: Intl.DateTimeFormatOptions = {
       };
 
 
+
 const showLoadingModal = ref(false)
 const removeParticipantId = ref(-1);
 
 const isParticipantRemovalModalOpen = ref(false);
+
+const getResult = (match: MatchShortOutputModel): string => {
+  if(!match || !match.results || !match.results.setResults || match.results.setResults.length == 0)
+    return "";
+  var result = match.results.setResults.reduce(
+    (result, set) => {
+      if (set.winner === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantOne]) {
+        result.participant1Wins++;
+      } else if (set.winner === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantTwo]) {
+        result.participant2Wins++;
+      }
+      return result;
+    },
+    { participant1Wins: 0, participant2Wins: 0 } // Initial accumulator
+  );
+  return `${result.participant1Wins}:${result.participant2Wins}`
+}
 
 const openParticipantRemovalModal = (participantId: number) => {
   removeParticipantId.value = participantId;
@@ -82,6 +102,19 @@ const closeParticipateDoublesModal = () => {
     isParticipateDoublesModalOpen.value = false;
 };
 
+const isGameDetailsModalOpen = ref(false);
+const selectedMatch = ref<MatchShortOutputModel|null>(null);
+
+const openGameDetailsModal = (match: MatchShortOutputModel) => {
+  selectedMatch.value = match;
+  isGameDetailsModalOpen.value = true;
+};
+
+const closeGameDetailsModal = () => {
+  isGameDetailsModalOpen.value = false;
+  selectedMatch.value = null;
+};
+
 const startDate = computed(() => new Date(tournament.value.startDate).toLocaleDateString(undefined, options).replace(' at', ''));
 const endDate = computed(() => new Date(tournament.value.endDate).toLocaleDateString(undefined, options).replace(' at', ''));
 const hasTournamentStarted = computed(() => tournament.value.matches.length > 0);
@@ -100,6 +133,10 @@ const showRemoveParticipantErrorNotification = ref(false)
 const hideRemoveParticipantErrorNotification = () => {
     showRemoveParticipantErrorNotification.value = false;
 }
+
+const isMatchWinner = (match: MatchShortOutputModel, side: 'home' | 'away') => {
+  return (side === 'home' && match.outcome === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantOne]) || (side === 'away' && match.outcome === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantTwo]);
+};
 
 
 const participate = async (tournamentId: number) => {
@@ -145,6 +182,18 @@ const participate = async (tournamentId: number) => {
   }
 }
 
+const getStageString = (stage: string) => {
+    switch(stage){
+        case "RoundOf16":
+            return "1/8 Final";
+        case "QuarterFinal":
+            return "1/4 Final";
+        case "SemiFinal":
+            return "Semi Final";
+        default:
+            return stage;
+    }
+}
 
 
 const generateDraw = async (tournamentId: number) => {
@@ -259,8 +308,8 @@ const generateDraw = async (tournamentId: number) => {
         
         <div class="box">
           <h2 class="subtitle has-text-centered">Organizer</h2>
+          <p><strong><NuxtLink class="custom-link" :to="`/users/profile/${tournament.organiser.username}`">{{ tournament.organiser.firstName }} {{ tournament.organiser.lastName }} ({{tournament.organiser.username}})</NuxtLink></strong></p>
           <p>{{ tournament.organiser.firstName }} {{ tournament.organiser.lastName }} ({{tournament.organiser.username}})</p>
-          <p>{{ tournament.organiser.lastName }}</p>
         </div>
       </div>
     </div>
@@ -269,9 +318,10 @@ const generateDraw = async (tournamentId: number) => {
       <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-users" /> Participants </h2>
       <div class="has-text-centered" v-if="isAuthorized && !hasTournamentStarted">
         <div class="buttons is-centered">
-          <button class="button" @click="openAddGuestModal">
-            Add Guest
-          </button>
+          <ParticipateButton          
+          :has-max-participants="tournament.participants.length === tournament.maxParticipants"
+          button-label="Add Guest"
+          @participate="openAddGuestModal()"/>
         
           <ParticipateButton v-if="tournament.type == 'Singles'"
           :has-max-participants="tournament.participants.length === tournament.maxParticipants"
@@ -346,27 +396,45 @@ const generateDraw = async (tournamentId: number) => {
       <table class="table is-striped is-fullwidth">
         <thead>
           <tr>
+            <th></th>
             <th>Start Date</th>
             <th>Match Id</th>
             <th>Stage</th>
             <th>Player 1</th>
             <th>Player 2</th>
-            <th>Score</th>
+            <th>Result</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="match in tournament.matches" :key="match.id">
             <td>
+              
+            <NuxtLink :to="`/matches/${match.id}`" class="custom-link has-text-weight-semibold">
+              Details
+            </NuxtLink>
+            </td>
+            <td>
+              
               {{ new Date(match.startDate).toLocaleDateString(undefined, options).replace(' at', '') }}
             </td>
             <td>{{ match.id }}</td>
-            <td>{{ match.stage }}</td>
-            <td>
-                {{ match.homeParticipant?.name ?? "Unknown" }}
+            <td>{{ getStageString(match.stage) }}</td>
+            <td :class="{ 'tournament-match-winner': isMatchWinner(match, 'home') }">
+                {{ buildHomeParticipantName(match, true, false) }}
+            </td>
+            <td :class="{ 'tournament-match-winner': isMatchWinner(match, 'away') }">
+                {{ buildAwayParticipantName(match, true, false) }}
             </td>
             <td>
-                {{ match.awayParticipant?.name ?? "Unknown"}}</td>
-            <td>INSERT SCORE</td>
+              <span v-if="match.status === EventStatus[EventStatus.NotStarted]"><font-awesome-icon icon="fa-solid fa-calendar-days" /> &nbsp</span>
+              <span v-if="match.status === EventStatus[EventStatus.InProgress]"><font-awesome-icon icon="fa-solid fa-hourglass-half" /> &nbsp</span>
+              <span v-if="match.status === EventStatus[EventStatus.Ended]"><font-awesome-icon icon="fa-solid fa-circle-check" /> &nbsp</span>
+              <span v-if="match.results">{{ getResult(match) }} &nbsp</span>
+              <button class="button is-small is-rounded" v-if="match.results"><font-awesome-icon icon="fa-regular fa-eye" @click="openGameDetailsModal(match)"/></button>
+              <!--
+              <span v-for="setResult in match.results?.setResults" :key="setResult.setNumber">{{ setResult.homeSideGamesWon }}:{{ setResult.awaySideGamesWon }}&nbsp</span>
+              -->
+            </td>
           </tr>
         </tbody>
       </table>
@@ -414,6 +482,13 @@ const generateDraw = async (tournamentId: number) => {
 :tournamentParticipants="tournament.participants"
 @close="closeParticipateDoublesModal"
 />
+
+<!-- Game Details Modal -->
+<MatchScoreDetailsSlimModal
+  :isOpen="isGameDetailsModalOpen"
+  :match="selectedMatch"
+  @close="closeGameDetailsModal"
+/>
 </template>
 
 <style scoped>
@@ -427,5 +502,16 @@ const generateDraw = async (tournamentId: number) => {
 
 .remove-participant-button {
   font-size: x-small;
+}
+
+.custom-link {
+  text-decoration: underline;
+  color: #00d1b2 !important;
+}
+
+/* Winner styling */
+.tournament-match-winner {
+  font-weight: bold;
+  color: #00d1b2;
 }
 </style>

@@ -7,8 +7,8 @@ using Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Contracts.Avenue;
-using Services.Interfaces;
-using Constants = CompetitiveTennis.Constants;
+using Services.Interfaces.Data;
+using Constants = Constants;
 
 public class AvenuesController : ApiController
 {
@@ -38,7 +38,7 @@ public class AvenuesController : ApiController
             {
                 var avenue = await _avenues.Get(id);
                 if (avenue == null)
-                    return NotFound(Result<AvenueOutputModel>.Failure($"Avenue {id} is missing"));
+                    return NotFound(Result.Failure($"Avenue {id} is missing"));
                 return Ok(Result<AvenueOutputModel>.SuccessWith(avenue));
             },
             msgOnError: $"An error occurred during GET request for avenue: {id}");

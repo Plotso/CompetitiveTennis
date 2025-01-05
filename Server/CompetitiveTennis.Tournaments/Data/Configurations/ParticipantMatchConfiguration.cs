@@ -28,6 +28,10 @@ public class ParticipantMatchConfiguration : IEntityTypeConfiguration<Participan
         builder
             .Property(pm => pm.Specifier)
             .IsRequired();
+        
+        builder
+            .Property(pm => pm.PrematchRating)
+            .IsRequired(false);
 
         builder
             .Property(pm => pm.CreatedOn)

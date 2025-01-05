@@ -12,8 +12,8 @@ using Contracts.Participant;
 using Contracts.Tournament;
 using Models.TournamentDrawGenerator;
 using Services;
-using Services.Interfaces;
 using Services.Interfaces.BL;
+using Services.Interfaces.Data;
 
 public class TournamentsController : ApiController
 {
@@ -61,10 +61,34 @@ public class TournamentsController : ApiController
             {
                 var tournament = await _tournaments.Get(id);
                 if (tournament == null)
-                    return NotFound(Result<SlimTournamentOutputModel>.Failure($"Tournament {id} does not exist"));
+                    return NotFound(Result.Failure($"Tournament {id} does not exist"));
                 return Ok(Result<SlimTournamentOutputModel>.SuccessWith(TournamentInfoProvider.GetTournamentInfo(tournament)));
             },
             msgOnError: $"An error occurred during GET request for tournament: {id}");
+    
+    [HttpGet]
+    [Route($"{nameof(GetTournamentName)}/{Id}")]
+    public async Task<ActionResult<string>> GetTournamentName(int id)
+        => await SafeHandle(async () =>
+            {
+                var tournamentName = await _tournaments.GetTournamentName(id);
+                if (tournamentName == null)
+                    return NotFound(Result.Failure($"Tournament {id} does not exist"));
+                return Ok(Result<string>.SuccessWith(tournamentName));
+            },
+            msgOnError: $"An error occurred during GET request for tournament name for tournament: {id}");
+    
+    [HttpGet]
+    [Route($"{nameof(GetOrganiserUsername)}/{Id}")]
+    public async Task<ActionResult<string>> GetOrganiserUsername(int id)
+        => await SafeHandle(async () =>
+            {
+                var tournamentOrganiserUsername = await _tournaments.GetOrganiserUsername(id);
+                if (tournamentOrganiserUsername == null)
+                    return NotFound(Result.Failure($"Tournament {id} does not exist"));
+                return Ok(Result<string>.SuccessWith(tournamentOrganiserUsername));
+            },
+            msgOnError: $"An error occurred during GET request for tournament organiser name for tournament: {id}");
 
     [HttpGet]
     [Route(nameof(Search))]
@@ -165,19 +189,22 @@ public class TournamentsController : ApiController
                 var isCurrentUserOrganiser = await IsCurrentUserOrganiser(input.TournamentId);
                 if (!_currentUser.IsAdministrator && !isCurrentUserOrganiser)
                     return Unauthorized(
-                        Result<int>.Failure("Only admins and tournament organiser are allowed to add guests to tournament!"));
+                        Result.Failure("Only admins and tournament organiser are allowed to add guests to tournament!"));
                 if (string.IsNullOrWhiteSpace(input.Name))
-                    return BadRequest(Result<int>.Failure("Name is mandatory for guest participants"));
+                    return BadRequest(Result.Failure("Name is mandatory for guest participants"));
                 
                 var team = input.TeamId.HasValue ? await _teams.GetInternal(input.TeamId.Value) : null;
                 var tournament = await _tournaments.GetInternal(input.TournamentId);
                 if (tournament == null)
-                    return BadRequest(Result<int>.Failure($"Tournament {input.TournamentId} could not be found!"));
+                    return BadRequest(Result.Failure($"Tournament {input.TournamentId} could not be found!"));
                 if (tournament.Matches.Any())
                 {
                     Logger.LogInformation($"An attempt to add guest to an ongoing tournament has been made. TournamentId: {input.TournamentId}. Endpoint: {nameof(AddGuest)}. Input: {input}");
                     return BadRequest(Result.Failure($"Cannot add guest to an ongoing tournament. Tournament {input.TournamentId}."));
                 }
+                if (tournament.Participants.Count == tournament.MaxParticipants)
+                    return BadRequest(Result.Failure(
+                        "Cannot add guest since tournament has already reached the max allowed number of participants"));
                 
                 var participantId = await _participants.Create(input, tournament, team);
                 return Ok(Result<int>.SuccessWith(participantId));
@@ -203,6 +230,9 @@ public class TournamentsController : ApiController
                 if (tournament.Type != TournamentType.Singles)
                     return BadRequest(
                         Result.Failure("Registration for doubles & teams tournaments are handled separately!"));
+                if (tournament.Participants.Count == tournament.MaxParticipants)
+                    return BadRequest(Result.Failure(
+                        $"Cannot participate since tournament has already reached the max allowed number of participants"));
                 
                 var currentAccount = await _accounts.GetByUserId(_currentUser.UserId);
                 if (await _tournaments.IsAccountPresentInAnyParticipant(currentAccount.Id, input.TournamentId))
@@ -230,6 +260,9 @@ public class TournamentsController : ApiController
                     Logger.LogInformation($"An attempt to participate in an ongoing tournament has been made. TournamentId: {input.ParticipantInfo.TournamentId}. Endpoint: {nameof(ParticipateDoubles)}. Input: {input}");
                     return BadRequest(Result.Failure($"Cannot participate in an ongoing tournament. Tournament {input.ParticipantInfo.TournamentId}."));
                 }
+                if (tournament.Participants.Count == tournament.MaxParticipants)
+                    return BadRequest(Result.Failure(
+                        $"Cannot participate since tournament has already reached the max allowed number of participants"));
                 if (tournament.Type != TournamentType.Doubles)
                     return BadRequest(
                         Result.Failure("Registration for singles & teams tournaments are handled separately!"));
@@ -306,6 +339,9 @@ public class TournamentsController : ApiController
                     Logger.LogInformation($"An attempt to add a participant to an ongoing tournament has been made. TournamentId: {input.ParticipantInput.TournamentId}. Endpoint: {nameof(AddSinglesParticipant)}. Input: {input}");
                     return BadRequest(Result.Failure($"Cannot add a participant to an ongoing in an ongoing tournament. Tournament {input.ParticipantInput.TournamentId}."));
                 }
+                if (tournament.Participants.Count == tournament.MaxParticipants)
+                    return BadRequest(Result.Failure(
+                        $"Cannot participate since tournament has already reached the max allowed number of participants"));
                 if (tournament.Type != TournamentType.Singles)
                     return BadRequest(
                         Result.Failure("Registration for doubles & teams tournaments are handled separately!"));

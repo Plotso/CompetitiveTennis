@@ -10,4 +10,7 @@ public static class EnumerableExtensions
                 .Skip((query.Page - 1) * query.ItemsPerPage)
                 .Take(query.ItemsPerPage) :
             new List<T>();
+    
+    public static bool IsNullOrEmpty<T>(this IEnumerable<T> collection)
+        => collection is null || !collection.Any();
 }

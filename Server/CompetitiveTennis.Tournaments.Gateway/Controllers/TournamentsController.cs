@@ -41,6 +41,32 @@ public class TournamentsController : BaseGatewayController
             }, $"An error occurred during GET request for tournament: {id}");
     
     [HttpGet]
+    [Route($"{nameof(GetTournamentName)}/{Id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetTournamentName(int id) 
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var tournament = await _tournaments.GetTournamentName(id);
+                return Ok(tournament);
+            }, $"An error occurred during GET request for tournament name for tournament: {id}");
+    
+    [HttpGet]
+    [Route($"{nameof(GetOrganiserUsername)}/{Id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetOrganiserUsername(int id) 
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var tournament = await _tournaments.GetOrganiserUsername(id);
+                return Ok(tournament);
+            }, $"An error occurred during GET request for tournament organiser username for tournament: {id}");
+    
+    [HttpGet]
     [Route(nameof(Search))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SearchOutputModel<TournamentOutputModel>))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: "default-transparent",
+});
 import {useAuthStore} from "~/stores/auth"
 const authStore = useAuthStore();
 </script>

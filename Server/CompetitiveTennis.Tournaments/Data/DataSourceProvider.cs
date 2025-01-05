@@ -19,6 +19,7 @@ public static class DataSourceProvider
         dataSourceBuilder.MapEnum<TournamentStage>(TournamentStageEnum);
         dataSourceBuilder.MapEnum<EventStatus>(EventStatusEnum);
         dataSourceBuilder.MapEnum<MatchOutcome>(MatchOutcomeEnum);
+        dataSourceBuilder.MapEnum<EventActor>(EventActorEnum);
 
         return dataSourceBuilder.Build();
         /*await using*/

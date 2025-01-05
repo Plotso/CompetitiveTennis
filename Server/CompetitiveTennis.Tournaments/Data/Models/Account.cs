@@ -1,6 +1,5 @@
 ﻿namespace CompetitiveTennis.Tournaments.Data.Models;
 
-using System.Collections.ObjectModel;
 using CompetitiveTennis.Data.Models;
 
 public class Account : BaseDeletableEntity<int>
@@ -14,6 +13,8 @@ public class Account : BaseDeletableEntity<int>
     public string LastName { get; set; }
 
     public int PlayerRating { get; set; }
+    
+    public int DoublesRating { get; set; }
 
     public ICollection<AccountParticipant> Participations { get; set; } = new List<AccountParticipant>();
 

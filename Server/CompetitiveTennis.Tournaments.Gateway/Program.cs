@@ -32,6 +32,7 @@ var serviceEndpoints = builder.Configuration
 builder.Services.AddRefitClient<IAccountsService>().WithConfiguration(serviceEndpoints.Tournaments);
 builder.Services.AddRefitClient<IAvenuesService>().WithConfiguration(serviceEndpoints.Tournaments);
 builder.Services.AddRefitClient<ITournamentsService>().WithConfiguration(serviceEndpoints.Tournaments);
+builder.Services.AddRefitClient<IMatchesService>().WithConfiguration(serviceEndpoints.Tournaments);
 
 var app = builder.Build();
 

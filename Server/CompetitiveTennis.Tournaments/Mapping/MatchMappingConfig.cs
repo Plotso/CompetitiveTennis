@@ -1,11 +1,11 @@
 ﻿namespace CompetitiveTennis.Tournaments.Mapping;
 
-using Contracts.Account;
 using Contracts.Match;
 using Contracts.Participant;
-using Contracts.Team;
 using Data.Models;
+using Extensions;
 using Mapster;
+using Models.MatchOutcomeHandler.RatingCalculations;
 
 public class MatchMappingConfig : IRegister
 {
@@ -13,7 +13,12 @@ public class MatchMappingConfig : IRegister
     {
         config.NewConfig<Match, MatchOutputModel>()
             .Map(dest => dest.Participants,
-                src => MapParticipants(src));
+                src => MapParticipants(src))
+            .Map(dest => dest.MatchPeriods, src => src.Periods);
+        config.NewConfig<Match, SlimMatchOutputModel>()
+            .Map(dest => dest.Participants,
+                src => MapParticipantsToParticipantRatingOutputModels(src))
+            .Map(dest => dest.MatchPeriods, src => src.Periods);
     }
 
     private List<ParticipantShortOutputModel> MapParticipants(Match source)
@@ -45,4 +50,14 @@ public class MatchMappingConfig : IRegister
 
         return participantModels;
     }
+
+    private List<ParticipantRatingOutputModel> MapParticipantsToParticipantRatingOutputModels(Match source) 
+        => source.Participants == null ?
+            null :
+            source.Participants.Select(participantMatch => new ParticipantRatingOutputModel(participantMatch.Participant.Id, participantMatch.Participant.IsGuest, participantMatch.Specifier, ConvertAccounts(participantMatch.Participant.Players))).ToList();
+
+    private static AccountRatingOutputModel[] ConvertAccounts(ICollection<AccountParticipant> participantAccounts) 
+        => participantAccounts.IsNullOrEmpty() ?
+            Array.Empty<AccountRatingOutputModel>() :
+            participantAccounts.Select(pa => new AccountRatingOutputModel(pa.Account.Id, pa.Account.PlayerRating, pa.Account.DoublesRating)).ToArray();
 }

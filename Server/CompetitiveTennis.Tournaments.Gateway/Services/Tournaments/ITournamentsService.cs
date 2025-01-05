@@ -14,6 +14,12 @@ public interface ITournamentsService
     [Get("/Tournaments/{id}")]
     Task<Result<SlimTournamentOutputModel>> ById(int id);
 
+    [Get("/Tournaments/GetTournamentName/{id}")]
+    Task<Result<string>> GetTournamentName(int id);
+
+    [Get("/Tournaments/GetOrganiserUsername/{id}")]
+    Task<Result<string>> GetOrganiserUsername(int id);
+
     [Get("/Tournaments/Search")]
     Task<Result<SearchOutputModel<TournamentOutputModel>>> Search([Query] TournamentQuery query);
     

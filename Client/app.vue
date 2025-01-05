@@ -48,7 +48,7 @@
 }
   
 .custom-link {
-    color: green;
+    color: green !important;
 }
 
 .edit-button {

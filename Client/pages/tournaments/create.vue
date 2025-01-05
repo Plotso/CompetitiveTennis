@@ -295,7 +295,7 @@ const cancel = () => {
             </select>
             <div v-if="selectedAvenue" class="field">
               <span v-if="selectedAvenue">Location: {{ selectedAvenue.location }}</span>
-              <button v-if="selectedAvenue" class="button is-link" @click="openGoogleMaps">View on Google Maps</button>
+              <button v-if="selectedAvenue" class="button is-link" @click="openGoogleMaps" type="button">View on Google Maps</button>
               <br>
             </div>
           </div>
@@ -324,6 +324,10 @@ const cancel = () => {
 </template>
 
 <style scoped>
+
+.container {
+  padding-top: 7%;
+}
 .toggle-button {
   padding: 8px 12px;
   border: none;

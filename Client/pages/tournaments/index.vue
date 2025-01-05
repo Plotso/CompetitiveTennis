@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: "default-transparent",
+});
 import { TournamentOutputModel, Result, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel, ParticipantShortOutputModel } from '@/types'; // Update the path as per your project setup
 import { storeToRefs } from 'pinia';
 import ParticipateDoublesModal from '~/components/ParticipateDoublesModal.vue';
@@ -173,13 +176,13 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
 
 <template>
     <div class="view-window">
-        <Banner title="All Tournaments">            
+        <Banner title="All Tournaments" background-img="/imgs/ongoing-tournament-banner.png">            
             <div>
-                <hr>
                 <div v-if="user.username" class="buttons is-centered">
-                    <NuxtLink to="/tournaments/create" class="button is-primary">Create Tournament</NuxtLink>
-                </div>
                 <hr>
+                    <NuxtLink to="/tournaments/create" class="button is-primary">Create Tournament</NuxtLink>
+                <hr>
+                </div>
             </div>
         </Banner>
     <div v-if="pending">

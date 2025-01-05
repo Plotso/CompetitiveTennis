@@ -131,7 +131,7 @@ const submitForm = async () => {
                                     </p>
                                 </div>
                                 <div class="has-text-centered">
-                                    <p class="is-size-7"> Already have an account? <NuxtLink to="/register" class="has-text-primary">Sign in</NuxtLink></p>
+                                    <p class="is-size-7"> Already have an account? <NuxtLink to="/login" class="has-text-primary">Sign in</NuxtLink></p>
                                     <hr>
                                     <p class="is-size-7"> <NuxtLink to="/" class="has-text-primary">Back to home</NuxtLink></p>
                                 </div>

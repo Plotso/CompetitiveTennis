@@ -6,7 +6,7 @@ using CompetitiveTennis.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Contracts.Account;
-using Services.Interfaces;
+using Services.Interfaces.Data;
 
 public class AccountsController : ApiController
 {
@@ -36,7 +36,7 @@ public class AccountsController : ApiController
             {
                 var account = await _accounts.GetById(id);
                 if (account == null)
-                    return NotFound(Result<AccountOutputModel>.Failure($"Account {id} is missing"));
+                    return NotFound(Result.Failure($"Account {id} is missing"));
                 return Ok(Result<AccountOutputModel>.SuccessWith(account));
             },
             msgOnError: $"An error occurred during GET request for account: {id}");
@@ -48,7 +48,7 @@ public class AccountsController : ApiController
             {
                 var account = await _accounts.GetByUsernamme(username);
                 if (account == null)
-                    return NotFound(Result<AccountOutputModel>.Failure($"Account {username} is missing"));
+                    return NotFound(Result.Failure($"Account {username} is missing"));
                 return Ok(Result<AccountOutputModel>.SuccessWith(account));
             },
             msgOnError: $"An error occurred during GET request for account: {username}");

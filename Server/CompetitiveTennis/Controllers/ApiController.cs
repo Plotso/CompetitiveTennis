@@ -19,9 +19,6 @@ public abstract class ApiController : ControllerBase
     public const string PathSeparator = "/";
     public const string Id = "{id}";
     
-    protected const int UnexpectedErrorCode = -666;
-    protected const int InvalidInputErrorCode = -777;
-    protected const int ProvidedDataNotFound = -888;
     protected ILogger<ApiController> Logger { get; }
 
     protected async Task<ActionResult> SafeHandle(
@@ -29,7 +26,7 @@ public abstract class ApiController : ControllerBase
         string msgOnError = "Unexpected error occurred",
         string msgOnNotFound = "Entry could not be found")
         => await SafeHandle(action,
-            failure: StatusCode((int) HttpStatusCode.InternalServerError, Result.Failure($"ErrorCode: {UnexpectedErrorCode}")),
+            failure: StatusCode((int) HttpStatusCode.InternalServerError, Result.Failure(ErrorInfo.UnexpectedError(msgOnError))),
             msgOnError, msgOnNotFound);
     
     protected async Task<ActionResult> SafeHandle(
@@ -42,19 +39,19 @@ public abstract class ApiController : ControllerBase
         {
             return await action();
         }
-        catch (MissingEntryException exception)
+        catch (MissingEntryException ex)
         {
-            Logger.LogError(exception, msgOnNotFound);
-            return NotFound(Result.Failure($"ErrorCode: {ProvidedDataNotFound}"));
+            Logger.LogError(ex, ex.Message);
+            return NotFound(Result.Failure(ErrorInfo.ProvidedDataNotFoundError(msgOnNotFound)));
         }
         catch (InvalidInputDataException ex)
         {
             Logger.LogError(ex, ex.Message);
-            return BadRequest(Result.Failure($"ErrorCode: {InvalidInputErrorCode}, ErrorMessage: {ex.Message}"));
+            return NotFound(Result.Failure(ErrorInfo.InvalidInputError(msgOnError)));
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, msgOnError);
+            Logger.LogError(ex, ex.Message);
             return failure;
         }
     }

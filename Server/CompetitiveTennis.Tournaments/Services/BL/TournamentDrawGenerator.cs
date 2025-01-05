@@ -2,14 +2,13 @@ namespace CompetitiveTennis.Tournaments.Services.BL;
 
 using CompetitiveTennis.Data.Models.Enums;
 using Configurations;
+using Contracts.Match;
 using Contracts.Participant;
-using Contracts.Tournament;
 using Extensions;
-using Interfaces;
 using Interfaces.BL;
+using Interfaces.Data;
 using Microsoft.Extensions.Options;
 using Models;
-using Models.Match;
 using Models.TournamentDrawGenerator;
 
 public class TournamentDrawGenerator : ITournamentDrawGenerator

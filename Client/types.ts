@@ -74,11 +74,22 @@ export namespace Auth {
     Ended,
   }
 
+  export enum EventActor {
+    Unknown,
+    Home,
+    Away,
+  }
+  export enum MatchPeriodOutcome {
+    NoOutcome,
+    ParticipantOne,
+    ParticipantTwo
+  }
+
   export enum MatchOutcome {
     Unknown,
     Participant1Won,
     Participant2Won,
-    Draw,
+    Draw
   }
 
   export enum OutcomeCondition {
@@ -249,7 +260,7 @@ export namespace Auth {
     status: EventStatus;
     outcome: MatchOutcome;
     outcomeCondition: OutcomeCondition | null;
-    scores: ScoreShortOutputModel[];
+    matchPeriods: MatchPeriodOutputModel[];
     participants: ParticipantShortOutputModel[];
   }
   
@@ -268,17 +279,52 @@ export namespace Auth {
     outcomeCondition: OutcomeCondition | null;
     homeParticipant: ParticipantInfo;
     awayParticipant: ParticipantInfo;
+    matchPeriods: MatchPeriodOutputModel[];
+    tournamentId: number;
+    results: MatchResultsOutputModel | null
+  }
+  
+  export interface MatchPeriodOutputModel {
+    id: number;
+    set: number;
+    game: number;
+    status: EventStatus;
+    winner: MatchPeriodOutcome;
+    server: EventActor;
+    isTiebreak: boolean;
     scores: ScoreShortOutputModel[];
   }
   
   export interface ScoreShortOutputModel {
     id: number;
-    set: number;
-    game: number;
+    periodPointNumber: number;
     participant1Points: string;
     participant2Points: string;
+    pointWinner: MatchPeriodOutcome,
+    isWinningPoint: boolean;
+  }
+
+  export interface MatchPeriodInputModel {
+    set: number;
+    game: number;
     status: EventStatus;
-    pointWinner: MatchOutcome
+    server: EventActor;
+    winner: MatchOutcome;
+    isTiebreak: boolean;
+    scores: ScoreInputModel[];
+  }
+  
+  export interface ScoreInputModel {
+    periodPointNumber: number;
+    participant1Points: string;
+    participant2Points: string;
+    pointWinner: MatchOutcome;
+    isWinningPoint: boolean;
+  }
+
+  export interface MatchOutcomeInputModel {
+    outcomeCondition: OutcomeCondition | null;
+    matchPeriods: MatchPeriodInputModel[];
   }
 
   export interface CourtsInfo {
@@ -381,3 +427,21 @@ export namespace Auth {
     page?: number;
     itemsPerPage?: number;
   }
+
+  export interface MatchCustomConditionResultInputModel {
+    outcomeCondition: OutcomeCondition;
+    matchOutcome: MatchPeriodOutcome;
+  }
+
+  export interface MatchResultsOutputModel {
+    setResults: SetResultOutput[];
+  }
+  
+  export interface SetResultOutput {
+    setNumber: number; // Using `number` since TypeScript does not have `sbyte` type
+    winner: MatchPeriodOutcome;
+    homeSideGamesWon: number; // Using `number` for `short`
+    awaySideGamesWon: number; // Using `number` for `short`
+  }
+  
+  
