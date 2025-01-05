@@ -309,7 +309,6 @@ const generateDraw = async (tournamentId: number) => {
         <div class="box">
           <h2 class="subtitle has-text-centered">Organizer</h2>
           <p>{{ tournament.organiser.firstName }} {{ tournament.organiser.lastName }} ({{tournament.organiser.username}})</p>
-          <p>{{ tournament.organiser.lastName }}</p>
         </div>
       </div>
     </div>

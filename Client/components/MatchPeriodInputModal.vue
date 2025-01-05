@@ -544,8 +544,32 @@ const addPeriod = () => {
   });
 }
 
+const canAddMoreGames = computed(() => {
+  if (!matchPeriods || matchPeriods.length === 0) {
+    return true;
+  }
+  const periodsForSelectedSet = matchPeriods.value.filter(period => period.set === selectedSet.value);
+
+  if (periodsForSelectedSet.length === 0) {
+    return true;
+  }
+
+  const homeGamesWon = periodsForSelectedSet.filter(period => period.winner === MatchOutcome.Participant1Won).length;
+  const awayGamesWon = periodsForSelectedSet.filter(period => period.winner === MatchOutcome.Participant2Won).length;
+
+  const maxGamesWon = Math.max(homeGamesWon, awayGamesWon);
+  const gamesDifference = Math.abs(homeGamesWon - awayGamesWon);
+
+  return !(maxGamesWon >= 6 && gamesDifference >= 2);
+});
+
 
 const addGamePeriod = () => {
+  if (!canAddMoreGames.value) {
+    errorNotification.value = "Cannot add more games to this set since one player has already won enough games to be marked as Set winner.";
+    showErrorNotification.value = true;
+    return;
+  }
   let server = EventActor.Unknown;
   if (gamesForSelectedSet.value.length && gamesForSelectedSet.value.length > 0) {
     var previousGameInAnonymousArrayIndex = gamesForSelectedSet.value.length - 1;
@@ -759,7 +783,7 @@ const saveMatchPeriods = async (isEnded = false) => {
                       gameInfo.game }}</a>
                   </li>
                 </ul>
-                <button class="button is-small ml-2  is-primary is-rounded" @click="addGamePeriod()">+</button>
+                <button class="button is-small ml-2  is-primary is-rounded" @click="addGamePeriod()" :disabled="!canAddMoreGames">+</button>
               </div>
 
               <!-- Game Details for the selected game -->
