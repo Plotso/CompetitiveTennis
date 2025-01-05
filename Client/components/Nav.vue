@@ -93,7 +93,7 @@ function linkClicked() {
         <div class="navbar-end">
           <div class="navbar-item">
             <h1 :class="['welcome-msg', {'transparent': isTransparent}]" v-if="authStore.user.username">
-              Welcome, <NuxtLink :to="`/users/user/${authStore.user.username}`" :class="['user-link', {'transparent': isTransparent}]">{{ authStore.user.username }}</NuxtLink>!
+              Welcome, <NuxtLink :to="`/users/profile/${authStore.user.username}`" :class="['user-link', {'transparent': isTransparent}]">{{ authStore.user.username }}</NuxtLink>!
             </h1>
             <div class="buttons" v-if="authStore.user.username">
               <a class="button is-light custom-button" @click="authStore.logout">

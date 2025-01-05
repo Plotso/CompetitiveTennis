@@ -308,6 +308,7 @@ const generateDraw = async (tournamentId: number) => {
         
         <div class="box">
           <h2 class="subtitle has-text-centered">Organizer</h2>
+          <p><strong><NuxtLink class="custom-link" :to="`/users/profile/${tournament.organiser.username}`">{{ tournament.organiser.firstName }} {{ tournament.organiser.lastName }} ({{tournament.organiser.username}})</NuxtLink></strong></p>
           <p>{{ tournament.organiser.firstName }} {{ tournament.organiser.lastName }} ({{tournament.organiser.username}})</p>
         </div>
       </div>
