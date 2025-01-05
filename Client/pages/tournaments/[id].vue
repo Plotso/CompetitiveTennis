@@ -16,24 +16,13 @@ if(error && error.statusCode == 404)
 {
     //ToDo: Redirect to NotFound page
 }
-
-function rename(){
-    data.value.data.title += " Gosho";
-}
 </script>
 
 <template>
     <div v-if="pending">
         <Loading></Loading>
     </div>
-    <div v-else>
-        <!--
-        <button @click="rename" class="button"> Add Gosho</button>
-        Gosho {{ $route.params }}
-        <h1>{{ data?.data.title }}</h1>
-        <p>{{ data?.data.description }}</p>
--->
-        
+    <div v-else>        
         <Tournament :data="data" v-if="data"></Tournament>
     </div>
 </template>

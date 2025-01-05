@@ -46,7 +46,7 @@ public class AccountsController : ApiController
     public async Task<ActionResult<Result<AccountOutputModel>>> ByUsername(string username) 
         => await SafeHandle(async () =>
             {
-                var account = await _accounts.GetByUsernamme(username);
+                var account = await _accounts.GetByUsername(username);
                 if (account == null)
                     return NotFound(Result.Failure($"Account {username} is missing"));
                 return Ok(Result<AccountOutputModel>.SuccessWith(account));

@@ -33,7 +33,7 @@ public class AccountsService : DataService<Account>, IAccountsService
             .ProjectToType<AccountOutputModel>()
             .SingleOrDefaultAsync();
 
-    public async Task<AccountOutputModel> GetByUsernamme(string username)
+    public async Task<AccountOutputModel> GetByUsername(string username)
         => await AllAsNoTracking()
             .Where(a => a.Username == username)
             .Include(a => a.Participations)
@@ -41,6 +41,19 @@ public class AccountsService : DataService<Account>, IAccountsService
             .Include(a => a.OrganisedTournaments)
             .ProjectToType<AccountOutputModel>()
             .SingleOrDefaultAsync();
+
+    //ToDo: Potentially refactor this to be separate DB calls in order to optimise DB performance by adding limit.
+    public async Task<Account> GetDashboardInfoByUsername(string username)
+        => await AllAsNoTracking()
+            .Where(a => a.Username == username)
+            .Include(a => a.Participations)
+            .ThenInclude(ap => ap.Participant)
+            .ThenInclude(p => p.Matches)
+            .ThenInclude(pm => pm.Match)
+            .Include(a => a.Participations)
+            .ThenInclude(ap => ap.Participant)
+            .ThenInclude(p => p.Tournament)
+            .FirstOrDefaultAsync();
 
     /// <summary>
     /// Retrieve PlayerRating for given account if there is such for current user
