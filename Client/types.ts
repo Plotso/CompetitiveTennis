@@ -4,6 +4,12 @@ export interface Result<TData> {
   data: TData;
 }
 
+export interface SearchOutputModel<TRecord> {
+  results: TRecord[];
+  page: number;
+  total: number;
+}
+
 
 /// Auth
 export namespace Auth {
@@ -401,7 +407,12 @@ export namespace Auth {
     includeCurrentUser: boolean;
   }
 
-  export interface TournamentQuery {
+  export interface PageQuery {
+    page?: number;
+    itemsPerPage?: number;
+  }
+
+  export interface TournamentQuery extends PageQuery {
     keyword?: string;
     hasEntryFee?: boolean | null;
     hasPrize?: boolean | null;
@@ -413,20 +424,30 @@ export namespace Auth {
     dateRangeUntil?: Date | null;
     organiserId?: number | null;
     participantIds?: number[] | null;
-    page?: number;
-    itemsPerPage?: number;
+    participantUsernames?: string[] | null;
   }
   
-  export interface AvenueQuery {
+  export interface AvenueQuery extends PageQuery  {
     keyword?: string;
     city?: string;
     country?: string;
     sortOptions?: SortOptions;
     surface?: Surface | null;
     courtType?: CourtType | null;
-    page?: number;
-    itemsPerPage?: number;
   }
+
+  export interface MatchQuery extends PageQuery {
+    participantUsername?: string;
+    participantName?: string;
+    status?: EventStatus | null;
+    outcomeCondition?: OutcomeCondition | null;
+    tournamentType?: TournamentType | null;
+    dateRangeFrom?: Date | null;
+    dateRangeUntil?: Date | null;
+    sortOptions?: SortOptions;
+    surface?: Surface | null;
+  }
+  
 
   export interface MatchCustomConditionResultInputModel {
     outcomeCondition: OutcomeCondition;

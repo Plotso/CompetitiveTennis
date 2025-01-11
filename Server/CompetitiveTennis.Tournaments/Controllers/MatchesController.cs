@@ -3,6 +3,7 @@
 using CompetitiveTennis.Controllers;
 using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
+using Contracts;
 using Contracts.Match;
 using Contracts.MatchPeriod;
 using Microsoft.AspNetCore.Authorization;
@@ -66,6 +67,18 @@ public class MatchesController : ApiController
                 return Ok(Result<MatchShortOutputModel>.SuccessWith(matchOutput));
             },
             msgOnError: $"An error occurred during GET request for match: {id}");
+    
+    [HttpGet]
+    [Route(nameof(Search))]
+    public async Task<ActionResult<Result<SearchOutputModel<MatchOutputModel>>>> Search([FromQuery] MatchQuery query)
+        => await SafeHandle(async () =>
+            {
+                var matches = await _matches.Query(query);
+                var total = await _matches.Total(query);
+                return Ok(Result<SearchOutputModel<MatchOutputModel>>.SuccessWith(
+                    new SearchOutputModel<MatchOutputModel>(matches, query.Page, total)));
+            },
+            msgOnError: $"An error occurred during Search request with query: {query}");
     
     [HttpGet]
     [Route($"{nameof(GetOrganiserUsername)}/{Id}")]

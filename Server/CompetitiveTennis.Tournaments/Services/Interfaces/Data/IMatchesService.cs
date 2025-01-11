@@ -9,6 +9,10 @@ using Models.MatchOutcomeHandler.RatingCalculations;
 
 public interface IMatchesService : IDataService<Match>
 {
+    Task<IEnumerable<MatchOutputModel>> Query(MatchQuery query);
+    
+    ValueTask<int> Total(MatchQuery query);
+    
     Task<IEnumerable<MatchOutputModel>> GetAll();
     
     Task<MatchOutputModel> Get(int id);

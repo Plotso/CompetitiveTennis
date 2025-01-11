@@ -116,9 +116,8 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             .ToListAsync();
 
     public async Task<IEnumerable<FullTournamentOutputModel>> Query(TournamentQuery query)
-        => _mapper.Map<IEnumerable<FullTournamentOutputModel>>(await GetTournamentsQuery(query)
-                .ToListAsync())
-            .PageFilterResult(query);
+        => _mapper.Map<IEnumerable<FullTournamentOutputModel>>(await GetTournamentsQuery(query).PageFilterResult(query)
+            .ToListAsync());
 
     public async ValueTask<int> Total(TournamentQuery query) => await GetTournamentsQuery(query).CountAsync();
 
@@ -237,6 +236,8 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             dataQuery = dataQuery.Where(t => t.OrganiserId == query.OrganiserId.Value);
         if (query.ParticipantIds != null && query.ParticipantIds.Any())
             dataQuery = dataQuery.Where(t => t.Participants.Any(p => p.Players.Any(acc => query.ParticipantIds.Contains(acc.AccountId))));
+        if (query.ParticipantUsernames != null && query.ParticipantUsernames.Any())
+            dataQuery = dataQuery.Where(t => t.Participants.Any(p => p.Players.Any(acc => query.ParticipantUsernames.Contains(acc.Account.Username))));
 
         if (!string.IsNullOrWhiteSpace(query.Keyword))
         {
