@@ -2,7 +2,7 @@
     <div class="modal" :class="{'is-active': isOpen}">
       <div class="modal-background"></div>
       <div class="modal-content">
-        <Loading></Loading>
+        <BaseLoading></BaseLoading>
       </div>
     </div>
   </template>

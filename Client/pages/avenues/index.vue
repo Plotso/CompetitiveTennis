@@ -47,7 +47,7 @@ const getDistinctCourtTypes = (avenue: AvenueOutputModel): CourtType[] => {
             </div>
         </Banner>
         <div v-if="pending">
-            <Loading></Loading>
+            <BaseLoading></BaseLoading>
         </div>
         <div class="container" v-else>
 

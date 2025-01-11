@@ -337,7 +337,7 @@ const cancel = () => {
         </div>
       </div>
 
-      <ConfirmationModal
+      <ModalsConfirmationModal
       :isOpen="isConfirmationModalOpen"
       title="Confirmation"
       message="Are you sure you want to delete tournament?"
@@ -350,7 +350,7 @@ const cancel = () => {
         {{errorNotification}}
     </div>
 
-<DangerModal
+<ModalsDangerModal
 :isOpen="isUnauthorizedModalOpen"
 title="Unauthorized!"
 message="You are not authorized to delete this tournament!"

@@ -46,6 +46,10 @@
     display: none;
   }
 }
+
+.modal {
+  padding-top: 5%;
+}
   
 .custom-link {
     color: green !important;

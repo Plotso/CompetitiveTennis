@@ -149,14 +149,14 @@ const deleteScoresForMath = async () => {
       </div>
     </div>
     
-    <ConfirmationModal
+    <ModalsConfirmationModal
       :isOpen="isConfirmationModalOpen"
       title="Confirmation"
       message="Are you sure you want to delete all scores for the match?"
       @confirm="deleteScoresForMath"
       @close="closeConfirmationModal"
     />
-    <DangerModal
+    <ModalsDangerModal
 :isOpen="isUnauthorizedModalOpen"
 title="Unauthorized!"
 message="You are not authorized to execute the desired action!"

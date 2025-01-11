@@ -245,15 +245,15 @@ const generateDraw = async (tournamentId: number) => {
     <div v-if="isAuthenticated && !hasTournamentStarted" class="buttons is-centered">
       
       <p v-if="!tournament.participants.find(p => p.players.find(pp => pp.username == user.username))">
-          <ParticipateButton v-if="tournament.type == 'Singles'"
+          <BaseParticipateButton v-if="tournament.type == 'Singles'"
           :has-max-participants="tournament.participants.length === tournament.maxParticipants"
           @participate="participate(tournament.id)"/>
 
-          <ParticipateButton v-if="tournament.type == 'Doubles'"
+          <BaseParticipateButton v-if="tournament.type == 'Doubles'"
           :has-max-participants="tournament.participants.length === tournament.maxParticipants"
           @participate="openParticipateDoublesModal()"/>
 
-          <ParticipateButton v-if="tournament.type == 'Teams'"
+          <BaseParticipateButton v-if="tournament.type == 'Teams'"
           :has-max-participants="tournament.participants.length === tournament.maxParticipants"
           @participate="openParticipateTeamModal()"/>
       </p>
@@ -318,22 +318,22 @@ const generateDraw = async (tournamentId: number) => {
       <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-users" /> Participants </h2>
       <div class="has-text-centered" v-if="isAuthorized && !hasTournamentStarted">
         <div class="buttons is-centered">
-          <ParticipateButton          
+          <BaseParticipateButton          
           :has-max-participants="tournament.participants.length === tournament.maxParticipants"
           button-label="Add Guest"
           @participate="openAddGuestModal()"/>
         
-          <ParticipateButton v-if="tournament.type == 'Singles'"
+          <BaseParticipateButton v-if="tournament.type == 'Singles'"
           :has-max-participants="tournament.participants.length === tournament.maxParticipants"
           button-label="Add Participant"
           @participate="openParticipateSinglesModal()"/>
 
-          <ParticipateButton v-if="tournament.type == 'Doubles'"
+          <BaseParticipateButton v-if="tournament.type == 'Doubles'"
           :has-max-participants="tournament.participants.length === tournament.maxParticipants"
           button-label="Add Doubles Participant"
           @participate="openOrganiserParticipateDoublesModal()"/>
 
-          <ParticipateButton v-if="tournament.type == 'Teams'"
+          <BaseParticipateButton v-if="tournament.type == 'Teams'"
           :has-max-participants="tournament.participants.length === tournament.maxParticipants"
           button-label="Add Team Participant"
           @participate="openParticipateTeamModal()"/>
@@ -443,16 +443,16 @@ const generateDraw = async (tournamentId: number) => {
     </div>
 
     <!--MODALS-->
-    <LoadingModal
+    <ModalsLoadingModal
       :isOpen="showLoadingModal"
     />
-    <AddGuestModal
+    <TournamentAddGuestModal
       :isOpen="isAddGuestModalOpen"
       :tournamentId="tournament.id"
       @close="closeAddGuestModal"
     />
 
-<RemoveParticipantModal
+<TournamentRemoveParticipantModal
   :isOpen="isParticipantRemovalModalOpen"
   title="Participant Removal Confirmation"
   message="Are you sure you want to remove participant?"
@@ -461,13 +461,13 @@ const generateDraw = async (tournamentId: number) => {
   @close="closeParticipantRemovalModal"
 />
 
-<ParticipateSinglesModal
+<TournamentParticipateSinglesModal
 :isOpen="isAddSinglesParticipantModalOpen"
 :tournamentId="tournament.id"
 @close="closeAddSinglesParticipantModal"
 />
 
-<ParticipateDoublesModal
+<TournamentParticipateDoublesModal
 :isOpen="isOrganiserParticipateDoublesModalOpen"
 :includeCurrentUser="false"
 :tournamentId="tournament.id"
@@ -475,7 +475,7 @@ const generateDraw = async (tournamentId: number) => {
 @close="closeOrganiserParticipateDoublesModal"
 />
 
-<ParticipateDoublesModal
+<TournamentParticipateDoublesModal
 :isOpen="isParticipateDoublesModalOpen"
 :includeCurrentUser="true"
 :tournamentId="tournament.id"

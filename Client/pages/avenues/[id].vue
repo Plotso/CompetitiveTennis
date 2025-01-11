@@ -22,7 +22,7 @@ if(error && error.statusCode == 404)
 
 <template>
     <div v-if="pending">
-        <Loading></Loading>
+        <BaseLoading></BaseLoading>
     </div>
     <div v-else>
         <Avenue :data="data" v-if="data"></Avenue>

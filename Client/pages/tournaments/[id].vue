@@ -20,10 +20,10 @@ if(error && error.statusCode == 404)
 
 <template>
     <div v-if="pending">
-        <Loading></Loading>
+        <BaseLoading></BaseLoading>
     </div>
     <div v-else>        
-        <Tournament :data="data" v-if="data"></Tournament>
+        <TournamentInfo :data="data" v-if="data"></TournamentInfo>
     </div>
 </template>
 

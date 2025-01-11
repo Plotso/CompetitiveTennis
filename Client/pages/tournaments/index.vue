@@ -4,7 +4,7 @@ definePageMeta({
 });
 import { TournamentOutputModel, Result, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel, ParticipantShortOutputModel } from '@/types'; // Update the path as per your project setup
 import { storeToRefs } from 'pinia';
-import ParticipateDoublesModal from '~/components/ParticipateDoublesModal.vue';
+import TournamentParticipateDoublesModal from '~/components/tournament/ParticipateDoublesModal.vue';
 import {useAuthStore} from "~/stores/auth"
 const router = useRouter();
 const config = useRuntimeConfig();
@@ -186,7 +186,7 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
             </div>
         </Banner>
     <div v-if="pending">
-        <Loading></Loading>
+        <BaseLoading></BaseLoading>
     </div>
 
     <div class="container" v-else>
@@ -247,17 +247,17 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
                         </td>
                         <td v-if="user.username">
                             <p v-if="!tournament.participants.find(p => p.players.find(pp => pp.username == user.username))">
-                                <ParticipateButton v-if="tournament.type == 'Singles'"
+                                <BaseParticipateButton v-if="tournament.type == 'Singles'"
                                 :has-max-participants="tournament.participants.length === tournament.maxParticipants"
                                 :is-disabled="hasTournamentStarted(tournament)"
                                 @participate="participate(tournament.id)"/>
 
-                                <ParticipateButton v-if="tournament.type == 'Doubles'"
+                                <BaseParticipateButton v-if="tournament.type == 'Doubles'"
                                 :has-max-participants="tournament.participants.length === tournament.maxParticipants"
                                 :is-disabled="hasTournamentStarted(tournament)"
                                 @participate="openParticipateDoublesModal(tournament.id, tournament.participants)"/>
 
-                                <ParticipateButton v-if="tournament.type == 'Teams'"
+                                <BaseParticipateButton v-if="tournament.type == 'Teams'"
                                 :has-max-participants="tournament.participants.length === tournament.maxParticipants"
                                 :is-disabled="hasTournamentStarted(tournament)"
                                 @participate="openParticipateTeamModal(tournament.id)"/>
@@ -280,18 +280,18 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
     </div>
 
     <!--MODALS-->
-    <LoadingModal
+    <ModalsLoadingModal
       :isOpen="showLoadingModal"
     />
 
-    <ParticipateDoublesModal
+    <TournamentParticipateDoublesModal
     :isOpen="isParticipateDoublesModalOpen"
     :includeCurrentUser="true"
     :tournamentId="doubleParticipationTournamentId"
     @close="closeParticipateDoublesModal"
     />
 
-    <ParticipateDoublesModal
+    <TournamentParticipateDoublesModal
     :isOpen="isParticipateDoublesModalOpen"
     :includeCurrentUser="true"
     :tournamentId="doubleParticipationTournamentId"
@@ -300,7 +300,7 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
     />
 
     
-    <RemoveParticipantModal
+    <TournamentRemoveParticipantModal
     :isOpen="isParticipantRemovalModalOpen"
     title="Opt out of tournament confirmal"
     message="Are you sure you want to opt out from the tournament?"
@@ -308,114 +308,6 @@ const optOutOfTournament = async (tournamentId: number, participantId: number) =
     :participantId="removeParticipantId"
     @close="closeParticipantRemovalModal"
     />
-
-    <!--
-    <div class="container" v-if="!pending">
-        <h1 class="title is-1 has-text-centered">All Tournaments</h1>
-        <div class="box">
-            <div class="content">
-                <div class="columns is-multiline">
-                    <div class="column is-one-third custom-box" v-for="tournament in data.data" :key="tournament.id">
-                        <div class="media  is-centered">
-                            <div class="media-left">
-                                <figure class="image img-custom is-4by3 image-container">
-                                    <img :src="clayImg" alt="Tournament Image">
-                                    <div class="tags ">
-                                        <span class="tag is-dark image-overlay-left"><font-awesome-icon
-                                                icon="fa-solid fa-calendar-days" /> {{ formatDate(tournament.startDate) }} -
-                                            {{ formatDate(tournament.endDate) }}</span>
-                                        <span> </span>
-                                        <span class="tag image-overlay-right">Clay</span>
-                                    </div>
-                                </figure>
-                                <div class="media-content is-centered-custom">
-                                    <p class="title is-5 has-text-centered">
-                                        <NuxtLink :to="`/tournaments/${tournament.id}`" class="has-text-weight-semibold">{{
-                                            tournament.title }}</NuxtLink>
-                                    </p>
-                                    <p class="subtitle is-6 has-text-centered">
-                                        <NuxtLink :to="`avenues/${tournament.avenue.id}`">
-                                            {{ tournament.avenue.name }}, {{ tournament.avenue.city }}
-                                        </NuxtLink>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container" v-if="!pending">
-        <h1 class="title">All Tournaments</h1>
-        <div class="columns is-multiline">
-            <div v-for="tournament in data.data" :key="tournament.id" class="column is-one-third">
-                <div class="card">
-                    <div class="card-image">
-                        <figure class="image is-4by3 backwards">
-                            <img src="https://placekitten.com/800/600" alt="Tournament Image">
-                        </figure>
-                    </div>
-                    <div class="card-content">
-                        <div class="content">
-                            <p class="title is-5">
-                                <NuxtLink :to="`/tournaments/${tournament.id}`">{{ tournament.title }}</NuxtLink>
-                            </p>
-                            <p class="subtitle is-6">{{ getTournamentTypeLabel(tournament.type) }}</p>
-                            <p><strong>Description:</strong> {{ tournament.description }}</p>
-                            <p><strong>Surface:</strong> {{ getSurfaceLabel(tournament.surface) }}</p>
-                            <p><strong>Start Date:</strong> {{ formatDate(tournament.startDate) }}</p>
-                            <p><strong>End Date:</strong> {{ formatDate(tournament.endDate) }}</p>
-                            <p><strong>Entry Fee:</strong> {{ tournament.entryFee ? `$${tournament.entryFee}` : 'Free' }}
-                            </p>
-                            <p><strong>Prize:</strong> {{ tournament.prize ? `$${tournament.prize}` : 'N/A' }}</p>
-                            <p><strong>Available Courts:</strong> {{ tournament.courtsAvailable }}</p>
-                            <p><strong>Participants:</strong> {{ tournament.participants.length }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="container" v-if="!pending">
-        <h1 class="title">All Tournaments</h1>
-        <div class="table-container">
-            <table class="table is-fullwidth is-hoverable">
-                <thead>
-                    <tr>
-                        <th>Tournament</th>
-                        <th>Type</th>
-                        <th>Surface</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Entry Fee</th>
-                        <th>Prize</th>
-                        <th>Courts</th>
-                        <th>Participants</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="tournament in data.data" :key="tournament.id">
-                        <td>
-                            <NuxtLink :to="`/tournaments/${tournament.id}`">{{ tournament.title }}</NuxtLink>
-                        </td>
-                        <td>{{ getTournamentTypeLabel(tournament.type) }}</td>
-                        <td>{{ getSurfaceLabel(tournament.surface) }}</td>
-                        <td>{{ formatDate(tournament.startDate) }}</td>
-                        <td>{{ formatDate(tournament.endDate) }}</td>
-                        <td>{{ tournament.entryFee ? `$${tournament.entryFee}` : 'Free' }}</td>
-                        <td>{{ tournament.prize ? `$${tournament.prize}` : 'N/A' }}</td>
-                        <td>{{ tournament.courtsAvailable }}</td>
-                        <td>{{ tournament.participants.length }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-    </div>
--->
     </div>
 
     

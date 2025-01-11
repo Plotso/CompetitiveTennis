@@ -1,7 +1,7 @@
 <template>
-    <Nav :is-transparent=false></Nav>
+    <LayoutNav :is-transparent=false></LayoutNav>
     <main>
         <slot />
     </main>
-    <Footer></Footer>
+    <LayoutFooter></LayoutFooter>
 </template>

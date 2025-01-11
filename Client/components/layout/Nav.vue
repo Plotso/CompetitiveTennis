@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { boolean } from "zod";
-import {useAuthStore} from "../stores/auth"
+import {useAuthStore} from "../../stores/auth";
 const authStore = useAuthStore();
 
 const props = defineProps({

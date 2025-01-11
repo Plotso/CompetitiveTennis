@@ -939,7 +939,7 @@ const saveMatchPeriods = async (isEnded = false) => {
       </footer>
     </div>
     
-    <ConfirmationModal
+    <ModalsConfirmationModal
       :isOpen="isConfirmationModalOpen"
       title="Confirmation"
       message="Are you sure you want to delete certain scores for the match?"
@@ -958,7 +958,7 @@ const saveMatchPeriods = async (isEnded = false) => {
   @close="closeMatchWinnerModal"
 />
 
-    <DangerModal
+    <ModalsDangerModal
 :isOpen="isUnauthorizedModalOpen"
 title="Unauthorized!"
 message="You are not authorized to execute the desired action!"
