@@ -29,7 +29,7 @@
       "applicationUrl": "https://localhost:7189;http://localhost:5189",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionStrings__DefaultConnection": "Server=localhost;Port=5433;User Id=sa;Password=Sup3rStrongS3cretPass1111;Database=CompetitiveTennisDatabase;Integrated Security=True"
+        "ConnectionStrings__DefaultConnection": "Server=localhost;Port=5433;User Id=sa;Password=Sup3rStrongS3cretPass1111;Database=CompetitiveTennisDatabase;Integrated Security=True;Include Error Detail"
       }
     },
     "Docker": {
