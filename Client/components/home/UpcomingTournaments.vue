@@ -16,7 +16,7 @@ const hideErrorNotification = () => {
 const showParticipationButtons = ref(false);
 
 const query: TournamentQuery = {
-    dateRangeFrom: new Date().toISOString(),
+    //dateRangeFrom: new Date().toISOString(),
     page: 1,
     itemsPerPage: 10,
 };
@@ -44,8 +44,9 @@ else {
 
 <template>
   <div class="container">
-
-    <h1>Upcoming Tournaments</h1>
+    <header class="special">
+            <h1><strong>Upcoming Tournaments</strong></h1>
+        </header>
     <div v-if="pending">
         <BaseLoading></BaseLoading>
     </div>
@@ -54,22 +55,35 @@ else {
                 <button class="delete" @click="hideErrorNotification"></button>
                 {{errorNotification}}
             </div>
-        <div v-else>
-            <ul>
-                <li v-for="tournament in tournaments" :key="tournament.id">
-                {{ tournament.title }} - {{ tournament.startDate }}
-                </li>
-            </ul>
-        </div>
+        <TournamentTableList v-else
+            :tournaments="tournaments"
+        />
     </div>
 
-    <!--MODALS-->
-    <!-- <ModalsLoadingModal
-      :isOpen="showLoadingModal"
-    /> -->
+    <div class="buttons is-centered">
+        <NuxtLink to="/tournaments" class="button is-primary">View All</NuxtLink>
+
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* Add your styles here */
+header {
+    
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 strong {
+  font-size: 1.75rem; /* Adjust title size */
+  font-weight: bold;
+  color: #00d1b2;
+  margin: 0; /* Ensure no extra margin around */
+}
+
+.summary {
+    font-size: 18px;
+    line-height: 24px;
+}
 </style>

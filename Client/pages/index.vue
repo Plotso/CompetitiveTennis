@@ -13,10 +13,15 @@ const authStore = useAuthStore();
         </Banner>
         <HomeUserDashboardSection v-if="authStore.user.username"/>
         <HomePublicSection v-else/>
+        <hr/>
         <HomeUpcomingTournaments/>
     </div>
 </template>
 
 <style scoped>
-
+hr {
+  font-weight: bold;
+  color: #00d1b2;
+  background-color: #00d1b2;
+}
 </style>
