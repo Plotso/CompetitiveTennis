@@ -2,12 +2,22 @@
 definePageMeta({
   layout: "default-transparent",
 });
-import { AvenueOutputModel, Result, SearchOutputModel, Surface, CourtsInfo, CourtType } from '@/types';
+import { AvenueOutputModel, Result, AvenueQuery, SearchOutputModel, Surface, CourtsInfo, CourtType } from '@/types';
 import { useAuthStore } from '@/stores/auth'
 const config = useRuntimeConfig();
 const authStore = useAuthStore();
 
-const { data, pending, refresh, error } = await useTournamentsApi<Result<SearchOutputModel<AvenueOutputModel>>>(`/Avenues/Search`)
+const query: AvenueQuery = {
+    page: 1,
+    itemsPerPage: 20,
+};
+const method = 'GET';
+const options = {
+    query,
+    method
+}
+
+const { data, pending, refresh, error } = await useTournamentsApi<Result<SearchOutputModel<AvenueOutputModel>>>(`/Avenues/Search`, options)
 if (error.value) {
     console.log('data', data.value)
     console.log('pending', pending.value)

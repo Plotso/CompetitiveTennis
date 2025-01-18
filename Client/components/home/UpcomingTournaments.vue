@@ -16,7 +16,7 @@ const hideErrorNotification = () => {
 const showParticipationButtons = ref(false);
 
 const query: TournamentQuery = {
-    //dateRangeFrom: new Date().toISOString(),
+    dateRangeFrom: new Date().toISOString(),
     page: 1,
     itemsPerPage: 10,
 };

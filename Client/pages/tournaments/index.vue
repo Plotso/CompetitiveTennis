@@ -2,7 +2,7 @@
 definePageMeta({
   layout: "default-transparent",
 });
-import { TournamentOutputModel, Result, SearchOutputModel, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel, ParticipantShortOutputModel } from '@/types'; // Update the path as per your project setup
+import { TournamentOutputModel, Result, SearchOutputModel, TournamentQuery, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel, ParticipantShortOutputModel } from '@/types'; // Update the path as per your project setup
 import { storeToRefs } from 'pinia';
 import TournamentParticipateDoublesModal from '~/components/tournament/ParticipateDoublesModal.vue';
 import {useAuthStore} from "~/stores/auth"
@@ -15,7 +15,17 @@ const { user } = storeToRefs(useAuthStore());
 
 const tournaments = ref<TournamentOutputModel[]>([]);
 
-const { data, pending, refresh, error } = await useTournamentsApi<Result<SearchOutputModel<TournamentOutputModel>>>(`/Tournaments/Search`)
+const query: TournamentQuery = {
+    page: 1,
+    itemsPerPage: 20,
+};
+const method = 'GET';
+const options = {
+    query,
+    method
+}
+
+const { data, pending, refresh, error } = await useTournamentsApi<Result<SearchOutputModel<TournamentOutputModel>>>(`/Tournaments/Search`, options)
 if (error.value) {
     console.log('data', data.value)
     console.log('pending', pending.value)
