@@ -228,6 +228,8 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             dataQuery = dataQuery.Where(t => t.Type == query.TournamentType);
         if (query.IsIndoor.HasValue)
             dataQuery = dataQuery.Where(t => t.IsIndoor == query.IsIndoor);
+        if (query.IsOngoingAtDateTime.HasValue)
+            dataQuery = dataQuery.Where(t => t.StartDate <= query.IsOngoingAtDateTime && t.EndDate >= query.IsOngoingAtDateTime);
         if (query.DateRangeFrom.HasValue)
             dataQuery = dataQuery.Where(t => t.StartDate >= query.DateRangeFrom);
         if (query.DateRangeUntil.HasValue)

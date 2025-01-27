@@ -36,6 +36,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 1rem;
+    
   }
   
   .card-header {
@@ -44,6 +45,11 @@
     padding: 0.5rem 1rem;
     border-bottom: 1px solid #ddd;
     font-weight: bold;
+  }
+
+  .card-header-title {
+    font-size: 1.25rem;
+    color: #fff;
   }
   
   .card-content {

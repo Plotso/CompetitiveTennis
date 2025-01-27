@@ -107,8 +107,16 @@ export namespace Auth {
 
   export enum TournamentStage {
     Unknown,
+    Qualification,
+    RoundOf128,
+    RoundOf64,
+    RoundOf32,
+    RoundOf16,
+    QuarterFinal,
+    SemiFinal,
+    Final,
+    LeagueMatch,
     GroupStage,
-    KnockoutStage,
   }
 
   export enum CourtType {
@@ -422,6 +430,7 @@ export namespace Auth {
     isIndoor?: boolean | null;
     dateRangeFrom?: Date | null;
     dateRangeUntil?: Date | null;
+    isOngoingAtDateTime?: Date | null;
     organiserId?: number | null;
     participantIds?: number[] | null;
     participantUsernames?: string[] | null;

@@ -40,11 +40,13 @@ public static class MatchInfoProvider
             matchOutput.Details, matchOutput.Status, matchOutput.Outcome, OutcomeCondition: matchOutput.OutcomeCondition,
             homePredecesorMatch?.MatchId,
             awayPredecesorMatch?.MatchId,
-            homeParticipantInfo, awayParticipantInfo, matchOutput.MatchPeriods, tournamentMatchFlowInfo.Id, GetMatchResults(matchOutput.MatchPeriods));
+            homeParticipantInfo, awayParticipantInfo, matchOutput?.MatchPeriods ?? Array.Empty<MatchPeriodOutputModel>(), tournamentMatchFlowInfo.Id, GetMatchResults(matchOutput?.MatchPeriods));
     }
 
-    public static MatchResultsOutputModel? GetMatchResults(IEnumerable<MatchPeriodOutputModel> matchPeriods)
+    public static MatchResultsOutputModel? GetMatchResults(IEnumerable<MatchPeriodOutputModel>? matchPeriods)
     {
+        if (matchPeriods.IsNullOrEmpty())
+            return null;
         var periodsInfo = matchPeriods.Select(MatchPeriodShortInfo.FromMatchPeriodInput).ToArray();
         if (periodsInfo.IsNullOrEmpty())
             return null;

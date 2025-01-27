@@ -98,5 +98,7 @@ const formatDate = (date: Date): string => {
 </template>
 
 <style scoped>
-
+.container {
+  margin-top : 5%;
+}
 </style>

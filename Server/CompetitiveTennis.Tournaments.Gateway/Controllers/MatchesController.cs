@@ -56,7 +56,7 @@ public class MatchesController : BaseGatewayController
     
     [HttpGet]
     [Route(nameof(Search))]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SearchOutputModel<MatchOutputModel>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SearchOutputModel<MatchShortOutputModel>))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Search([FromQuery] MatchQuery query)
         => await SafeProcessRefitRequest(

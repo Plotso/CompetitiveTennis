@@ -8,6 +8,7 @@ using Contracts.Match;
 using Contracts.MatchPeriod;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using Services;
 using Services.Interfaces.BL;
 using Services.Interfaces.Data;
@@ -70,13 +71,28 @@ public class MatchesController : ApiController
     
     [HttpGet]
     [Route(nameof(Search))]
-    public async Task<ActionResult<Result<SearchOutputModel<MatchOutputModel>>>> Search([FromQuery] MatchQuery query)
+    public async Task<ActionResult<Result<SearchOutputModel<MatchShortOutputModel>>>> Search([FromQuery] MatchQuery query)
         => await SafeHandle(async () =>
             {
                 var matches = await _matches.Query(query);
                 var total = await _matches.Total(query);
-                return Ok(Result<SearchOutputModel<MatchOutputModel>>.SuccessWith(
-                    new SearchOutputModel<MatchOutputModel>(matches, query.Page, total)));
+                var result = new List<MatchShortOutputModel>(matches.Count());
+                var tournaments = new Dictionary<int, TournamentMatchFlowInfo>();
+                foreach (var match in matches)
+                {
+                    if (!tournaments.TryGetValue(match.TournamentId, out var tournamentMatchFlowInfo))
+                    {
+                        var tournament = await _tournaments.GetTournamentMatchFlowInfo(match.TournamentId);
+                        if (tournament == null)
+                            return NotFound(Result.Failure($"Failed to retrieve tournament data for match {match.Id}"));
+                        tournamentMatchFlowInfo = tournament;
+                        tournaments[match.TournamentId] = tournamentMatchFlowInfo;
+                    }
+                    var matchOutput = MatchInfoProvider.GetMatchInfoFromTournament(match, tournamentMatchFlowInfo);
+                    result.Add(matchOutput);
+                }
+                return Ok(Result<SearchOutputModel<MatchShortOutputModel>>.SuccessWith(
+                    new SearchOutputModel<MatchShortOutputModel>(result, query.Page, total)));
             },
             msgOnError: $"An error occurred during Search request with query: {query}");
     

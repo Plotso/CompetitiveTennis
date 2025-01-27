@@ -215,7 +215,7 @@ const canAddPointForPlayer1 = computed(() => {
     return p1Points !== 'Adv' && parseInt(p2Points) > 0;
   }
 
-  if (canAddLoveInSelectedSetAndGame.value) {
+  if (canAddLoveInSelectedSetAndGame.value && !canAddDeuceInSelectedSetAndGame.value) {
     return p1Points === '0';
   }
 
@@ -241,7 +241,7 @@ const canAddPointForPlayer2 = computed(() => {
     return p2Points !== 'Adv' && parseInt(p1Points) > 0;
   }
 
-  if (canAddLoveInSelectedSetAndGame.value) {
+  if (canAddLoveInSelectedSetAndGame.value && !canAddDeuceInSelectedSetAndGame.value) {
     return p2Points === '0';
   }
 

@@ -20,6 +20,6 @@ public record MatchShortOutputModel(
     int? AwayPredecesorMatchId,
     ParticipantInfo? HomeParticipant,
     ParticipantInfo? AwayParticipant,
-    IEnumerable<MatchPeriodOutputModel> MatchPeriods,
+    IEnumerable<MatchPeriodOutputModel>? MatchPeriods,
     int TournamentId,
     MatchResultsOutputModel? Results = null);
