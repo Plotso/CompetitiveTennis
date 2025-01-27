@@ -3,7 +3,7 @@
 import { useParticipantNameBuilder } from '~/composables/useParticipantNameBuilder'
 import { useMatchHelper  } from '~/composables/useMatchHelper'
 const { buildHomeParticipantName, buildAwayParticipantName } = useParticipantNameBuilder();
-const { getStageString, getStageStringFromMatch, getResult, isMatchWinner } = useMatchHelper();
+const { getStageString, getStageStringFromMatch, getMinimalStageStringFromMatch, getResult, isMatchWinner } = useMatchHelper();
   
 const props =  defineProps({
     matches: {
@@ -84,14 +84,15 @@ const isUserMatchWinner = (match: MatchShortOutputModel) => {
       <table class="table is-striped is-fullwidth no-borders">
         <thead v-if="showTableHeaders">
           <tr>
-            <th>vs</th>
-            <th>Start Date</th>
             <th>Stage</th>
+            <th>Opponent</th>
+            <th>Start Date</th>
             <th v-if="showResults">Result</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="match in matches" :key="match.id">
+            <td>{{ getMinimalStageStringFromMatch(match) }}</td>
             <td v-if="username">
               <NuxtLink :to="`/matches/${match.id}`" class="custom-link has-text-weight-semibold">
                 {{ opponentName(match) }}
@@ -103,9 +104,8 @@ const isUserMatchWinner = (match: MatchShortOutputModel) => {
             </NuxtLink>              
             </td>
             <td>              
-              {{ new Date(match.startDate).toLocaleDateString(undefined, options).replace(' at', '') }}
+                {{ new Date(match.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false }).replace(',', '') }}
             </td>
-            <td>{{ getStageStringFromMatch(match) }}</td>
             <td v-if="showResults">
               <span v-if="match.status === EventStatus[EventStatus.NotStarted]"><font-awesome-icon icon="fa-solid fa-calendar-days" /> &nbsp</span>
               <span v-if="match.status === EventStatus[EventStatus.InProgress]"><font-awesome-icon icon="fa-solid fa-hourglass-half" /> &nbsp</span>
