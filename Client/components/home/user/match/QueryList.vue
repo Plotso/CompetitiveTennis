@@ -41,8 +41,6 @@ const props = defineProps({
     }
 });
 
-console.log(props);
-
 
 const errorNotification = ref("")
 const showErrorNotification = ref(false)

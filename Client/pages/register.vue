@@ -23,6 +23,14 @@ const user = ref({
       password: ''
     } as RegisterInputModel)
 
+    
+const errorNotification = ref("")
+const showErrorNotification = ref(false)
+
+const hideErrorNotification = () => {
+    showErrorNotification.value = false;
+}
+
 
 
 const submitForm = async () => {
@@ -33,6 +41,7 @@ const submitForm = async () => {
         //this.$router.push('/')
     } catch (e) {
         console.error(e)
+        errorNotification.value = e.response.data.message
       }
 }
 </script>
@@ -40,6 +49,11 @@ const submitForm = async () => {
 <template>
     <div>    
     <section class="is-relative section py-20">
+    
+    <div class="notification is-danger" v-if="showErrorNotification">
+        <button class="delete" @click="hideErrorNotification"></button>
+        {{errorNotification}}
+    </div>
             <div class="is-absolute is-left-0 is-bottom-0 is-right-0 has-mw-5xl has-background-white" style="height: 100%; width: 100%;" >
             </div>
             <div class="is-relative container">

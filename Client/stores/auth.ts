@@ -30,7 +30,7 @@ export const useAuthStore = defineStore("auth", () => {
 
         const addAcc = {'firstName': data.value.data.firstName, 'lastName': data.value.data.lastName}
         const accCreate = await useFetch(() => `/Accounts/Add`, {
-          baseURL: config.public.authBase,
+          baseURL: config.public.tournamentsBase,
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token.value}` },
           body: JSON.stringify(addAcc)
