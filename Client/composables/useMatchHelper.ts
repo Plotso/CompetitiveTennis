@@ -28,6 +28,27 @@ export function useMatchHelper() {
             return match.stage;
     };
   }
+      
+  const getMinimalStageStringFromMatch = (match: MatchShortOutputModel) => {
+    switch(match.stage){
+        case TournamentStage[TournamentStage.RoundOf128]:
+            return "R128";
+        case TournamentStage[TournamentStage.RoundOf64]:
+            return "R64";
+        case TournamentStage[TournamentStage.RoundOf32]:
+            return "R32";
+        case TournamentStage[TournamentStage.RoundOf16]:
+            return "R16";
+        case TournamentStage[TournamentStage.QuarterFinal]:
+            return "QF";
+        case TournamentStage[TournamentStage.SemiFinal]:
+            return "SF";
+        case TournamentStage[TournamentStage.Final]:
+            return "F🏆";
+        default:
+            return match.stage;
+    };
+  }
 
   const getResult = (match: MatchShortOutputModel): string => {
     if(!match || !match.results || !match.results.setResults || match.results.setResults.length == 0)
@@ -50,5 +71,5 @@ export function useMatchHelper() {
     return (side === 'home' && match.outcome === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantOne]) || (side === 'away' && match.outcome === MatchPeriodOutcome[MatchPeriodOutcome.ParticipantTwo]);
   };
 
-  return { getStageString, getStageStringFromMatch, getResult, isMatchWinner };
+  return { getStageString, getStageStringFromMatch, getMinimalStageStringFromMatch, getResult, isMatchWinner };
 }

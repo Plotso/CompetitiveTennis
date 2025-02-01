@@ -11,7 +11,7 @@ public interface IMatchesService : IDataService<Match>
 {
     Task<IEnumerable<MatchOutputModel>> Query(MatchQuery query);
     
-    ValueTask<int> Total(MatchQuery query);
+    Task<int> Total(MatchQuery query);
     
     Task<IEnumerable<MatchOutputModel>> GetAll();
     

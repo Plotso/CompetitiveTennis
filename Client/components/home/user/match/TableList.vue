@@ -82,7 +82,7 @@ const isUserMatchWinner = (match: MatchShortOutputModel) => {
 <template>
     <div class="table-container">
       <table class="table is-striped is-fullwidth no-borders">
-        <thead v-if="showTableHeaders">
+        <thead v-if="showTableHeaders && matches.length > 0">
           <tr>
             <th>Stage</th>
             <th>Opponent</th>
@@ -134,6 +134,9 @@ const isUserMatchWinner = (match: MatchShortOutputModel) => {
   </template>  
 
 <style scoped>
+th {
+  color: #00d1b2 !important;
+}
 .won-icon {
   color: green;
 }

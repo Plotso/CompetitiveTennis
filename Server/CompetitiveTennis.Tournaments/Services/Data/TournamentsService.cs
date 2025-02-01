@@ -119,7 +119,7 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
         => _mapper.Map<IEnumerable<FullTournamentOutputModel>>(await GetTournamentsQuery(query).PageFilterResult(query)
             .ToListAsync());
 
-    public async ValueTask<int> Total(TournamentQuery query) => await GetTournamentsQuery(query).CountAsync();
+    public async Task<int> Total(TournamentQuery query) => await GetTournamentsQuery(query).CountAsync();
 
     public async Task<int> Create(TournamentInputModel input, Account organiser, Avenue avenue)
     {

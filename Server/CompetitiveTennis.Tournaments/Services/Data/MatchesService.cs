@@ -28,7 +28,7 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         => _mapper.Map<IEnumerable<MatchOutputModel>>(await GetTournamentsQuery(query).PageFilterResult(query)
             .ToListAsync());
 
-    public async ValueTask<int> Total(MatchQuery query) => await GetTournamentsQuery(query).CountAsync();
+    public async Task<int> Total(MatchQuery query) => await GetTournamentsQuery(query).CountAsync();
 
     public async Task<IEnumerable<MatchOutputModel>> GetAll()
         => await All()
@@ -359,8 +359,19 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
             return dataQuery;
         }
 
-        if (!string.IsNullOrWhiteSpace(query.ParticipantUsername))
+        if (!string.IsNullOrWhiteSpace(query.ParticipantUsername) && !query.IsParticipantWinner.HasValue)
             dataQuery = dataQuery.Where(m => m.Participants.Any(p => p.Participant.Players.Any(pp => pp.Account.Username == query.ParticipantUsername)));
+        // ToDo: Cache the results of the below filtered query somewhere since it's very heavy
+        if (!string.IsNullOrWhiteSpace(query.ParticipantUsername) && query.IsParticipantWinner.HasValue && query.IsParticipantWinner.Value)
+            dataQuery = dataQuery.Where(m => m.Status == EventStatus.Ended &&
+                (m.Outcome == MatchOutcome.ParticipantOne &&
+                 m.Participants.Any(p =>
+                     p.Specifier == DataConstants.ParticipantSpecifiers.Home &&
+                     p.Participant.Players.Any(pp => pp.Account.Username == query.ParticipantUsername))) ||
+                (m.Outcome == MatchOutcome.ParticipantTwo &&
+                 m.Participants.Any(p =>
+                     p.Specifier == DataConstants.ParticipantSpecifiers.Away &&
+                     p.Participant.Players.Any(pp => pp.Account.Username == query.ParticipantUsername))));
 
         if (!string.IsNullOrWhiteSpace(query.ParticipantName))
             dataQuery = dataQuery.Where(m => m.Participants.Any(p => string.Equals(p.Participant.Name, query.ParticipantName, StringComparison.OrdinalIgnoreCase) ||
@@ -373,6 +384,8 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
             dataQuery = dataQuery.Where(m => m.Tournament.Surface == query.Surface);
         if (query.TournamentType.HasValue)
             dataQuery = dataQuery.Where(m => m.Tournament.Type == query.TournamentType);
+        if (query.TournamentStage.HasValue)
+            dataQuery = dataQuery.Where(m => m.Stage == query.TournamentStage.Value);
         if (query.DateRangeFrom.HasValue)
             dataQuery = dataQuery.Where(m => m.StartDate >= query.DateRangeFrom);
         if (query.DateRangeUntil.HasValue)

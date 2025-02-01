@@ -18,6 +18,7 @@ public abstract class ApiController : ControllerBase
     }
     public const string PathSeparator = "/";
     public const string Id = "{id}";
+    public const string Username = "{username}";
     
     protected ILogger<ApiController> Logger { get; }
 

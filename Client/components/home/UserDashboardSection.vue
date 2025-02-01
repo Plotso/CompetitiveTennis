@@ -43,7 +43,7 @@ const { user } = storeToRefs(useAuthStore());
                 <BaseCard
                 title="User Stats"
                 class="column is-4">
-                    User Stats
+                    <HomeUserAccountStats :username="user.username" />
                 </BaseCard>
             </div>
         </div>

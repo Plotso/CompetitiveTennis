@@ -1,6 +1,7 @@
 ﻿namespace CompetitiveTennis.Tournaments;
 
 using Configurations;
+using Services;
 using Services.BL;
 using Services.Data;
 using Services.Interfaces.BL;
@@ -24,6 +25,7 @@ public static class DependencyInjection
             .AddScoped<IMatchPeriodInfoManager, MatchPeriodInfoManager>()
             .AddScoped<IMatchOutcomeHandler, MatchOutcomeHandler>()
             .AddScoped<ITournamentDrawGenerator, TournamentDrawGenerator>()
+            .AddScoped<IAccountStatsProvider, AccountStatsProvider>()
             .AddScoped<IRatingCalculator, RatingCalculator>();
 
     public static IServiceCollection AddConfigurations(this IServiceCollection serviceCollection,

@@ -8,6 +8,7 @@ using Interfaces.Data;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Models;
 using static ServiceConstants;
 
 public class AccountsService : DataService<Account>, IAccountsService
@@ -42,18 +43,15 @@ public class AccountsService : DataService<Account>, IAccountsService
             .ProjectToType<AccountOutputModel>()
             .SingleOrDefaultAsync();
 
-    //ToDo: Potentially refactor this to be separate DB calls in order to optimise DB performance by adding limit.
-    public async Task<Account> GetDashboardInfoByUsername(string username)
+    public async Task<AccountRatingInfo> GetRatingForUsername(string username)
         => await AllAsNoTracking()
-            .Where(a => a.Username == username)
-            .Include(a => a.Participations)
-            .ThenInclude(ap => ap.Participant)
-            .ThenInclude(p => p.Matches)
-            .ThenInclude(pm => pm.Match)
-            .Include(a => a.Participations)
-            .ThenInclude(ap => ap.Participant)
-            .ThenInclude(p => p.Tournament)
-            .FirstOrDefaultAsync();
+        .Where(a => a.Username == username)
+        .ProjectToType<AccountRatingInfo>()
+        .FirstOrDefaultAsync();
+
+    public async Task<bool> HasAccountWithUsername(string username)
+        => await AllAsNoTracking()
+            .AnyAsync(a => a.Username == username);
 
     /// <summary>
     /// Retrieve PlayerRating for given account if there is such for current user
@@ -134,7 +132,7 @@ public class AccountsService : DataService<Account>, IAccountsService
     public async Task Create(AccountCreateInputModel createModel)
     {
         var existingAccount = await AllAsNoTracking().AnyAsync(a => a.UserId == createModel.UserId);
-        if (existingAccount == null)
+        if (!existingAccount)
         {
             var account = new Account
             {
@@ -142,7 +140,8 @@ public class AccountsService : DataService<Account>, IAccountsService
                 LastName = createModel.Input.LastName,
                 UserId = createModel.UserId,
                 Username = createModel.Username,
-                PlayerRating = DefaultPlayerRating
+                PlayerRating = DefaultPlayerRating,
+                DoublesRating = DefaultPlayerRating
             };
             await SaveAsync(account);
         }

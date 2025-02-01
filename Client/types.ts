@@ -222,6 +222,7 @@ export namespace Auth {
     firstName: string;
     lastName: string;
     playerRating: number;
+    doublesRating: number;
     participations: ParticipantShortOutputModel[];
     organisedTournaments: TournamentShortInfoOutput[];
   }
@@ -258,7 +259,8 @@ export namespace Auth {
     username: string;
     firstName: string;
     lastName: string;
-    playerRating: number;
+    playerRating: number;    
+    doublesRating: number;
   }
   
   export interface MatchOutputModel {
@@ -448,6 +450,7 @@ export namespace Auth {
   export interface MatchQuery extends PageQuery {
     participantUsername?: string;
     participantName?: string;
+    isParticipantWinner?: boolean | null;
     status?: EventStatus | null;
     outcomeCondition?: OutcomeCondition | null;
     tournamentType?: TournamentType | null;
@@ -455,6 +458,7 @@ export namespace Auth {
     dateRangeUntil?: Date | null;
     sortOptions?: SortOptions;
     surface?: Surface | null;
+    tournamentStage?: TournamentStage | null;
   }
   
 
@@ -468,10 +472,20 @@ export namespace Auth {
   }
   
   export interface SetResultOutput {
-    setNumber: number; // Using `number` since TypeScript does not have `sbyte` type
+    setNumber: number; 
     winner: MatchPeriodOutcome;
-    homeSideGamesWon: number; // Using `number` for `short`
-    awaySideGamesWon: number; // Using `number` for `short`
+    homeSideGamesWon: number;
+    awaySideGamesWon: number;
+  }
+  
+  
+
+  export interface AccountStats {
+    playerRating: number;
+    doublesRating: number;
+    matchesPlayed: number;
+    tournamentsPlayed: number;
+    tournamentsWon: number;
   }
   
   

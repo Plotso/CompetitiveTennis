@@ -39,6 +39,10 @@ public class IdentityController : ApiController
     [Route(nameof(Login))]
     public async Task<ActionResult<Result<FullUserOutputModel>>> Login(UserInputModel input)
     {
+        if (input == null)
+            return BadRequest(Result.Failure("No input provided"));
+        if (string.IsNullOrWhiteSpace(input.LoginInfo))
+            return BadRequest(Result.Failure("No login information provided"));
         var result = await _identity.Login(input);
         return result.IsSuccess ? result : Result<FullUserOutputModel>.Failure(result.Errors);
     }
