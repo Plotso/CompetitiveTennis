@@ -3,7 +3,7 @@
       <header class="card-header">
         <p class="card-header-title">{{ title }}</p>
       </header>
-      <div class="card-content">
+      <div class="card-content" :style="{ maxHeight: maxHeight + 'px', overflowY: 'auto' }">
         <div class="content">
           <p>{{ content }}</p>
           <slot></slot>
@@ -26,6 +26,10 @@
     details: {
       type: String,
       required: false,
+    },
+    maxHeight: {
+      type: Number,
+      default: 350, // Default max height in pixels
     },
   });
 </script>
