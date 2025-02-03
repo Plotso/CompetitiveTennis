@@ -64,34 +64,31 @@ const options = {
     query,
     method
 }
-const { data, pending, refresh, error } = await useTournamentsApi<Result<SearchOutputModel<MatchShortOutputModel>>>('/Matches/Search', options);
-if (error.value) {
-    console.log('data', data.value)
-    console.log('pending', pending.value)
-    console.log('error', error.value)
-    refresh()
-}
-if (data?.value?.data.results) {
-    matches.value = data.value?.data.results
-    showLoadingModal.value = false
-}
-if (error.value) {
+const apiResponse = await useTournamentsApi<Result<SearchOutputModel<MatchShortOutputModel>>>('/Matches/Search', options);
+watchEffect(() => {
+    if (apiResponse.error.value) {
     errorNotification.value = "Error loading matches"
     showErrorNotification.value = true
-}
+    showLoadingModal.value = false
+  }  
+  if (apiResponse.data.value?.data.results) {
+    matches.value = apiResponse.data.value.data.results
+    showLoadingModal.value = false
+  }
+})
 </script>
 
 <template>
   <div class="container">
-    <div v-if="pending">
+    <div v-if="showLoadingModal">
         <BaseLoading></BaseLoading>
     </div>
     <div v-else>
-        <div class="notification is-danger" v-if="showErrorNotification">
+        <div class="notification is-danger" v-show="showErrorNotification">
                 <button class="delete" @click="hideErrorNotification"></button>
                 {{errorNotification}}
             </div>
-        <MatchTableList v-else
+        <MatchTableList v-if="matches"
             :matches="matches"
         />
     </div>
