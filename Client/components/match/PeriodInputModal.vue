@@ -215,7 +215,7 @@ const canAddPointForPlayer1 = computed(() => {
     return p1Points !== 'Adv' && parseInt(p2Points) > 0;
   }
 
-  if (canAddLoveInSelectedSetAndGame.value) {
+  if (canAddLoveInSelectedSetAndGame.value && !canAddDeuceInSelectedSetAndGame.value) {
     return p1Points === '0';
   }
 
@@ -241,7 +241,7 @@ const canAddPointForPlayer2 = computed(() => {
     return p2Points !== 'Adv' && parseInt(p1Points) > 0;
   }
 
-  if (canAddLoveInSelectedSetAndGame.value) {
+  if (canAddLoveInSelectedSetAndGame.value && !canAddDeuceInSelectedSetAndGame.value) {
     return p2Points === '0';
   }
 
@@ -939,7 +939,7 @@ const saveMatchPeriods = async (isEnded = false) => {
       </footer>
     </div>
     
-    <ConfirmationModal
+    <ModalsConfirmationModal
       :isOpen="isConfirmationModalOpen"
       title="Confirmation"
       message="Are you sure you want to delete certain scores for the match?"
@@ -958,7 +958,7 @@ const saveMatchPeriods = async (isEnded = false) => {
   @close="closeMatchWinnerModal"
 />
 
-    <DangerModal
+    <ModalsDangerModal
 :isOpen="isUnauthorizedModalOpen"
 title="Unauthorized!"
 message="You are not authorized to execute the desired action!"

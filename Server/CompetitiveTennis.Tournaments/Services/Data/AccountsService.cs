@@ -8,6 +8,7 @@ using Interfaces.Data;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Models;
 using static ServiceConstants;
 
 public class AccountsService : DataService<Account>, IAccountsService
@@ -20,12 +21,12 @@ public class AccountsService : DataService<Account>, IAccountsService
     }
 
     public async Task<IEnumerable<AccountOutputModel>> GetAll()
-        => await All()
+        => await AllAsNoTracking()
             .ProjectToType<AccountOutputModel>()
             .ToListAsync();
 
     public async Task<AccountOutputModel> GetById(int id)
-        => await All()
+        => await AllAsNoTracking()
             .Where(a => a.Id == id)
             .Include(a => a.Participations)
             .ThenInclude(p => p.Participant)
@@ -33,14 +34,24 @@ public class AccountsService : DataService<Account>, IAccountsService
             .ProjectToType<AccountOutputModel>()
             .SingleOrDefaultAsync();
 
-    public async Task<AccountOutputModel> GetByUsernamme(string username)
-        => await All()
+    public async Task<AccountOutputModel> GetByUsername(string username)
+        => await AllAsNoTracking()
             .Where(a => a.Username == username)
             .Include(a => a.Participations)
             .ThenInclude(p => p.Participant)
             .Include(a => a.OrganisedTournaments)
             .ProjectToType<AccountOutputModel>()
             .SingleOrDefaultAsync();
+
+    public async Task<AccountRatingInfo> GetRatingForUsername(string username)
+        => await AllAsNoTracking()
+        .Where(a => a.Username == username)
+        .ProjectToType<AccountRatingInfo>()
+        .FirstOrDefaultAsync();
+
+    public async Task<bool> HasAccountWithUsername(string username)
+        => await AllAsNoTracking()
+            .AnyAsync(a => a.Username == username);
 
     /// <summary>
     /// Retrieve PlayerRating for given account if there is such for current user
@@ -51,7 +62,7 @@ public class AccountsService : DataService<Account>, IAccountsService
     {
         try
         {
-            return await All()
+            return await AllAsNoTracking()
                 .Where(a => a.UserId == userId)
                 .Select(a => a.PlayerRating)
                 .SingleOrDefaultAsync();
@@ -120,8 +131,8 @@ public class AccountsService : DataService<Account>, IAccountsService
 
     public async Task Create(AccountCreateInputModel createModel)
     {
-        var existingAccount = await GetByUserId(createModel.UserId);
-        if (existingAccount == null)
+        var existingAccount = await AllAsNoTracking().AnyAsync(a => a.UserId == createModel.UserId);
+        if (!existingAccount)
         {
             var account = new Account
             {
@@ -129,7 +140,8 @@ public class AccountsService : DataService<Account>, IAccountsService
                 LastName = createModel.Input.LastName,
                 UserId = createModel.UserId,
                 Username = createModel.Username,
-                PlayerRating = DefaultPlayerRating
+                PlayerRating = DefaultPlayerRating,
+                DoublesRating = DefaultPlayerRating
             };
             await SaveAsync(account);
         }

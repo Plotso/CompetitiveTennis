@@ -6,17 +6,20 @@ using CompetitiveTennis.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Contracts.Account;
+using Services.Interfaces.BL;
 using Services.Interfaces.Data;
 
 public class AccountsController : ApiController
 {
     private readonly IAccountsService _accounts;
     private readonly ICurrentUserService _currentUser;
+    private readonly IAccountStatsProvider _accountStatsProvider;
 
-    public AccountsController(IAccountsService accounts, ICurrentUserService currentUser, ILogger<AccountsController> logger) : base(logger)
+    public AccountsController(IAccountsService accounts, ICurrentUserService currentUser, IAccountStatsProvider accountStatsProvider, ILogger<AccountsController> logger) : base(logger)
     {
         _accounts = accounts;
         _currentUser = currentUser;
+        _accountStatsProvider = accountStatsProvider;
     }
 
     [HttpGet]
@@ -46,10 +49,27 @@ public class AccountsController : ApiController
     public async Task<ActionResult<Result<AccountOutputModel>>> ByUsername(string username) 
         => await SafeHandle(async () =>
             {
-                var account = await _accounts.GetByUsernamme(username);
+                var account = await _accounts.GetByUsername(username);
                 if (account == null)
                     return NotFound(Result.Failure($"Account {username} is missing"));
                 return Ok(Result<AccountOutputModel>.SuccessWith(account));
+            },
+            msgOnError: $"An error occurred during GET request for account: {username}");
+    
+    [HttpGet]
+    [Route($"{nameof(Stats)}/{Username}")]
+    public async Task<ActionResult<Result<AccountStats>>> Stats(string username) 
+        => await SafeHandle(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(username))
+                    return BadRequest(Result.Failure($"Username is required"));
+                var hasAccountWithUsername = await _accounts.HasAccountWithUsername(username);
+                if (!hasAccountWithUsername)
+                    return NotFound(Result.Failure($"Account {username} is missing"));
+                var account = await _accountStatsProvider.GetAccountStats(username);
+                if (account == null)
+                    return Result.Failure($"Failed to get account stats for {username}");
+                return Ok(Result<AccountStats>.SuccessWith(account));
             },
             msgOnError: $"An error occurred during GET request for account: {username}");
 

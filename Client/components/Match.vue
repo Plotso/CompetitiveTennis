@@ -135,7 +135,7 @@ const formatEventStatus = (status: EventStatus) => {
   </div>
 
   <!--MODALS-->
-  <LoadingModal :isOpen="showLoadingModal" />
+  <ModalsLoadingModal :isOpen="showLoadingModal" />
 </template>
 
 <style scoped>

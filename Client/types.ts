@@ -4,6 +4,12 @@ export interface Result<TData> {
   data: TData;
 }
 
+export interface SearchOutputModel<TRecord> {
+  results: TRecord[];
+  page: number;
+  total: number;
+}
+
 
 /// Auth
 export namespace Auth {
@@ -101,8 +107,16 @@ export namespace Auth {
 
   export enum TournamentStage {
     Unknown,
+    Qualification,
+    RoundOf128,
+    RoundOf64,
+    RoundOf32,
+    RoundOf16,
+    QuarterFinal,
+    SemiFinal,
+    Final,
+    LeagueMatch,
     GroupStage,
-    KnockoutStage,
   }
 
   export enum CourtType {
@@ -208,6 +222,7 @@ export namespace Auth {
     firstName: string;
     lastName: string;
     playerRating: number;
+    doublesRating: number;
     participations: ParticipantShortOutputModel[];
     organisedTournaments: TournamentShortInfoOutput[];
   }
@@ -244,7 +259,8 @@ export namespace Auth {
     username: string;
     firstName: string;
     lastName: string;
-    playerRating: number;
+    playerRating: number;    
+    doublesRating: number;
   }
   
   export interface MatchOutputModel {
@@ -401,7 +417,12 @@ export namespace Auth {
     includeCurrentUser: boolean;
   }
 
-  export interface TournamentQuery {
+  export interface PageQuery {
+    page?: number;
+    itemsPerPage?: number;
+  }
+
+  export interface TournamentQuery extends PageQuery {
     keyword?: string;
     hasEntryFee?: boolean | null;
     hasPrize?: boolean | null;
@@ -411,22 +432,35 @@ export namespace Auth {
     isIndoor?: boolean | null;
     dateRangeFrom?: Date | null;
     dateRangeUntil?: Date | null;
+    isOngoingAtDateTime?: Date | null;
     organiserId?: number | null;
     participantIds?: number[] | null;
-    page?: number;
-    itemsPerPage?: number;
+    participantUsernames?: string[] | null;
   }
   
-  export interface AvenueQuery {
+  export interface AvenueQuery extends PageQuery  {
     keyword?: string;
     city?: string;
     country?: string;
     sortOptions?: SortOptions;
     surface?: Surface | null;
     courtType?: CourtType | null;
-    page?: number;
-    itemsPerPage?: number;
   }
+
+  export interface MatchQuery extends PageQuery {
+    participantUsername?: string;
+    participantName?: string;
+    isParticipantWinner?: boolean | null;
+    status?: EventStatus | null;
+    outcomeCondition?: OutcomeCondition | null;
+    tournamentType?: TournamentType | null;
+    dateRangeFrom?: Date | null;
+    dateRangeUntil?: Date | null;
+    sortOptions?: SortOptions;
+    surface?: Surface | null;
+    tournamentStage?: TournamentStage | null;
+  }
+  
 
   export interface MatchCustomConditionResultInputModel {
     outcomeCondition: OutcomeCondition;
@@ -438,10 +472,20 @@ export namespace Auth {
   }
   
   export interface SetResultOutput {
-    setNumber: number; // Using `number` since TypeScript does not have `sbyte` type
+    setNumber: number; 
     winner: MatchPeriodOutcome;
-    homeSideGamesWon: number; // Using `number` for `short`
-    awaySideGamesWon: number; // Using `number` for `short`
+    homeSideGamesWon: number;
+    awaySideGamesWon: number;
+  }
+  
+  
+
+  export interface AccountStats {
+    playerRating: number;
+    doublesRating: number;
+    matchesPlayed: number;
+    tournamentsPlayed: number;
+    tournamentsWon: number;
   }
   
   

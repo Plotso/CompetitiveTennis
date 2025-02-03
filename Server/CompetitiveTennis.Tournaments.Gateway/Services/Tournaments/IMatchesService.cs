@@ -26,7 +26,7 @@ public interface IMatchesService
         [Body] MatchCustomConditionResultInputModel matchCustomConditionResultInput);
 
     [Get("/Matches/Search")]
-    Task<Result<SearchOutputModel<MatchShortOutputModel>>> Search([Query] TournamentQuery query);
+    Task<Result<SearchOutputModel<MatchShortOutputModel>>> Search([Query] MatchQuery query);
     
     [Post("/Matches/Add")]
     Task<Result<int>> Create(MatchInputModel input);

@@ -2,14 +2,22 @@
 definePageMeta({
   layout: "default-transparent",
 });
-import { AvenueOutputModel, Result, Surface, CourtsInfo, CourtType } from '@/types';
+import { AvenueOutputModel, Result, AvenueQuery, SearchOutputModel, Surface, CourtsInfo, CourtType } from '@/types';
 import { useAuthStore } from '@/stores/auth'
 const config = useRuntimeConfig();
 const authStore = useAuthStore();
 
-const { data, pending, refresh, error } = await useFetch<Result<AvenueOutputModel[]>>(() => `/Avenues/All`, {
-    baseURL: config.public.tournamentsBase
-})
+const query: AvenueQuery = {
+    page: 1,
+    itemsPerPage: 20,
+};
+const method = 'GET';
+const options = {
+    query,
+    method
+}
+
+const { data, pending, refresh, error } = await useTournamentsApi<Result<SearchOutputModel<AvenueOutputModel>>>(`/Avenues/Search`, options)
 if (error.value) {
     console.log('data', data.value)
     console.log('pending', pending.value)
@@ -47,14 +55,14 @@ const getDistinctCourtTypes = (avenue: AvenueOutputModel): CourtType[] => {
             </div>
         </Banner>
         <div v-if="pending">
-            <Loading></Loading>
+            <BaseLoading></BaseLoading>
         </div>
         <div class="container" v-else>
 
             <div class="table-container">
                 <table class="table is-striped is-fullwidth">
                     <tbody>
-                        <tr v-for="avenue in data.data" :key="avenue.id">
+                        <tr v-for="avenue in data.data.results" :key="avenue.id">
                             <td>
                                 <img alt="avenue badge"
                                     src="https://previews.123rf.com/images/woters/woters1606/woters160600042/57889049-tennis-club-vintage-badge-symbol-or-logo-design-template.jpg"

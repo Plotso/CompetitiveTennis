@@ -51,7 +51,7 @@ public class MatchOutcomeHandler : IMatchOutcomeHandler
         await _matchesService.UpdateOutcomeWithCondition(matchId, matchCustomConditionResultInputModel.MatchOutcome, matchCustomConditionResultInputModel.OutcomeCondition, status: EventStatus.Ended);    
         //ToDo: InDepth revise the code below
         var hasSuccessorMatchEnded = await HasSuccessorMatchEnded(matchId); //If successor match has ended, player ratings should be adjusted since this will mess up everything afterwards
-        if (hasSuccessorMatchEnded)
+        if (!hasSuccessorMatchEnded)
             await UpdateRatingsAndSuccessorMatchParticipants(matchId, previousMatchOutcome);
     }
 

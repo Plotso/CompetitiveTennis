@@ -312,7 +312,7 @@ const cancel = () => {
         </div>
       </div>
 
-      <ConfirmationModal
+      <ModalsConfirmationModal
       :isOpen="isConfirmationModalOpen"
       title="Confirmation"
       message="Are you sure you want to cancel tournament creation?"

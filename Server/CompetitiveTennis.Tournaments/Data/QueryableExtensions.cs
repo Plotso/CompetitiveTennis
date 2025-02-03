@@ -12,6 +12,17 @@ public static class QueryableExtensions
             .ThenInclude(m => m.Participants )
             .Include(t => t.Matches)
             .ThenInclude(m => m.Periods );
+
+    public static IQueryable<Match> EnrichMatchQueryData(this IQueryable<Match> matches)
+        => matches
+            .Include(m => m.Tournament)
+            .ThenInclude(t => t.Avenue)
+            .Include(m => m.Participants)
+            .ThenInclude(pm => pm.Participant)
+            .ThenInclude(p => p.Players)
+            .ThenInclude(p => p.Account)
+            .Include(m => m.Periods)
+            .ThenInclude(mp => mp.Scores);
     public static IQueryable<Tournament> EnrichTournamentQueryData(this IQueryable<Tournament> tournaments)
         => tournaments
             .Include(t => t.Avenue)

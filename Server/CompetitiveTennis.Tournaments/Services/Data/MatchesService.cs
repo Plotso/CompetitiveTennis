@@ -24,6 +24,12 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         _logger = logger;
     }
 
+    public async Task<IEnumerable<MatchOutputModel>> Query(MatchQuery query)
+        => _mapper.Map<IEnumerable<MatchOutputModel>>(await GetTournamentsQuery(query).PageFilterResult(query)
+            .ToListAsync());
+
+    public async Task<int> Total(MatchQuery query) => await GetTournamentsQuery(query).CountAsync();
+
     public async Task<IEnumerable<MatchOutputModel>> GetAll()
         => await All()
             //.Include(m => m.Participants)  ToDo: Verify if Include is needed
@@ -342,4 +348,56 @@ public class MatchesService : DeletableDataService<Match>, IMatchesService
         };
         await Data.Set<ParticipantMatch>().AddAsync(entities);
     }
+    
+    private IQueryable<Match> GetTournamentsQuery(MatchQuery query, int? matchId = null)
+    {
+        var dataQuery = All().EnrichMatchQueryData();
+
+        if (matchId.HasValue)
+        {
+            dataQuery = dataQuery.Where( t=> t.Id == matchId);
+            return dataQuery;
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.ParticipantUsername) && !query.IsParticipantWinner.HasValue)
+            dataQuery = dataQuery.Where(m => m.Participants.Any(p => p.Participant.Players.Any(pp => pp.Account.Username == query.ParticipantUsername)));
+        // ToDo: Cache the results of the below filtered query somewhere since it's very heavy
+        if (!string.IsNullOrWhiteSpace(query.ParticipantUsername) && query.IsParticipantWinner.HasValue && query.IsParticipantWinner.Value)
+            dataQuery = dataQuery.Where(m => m.Status == EventStatus.Ended &&
+                (m.Outcome == MatchOutcome.ParticipantOne &&
+                 m.Participants.Any(p =>
+                     p.Specifier == DataConstants.ParticipantSpecifiers.Home &&
+                     p.Participant.Players.Any(pp => pp.Account.Username == query.ParticipantUsername))) ||
+                (m.Outcome == MatchOutcome.ParticipantTwo &&
+                 m.Participants.Any(p =>
+                     p.Specifier == DataConstants.ParticipantSpecifiers.Away &&
+                     p.Participant.Players.Any(pp => pp.Account.Username == query.ParticipantUsername))));
+
+        if (!string.IsNullOrWhiteSpace(query.ParticipantName))
+            dataQuery = dataQuery.Where(m => m.Participants.Any(p => string.Equals(p.Participant.Name, query.ParticipantName, StringComparison.OrdinalIgnoreCase) ||
+                                                                     p.Participant.Players.Any(pp => AccountContainsName(pp.Account, query.ParticipantName))));
+        if (query.Status.HasValue)
+            dataQuery = dataQuery.Where(m => m.Status == query.Status.Value);
+        if (query.OutcomeCondition.HasValue)
+            dataQuery = dataQuery.Where(m => m.OutcomeCondition == query.OutcomeCondition.Value);
+        if (query.Surface.HasValue)
+            dataQuery = dataQuery.Where(m => m.Tournament.Surface == query.Surface);
+        if (query.TournamentType.HasValue)
+            dataQuery = dataQuery.Where(m => m.Tournament.Type == query.TournamentType);
+        if (query.TournamentStage.HasValue)
+            dataQuery = dataQuery.Where(m => m.Stage == query.TournamentStage.Value);
+        if (query.DateRangeFrom.HasValue)
+            dataQuery = dataQuery.Where(m => m.StartDate >= query.DateRangeFrom);
+        if (query.DateRangeUntil.HasValue)
+            dataQuery = dataQuery.Where(m => m.EndDate <= query.DateRangeUntil);
+
+        dataQuery = dataQuery.SortQuery(query.SortOptions);
+
+        return dataQuery;
+    }
+
+    private bool AccountContainsName(Account account, string name)
+        => string.Equals(account.FirstName, name, StringComparison.OrdinalIgnoreCase) ||
+           string.Equals(account.LastName, name, StringComparison.OrdinalIgnoreCase) ||
+           string.Equals($"{account.FirstName} {account.LastName}", name, StringComparison.OrdinalIgnoreCase);
 }

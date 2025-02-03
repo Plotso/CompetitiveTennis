@@ -30,7 +30,7 @@ public interface ITournamentsService : IDataService<Tournament>
     
     Task<IEnumerable<FullTournamentOutputModel>> Query(TournamentQuery query);
     
-    ValueTask<int> Total(TournamentQuery query);
+    Task<int> Total(TournamentQuery query);
     
     Task<int> Create(TournamentInputModel input, Account organiser, Avenue avenue);
 

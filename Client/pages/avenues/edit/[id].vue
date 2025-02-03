@@ -211,7 +211,7 @@ const cancel = () => {
         </div>
       </div>
 
-      <ConfirmationModal
+      <ModalsConfirmationModal
       :isOpen="isConfirmationModalOpen"
       title="Confirmation"
       message="Are you sure you want to cancel avenue creation?"
@@ -219,7 +219,7 @@ const cancel = () => {
       @close="closeConfirmationModal"
     />
 
-<DangerModal
+<ModalsDangerModal
 :isOpen="isUnauthorizedModalOpen"
 title="Unauthorized!"
 message="You are not authorized to edit this avenue!"

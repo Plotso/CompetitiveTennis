@@ -4,12 +4,15 @@ using CompetitiveTennis.Data;
 using Exceptions;
 using Contracts.Account;
 using CompetitiveTennis.Tournaments.Data.Models;
+using Models;
 
 public interface IAccountsService : IDataService<Account>
 {
     Task<IEnumerable<AccountOutputModel>> GetAll();
     Task<AccountOutputModel> GetById(int id);
-    Task<AccountOutputModel> GetByUsernamme(string username);
+    Task<AccountOutputModel> GetByUsername(string username);
+    Task<AccountRatingInfo> GetRatingForUsername(string username);
+    Task<bool> HasAccountWithUsername(string username);
     Task<IEnumerable<Account>> GetMultiple(IEnumerable<int> ids);
     Task<Account?> GetByUserId(string userId);
     Task<Account?> GetInternal(int id);

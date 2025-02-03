@@ -2,7 +2,7 @@
 import { storeToRefs } from 'pinia';
 import { Surface, TournamentType, Result, TournamentOutputModel, SlimTournamentOutputModel, ParticipantInputModel, MatchShortOutputModel, EventStatus, MatchPeriodOutcome, OutcomeCondition } from "@/types"
 import { useAuthStore } from "~/stores/auth"
-import MatchConditionalOutcomeModal from './MatchConditionalOutcomeModal.vue';
+import MatchConditionalOutcomeModal from './ConditionalOutcomeModal.vue';
 import { useParticipantNameBuilder } from '~/composables/useParticipantNameBuilder'
 const { buildHomeParticipantName, buildAwayParticipantName } = useParticipantNameBuilder()
 const props = defineProps({
@@ -199,7 +199,7 @@ const formatOutcomeCondition = (outcomeCondition: OutcomeCondition) => {
   </div>
 
   <!--MODALS-->
-  <LoadingModal :isOpen="showLoadingModal" />
+  <ModalsLoadingModal :isOpen="showLoadingModal" />
   <MatchPeriodInputModal
 :isOpen="isMatchPeriodInputModalOpen"
 :matchId="mData.data.id"

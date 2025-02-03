@@ -9,5 +9,6 @@ public record AccountOutputModel(
     string FirstName,
     string LastName,
     int PlayerRating,
+    int DoublesRating,
     IEnumerable<ParticipantShortOutputModel> Participations,
     IEnumerable<TournamentShortInfoOutput> OrganisedTournaments);

@@ -34,10 +34,11 @@ public class AvenuesService : DeletableDataService<Avenue>, IAvenuesService
     public async Task<IEnumerable<AvenueOutputModel>> Query(AvenueQuery query)
         => (query.Surface == null && query.CourtType == null ?
             await GetAvenuesQuery(query)
+                .PageFilterResult(query)
                 .ProjectToType<AvenueOutputModel>()
                 .ToListAsync() :
-            FilterAvenuesByCourtInfo(GetAvenuesQuery(query).Include(a => a.Tournaments), query)
-            ).PageFilterResult(query) ;
+            FilterAvenuesByCourtInfo(GetAvenuesQuery(query).Include(a => a.Tournaments), query).PageFilterResult(query)
+            ) ;
 
     public async ValueTask<int> Total(AvenueQuery query) 
         => query.Surface == null && query.CourtType == null ?

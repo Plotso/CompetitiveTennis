@@ -116,11 +116,10 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             .ToListAsync();
 
     public async Task<IEnumerable<FullTournamentOutputModel>> Query(TournamentQuery query)
-        => _mapper.Map<IEnumerable<FullTournamentOutputModel>>(await GetTournamentsQuery(query)
-                .ToListAsync())
-            .PageFilterResult(query);
+        => _mapper.Map<IEnumerable<FullTournamentOutputModel>>(await GetTournamentsQuery(query).PageFilterResult(query)
+            .ToListAsync());
 
-    public async ValueTask<int> Total(TournamentQuery query) => await GetTournamentsQuery(query).CountAsync();
+    public async Task<int> Total(TournamentQuery query) => await GetTournamentsQuery(query).CountAsync();
 
     public async Task<int> Create(TournamentInputModel input, Account organiser, Avenue avenue)
     {
@@ -229,6 +228,8 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             dataQuery = dataQuery.Where(t => t.Type == query.TournamentType);
         if (query.IsIndoor.HasValue)
             dataQuery = dataQuery.Where(t => t.IsIndoor == query.IsIndoor);
+        if (query.IsOngoingAtDateTime.HasValue)
+            dataQuery = dataQuery.Where(t => t.StartDate <= query.IsOngoingAtDateTime && t.EndDate >= query.IsOngoingAtDateTime);
         if (query.DateRangeFrom.HasValue)
             dataQuery = dataQuery.Where(t => t.StartDate >= query.DateRangeFrom);
         if (query.DateRangeUntil.HasValue)
@@ -237,6 +238,8 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
             dataQuery = dataQuery.Where(t => t.OrganiserId == query.OrganiserId.Value);
         if (query.ParticipantIds != null && query.ParticipantIds.Any())
             dataQuery = dataQuery.Where(t => t.Participants.Any(p => p.Players.Any(acc => query.ParticipantIds.Contains(acc.AccountId))));
+        if (query.ParticipantUsernames != null && query.ParticipantUsernames.Any())
+            dataQuery = dataQuery.Where(t => t.Participants.Any(p => p.Players.Any(acc => query.ParticipantUsernames.Contains(acc.Account.Username))));
 
         if (!string.IsNullOrWhiteSpace(query.Keyword))
         {

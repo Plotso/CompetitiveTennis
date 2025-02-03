@@ -51,6 +51,20 @@ public class AccountsController : BaseGatewayController
                 return Ok(account);
             }, $"An error occurred during GET request for account: {username}");
 
+    [HttpGet]
+    [Route($"{nameof(Stats)}/{Username}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountStats))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Stats(string username)
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var accountStats = await _accounts.Stats(username);
+                return Ok(accountStats);
+            }, $"An error occurred during Stats request for account: {username}");
+
     [HttpPost]
     [Authorize]
     [Route(nameof(Add))]

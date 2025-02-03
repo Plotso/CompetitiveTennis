@@ -35,7 +35,7 @@ const tournamentName = ref(data.value.data);
   </div>
 
   <!--MODALS-->
-  <LoadingModal :isOpen="showLoadingModal" />
+  <ModalsLoadingModal :isOpen="showLoadingModal" />
 </template>
 
 <style scoped>
