@@ -42,7 +42,7 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
         {
             //await _matchesService.BeginTransaction();
             var dbTournament = await _tournamentsService.GetInternal(tournament.Id);
-            var seeds = ConvertParticipantData(tournament.Participants).ToList();
+            var seeds = ConvertParticipantData(tournament.Participants, dbTournament.Type == TournamentType.Doubles).ToList();
             var matches = GenerateMatches(seeds);
             var startHour = _tournamentConfiguration.CurrentValue.HasValidDailyStartHour()
                 ? _tournamentConfiguration.CurrentValue.DailyStartHour
@@ -98,18 +98,22 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
             return false;
         }
     }
-    
-    public static IEnumerable<Seed> ConvertParticipantData(IEnumerable<ParticipantShortOutputModel> participants)
+    /// <summary>
+    /// Orders participants based on Rating descending.
+    /// Those with equal ratings are randomly shuffled in order to randomise the algorithm output and not always output the same draw in cases when exactly the same list of participants is included, which could be the case with guests.
+    /// </summary>
+    public static IEnumerable<Seed> ConvertParticipantData(IEnumerable<ParticipantShortOutputModel> participants, bool isDoublesTournament = false)
     {
         var rng = new Random();
         var orderedParticipants = participants
-            .OrderByDescending(p => p.Players.Sum(p => p.PlayerRating))
-            .GroupBy(p => p.Players.Sum(p => p.PlayerRating))
+            .OrderByDescending(p => p.Players.Sum(pp => !isDoublesTournament ? pp.PlayerRating : pp.DoublesRating))
+            .GroupBy(p => p.Players.Sum(pp => !isDoublesTournament ? pp.PlayerRating : pp.DoublesRating))
             .SelectMany(g => g.OrderBy(p => rng.Next()));
 
         return orderedParticipants.Select(p =>
             new Seed(p.Id, p.Name ?? string.Join("/", p.Players.Select(p => $"{p.FirstName} {p.LastName}"))));
     }
+
     public static List<MatchGeneratorOutput> GenerateMatches(List<Seed> seeds)
     { 
         var matches = new List<MatchGeneratorOutput>();
@@ -256,7 +260,7 @@ public class TournamentDrawGenerator : ITournamentDrawGenerator
         if (qualificationPlayers.Any())
         {
             
-            // The loop is reversed since players must be grouped from the middle 2 backwarrds
+            // The loop is reversed since players must be grouped from the middle 2 backwards
             for (int i = qualificationPlayers.Length / 2; i > 0 / 2; i--)
             {
                 var match = new MatchGeneratorOutput()
