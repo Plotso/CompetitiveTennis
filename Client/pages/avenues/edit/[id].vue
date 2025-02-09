@@ -228,3 +228,11 @@ message="You are not authorized to edit this avenue!"
     </form>
   </div>
 </template>
+
+<style scoped>
+
+
+.container {
+  padding-top: 7%;
+}
+</style>

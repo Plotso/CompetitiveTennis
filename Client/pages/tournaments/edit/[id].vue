@@ -360,6 +360,10 @@ message="You are not authorized to edit this tournament!"
 </template>
 
 <style scoped>
+
+.container {
+  padding-top: 7%;
+}
 .toggle-button {
   padding: 8px 12px;
   border: none;
