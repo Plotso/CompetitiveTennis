@@ -1,14 +1,17 @@
 ﻿namespace CompetitiveTennis.Tournaments.Services.Data;
 
 using CompetitiveTennis.Data;
+using CompetitiveTennis.Data.Models.Enums;
 using Exceptions;
 using Contracts.Account;
 using CompetitiveTennis.Tournaments.Data.Models;
+using Extensions;
 using Interfaces.Data;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Tournaments.Data;
 using static ServiceConstants;
 
 public class AccountsService : DataService<Account>, IAccountsService
@@ -19,6 +22,12 @@ public class AccountsService : DataService<Account>, IAccountsService
     {
         _mapper = mapper;
     }
+
+    public async Task<IEnumerable<AccountOutputModel>> Query(AccountQuery query)
+        => _mapper.Map<IEnumerable<AccountOutputModel>>(await GetAccountsQuery(query).PageFilterResult(query)
+            .ToListAsync());
+
+    public async ValueTask<int> Total(AccountQuery query) => await GetAccountsQuery(query).CountAsync();
 
     public async Task<IEnumerable<AccountOutputModel>> GetAll()
         => await AllAsNoTracking()
@@ -164,4 +173,30 @@ public class AccountsService : DataService<Account>, IAccountsService
         => await All()
             .Where(a => a.Username == Constants.SystemUser)
             .SingleOrDefaultAsync();
+    
+    private IQueryable<Account> GetAccountsQuery(AccountQuery query, int? accountId = null)
+    {
+        var dataQuery = All();
+
+        if (accountId.HasValue)
+        {
+            dataQuery = dataQuery.Where( t=> t.Id == accountId);
+            return dataQuery;
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.Keyword))
+        {
+            dataQuery = dataQuery.Where(a => 
+                a.FirstName.Contains(query.Keyword) ||
+                a.LastName.Contains(query.Keyword) ||
+                a.Username.Contains(query.Keyword));
+        }
+
+        // Sort query
+        dataQuery = query.AdditionalSortOptions is not null ?
+            dataQuery.SortAccounts(query.AdditionalSortOptions.Value) :
+            dataQuery.SortQuery(query.SortOptions);
+
+        return dataQuery;
+    }
 }
