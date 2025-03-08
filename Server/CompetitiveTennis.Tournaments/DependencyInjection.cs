@@ -25,6 +25,7 @@ public static class DependencyInjection
             .AddScoped<IMatchPeriodInfoManager, MatchPeriodInfoManager>()
             .AddScoped<IMatchOutcomeHandler, MatchOutcomeHandler>()
             .AddScoped<ITournamentDrawGenerator, TournamentDrawGenerator>()
+            .AddScoped<IMatchesGenerator, MatchesGenerator>()
             .AddScoped<IAccountStatsProvider, AccountStatsProvider>()
             .AddScoped<IRatingCalculator, RatingCalculator>();
 
