@@ -31,8 +31,8 @@ public class MatchesGenerator : IMatchesGenerator
             {
                 Id = matchesGenerated++,
                 PlayOrderNumber = matchesGenerated - 1,
-                HomePlayer = seeds[0].Name,
-                AwayPlayer = seeds[1].Name,
+                HomeSeedPlaceholder = seeds[0].Name,
+                AwaySeedPlaceholder = seeds[1].Name,
                 HomeSeed = seeds[0],
                 AwaySeed = seeds[1],
                 TournamentStage = GetTournamentStageFromRoundNumber(numRounds)
@@ -51,8 +51,8 @@ public class MatchesGenerator : IMatchesGenerator
             {
                 Id = matchesGenerated++,
                 PlayOrderNumber = matchesGenerated - 1,
-                HomePlayer = seeds[0].Name,
-                AwayPlayer = MatchTemplateProviders.WinnerOfMatchSeedName(matches[0].Id),
+                HomeSeedPlaceholder = seeds[0].Name,
+                AwaySeedPlaceholder = MatchTemplateProviders.WinnerOfMatchSeedName(matches[0].Id),
                 HomeSeed = seeds[0],
                 AwaySeed = null,
                 AwayPrevMatch = matches[0].Id,
@@ -141,8 +141,8 @@ public class MatchesGenerator : IMatchesGenerator
                 {
                     Id = matchesGenerated++,
                     PlayOrderNumber = matchesGenerated - 1,
-                    HomePlayer = matchPair.HomePlayer,
-                    AwayPlayer = matchPair.AwayPlayer,
+                    HomeSeedPlaceholder = matchPair.HomeSeedPlaceholder,
+                    AwaySeedPlaceholder = matchPair.AwaySeedPlaceholder,
                     HomeSeed = matchPair.HomeSeed,
                     AwaySeed = matchPair.AwaySeed,
                     HomePrevMatch = matchPair.HomePrevMatch,
@@ -186,8 +186,8 @@ public class MatchesGenerator : IMatchesGenerator
                 {
                     Id = matchesGenerated++,
                     PlayOrderNumber = matchesGenerated - 1,
-                    HomePlayer = seeds[0].Name,
-                    AwayPlayer = seeds[1].Name,
+                    HomeSeedPlaceholder = seeds[0].Name,
+                    AwaySeedPlaceholder = seeds[1].Name,
                     HomeSeed = seeds[0],
                     AwaySeed = seeds[1],
                     TournamentStage = TournamentStage.Qualification
@@ -202,8 +202,8 @@ public class MatchesGenerator : IMatchesGenerator
                 {
                     Id = matchesGenerated++,
                     PlayOrderNumber = matchesGenerated - 1,
-                    HomePlayer = seeds[1].Name,
-                    AwayPlayer = seeds[2].Name,
+                    HomeSeedPlaceholder = seeds[1].Name,
+                    AwaySeedPlaceholder = seeds[2].Name,
                     HomeSeed = seeds[1],
                     AwaySeed = seeds[2],
                     TournamentStage = TournamentStage.Qualification
@@ -328,8 +328,8 @@ public class MatchesGenerator : IMatchesGenerator
             {
                 Id = matchesGenerated++,
                 PlayOrderNumber = matchesGenerated - 1,
-                HomePlayer = matchPair.HomePlayer,
-                AwayPlayer = matchPair.AwayPlayer,
+                HomeSeedPlaceholder = matchPair.HomeSeedPlaceholder,
+                AwaySeedPlaceholder = matchPair.AwaySeedPlaceholder,
                 HomeSeed = matchPair.HomeSeed,
                 AwaySeed = matchPair.AwaySeed,
                 HomePrevMatch = matchPair.HomePrevMatch,

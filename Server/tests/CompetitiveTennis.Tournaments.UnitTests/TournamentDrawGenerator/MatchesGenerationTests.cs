@@ -52,8 +52,8 @@ public class MatchesGenerationTests
                     numberOfSeeds);
             match.PlayOrderNumber.Should().Be(expectedMatch.PlayOrderNumber);
             match.TournamentStage.Should().Be(expectedMatch.TournamentStage);
-            match.HomePlayer.Should().Be(expectedMatch.HomePlayer);
-            match.AwayPlayer.Should().Be(expectedMatch.AwayPlayer);
+            match.HomeSeedPlaceholder.Should().Be(expectedMatch.HomeSeedPlaceholder);
+            match.AwaySeedPlaceholder.Should().Be(expectedMatch.AwaySeedPlaceholder);
             match.HomePrevMatch.Should().Be(expectedMatch.HomePrevMatch);
             match.AwayPrevMatch.Should().Be(expectedMatch.AwayPrevMatch);
         }
@@ -79,20 +79,20 @@ public class MatchesGenerationTests
         foreach (var qualificant in qualificants)
         {
             //Ensure qualificant is present in qualifications matches
-            qualificationMatches.Any(m => m.HomePlayer == qualificant.Name || m.AwayPlayer == qualificant.Name).Should().BeTrue();
+            qualificationMatches.Any(m => m.HomeSeedPlaceholder == qualificant.Name || m.AwaySeedPlaceholder == qualificant.Name).Should().BeTrue();
             //Ensure qualificant ain't present in any main draw match
-            nonQualificationMatches.All(m => m.HomePlayer != qualificant.Name && m.AwayPlayer != qualificant.Name).Should().BeTrue();
+            nonQualificationMatches.All(m => m.HomeSeedPlaceholder != qualificant.Name && m.AwaySeedPlaceholder != qualificant.Name).Should().BeTrue();
         }
         
         var byePlayers = players.Take(byes);
         foreach (var byePlayer in byePlayers)
         {
             // Ensure no bye is present in qualification match
-            qualificationMatches.All(m => m.HomePlayer != byePlayer.Name && m.AwayPlayer != byePlayer.Name).Should().BeTrue();
+            qualificationMatches.All(m => m.HomeSeedPlaceholder != byePlayer.Name && m.AwaySeedPlaceholder != byePlayer.Name).Should().BeTrue();
             if (n > 1)
             {
                 // Ensure bye is present in main draw match
-                nonQualificationMatches.Any(m => m.HomePlayer == byePlayer.Name || m.AwayPlayer == byePlayer.Name).Should().BeTrue();
+                nonQualificationMatches.Any(m => m.HomeSeedPlaceholder == byePlayer.Name || m.AwaySeedPlaceholder == byePlayer.Name).Should().BeTrue();
             }
         }
     }
@@ -136,23 +136,23 @@ public class MatchesGenerationTests
 
         firstMatch.Id.Should().Be(1, "First match should be M1");
         firstMatch.PlayOrderNumber.Should().Be(1);
-        firstMatch.HomePlayer.Should().Be("Seed 1");
-        firstMatch.AwayPlayer.Should().Be("Seed 64");
+        firstMatch.HomeSeedPlaceholder.Should().Be("Seed 1");
+        firstMatch.AwaySeedPlaceholder.Should().Be("Seed 64");
 
         secondMatch.Id.Should().Be(2, "Second match should be M2");
         secondMatch.PlayOrderNumber.Should().Be(2);
-        secondMatch.HomePlayer.Should().Be("Seed 32");
-        secondMatch.AwayPlayer.Should().Be("Seed 33");
+        secondMatch.HomeSeedPlaceholder.Should().Be("Seed 32");
+        secondMatch.AwaySeedPlaceholder.Should().Be("Seed 33");
 
         thirdMatch.Id.Should().Be(3, "Third match should be M3");
         thirdMatch.PlayOrderNumber.Should().Be(3);
-        thirdMatch.HomePlayer.Should().Be("Seed 16");
-        thirdMatch.AwayPlayer.Should().Be("Seed 49");
+        thirdMatch.HomeSeedPlaceholder.Should().Be("Seed 16");
+        thirdMatch.AwaySeedPlaceholder.Should().Be("Seed 49");
 
         lastMatch.Id.Should().Be(32, "Last match should be M32");
         lastMatch.PlayOrderNumber.Should().Be(32);
-        lastMatch.HomePlayer.Should().Be("Seed 22");
-        lastMatch.AwayPlayer.Should().Be("Seed 43");
+        lastMatch.HomeSeedPlaceholder.Should().Be("Seed 22");
+        lastMatch.AwaySeedPlaceholder.Should().Be("Seed 43");
     }
 
     [Test]
@@ -186,8 +186,8 @@ public class MatchesGenerationTests
             var match = firstRoundMatches[i];
             match.Id.Should().Be(i + 1, $"Match {i + 1} should have correct ID");
             match.PlayOrderNumber.Should().Be(i + 1);
-            match.HomePlayer.Should().Be(expectedPairings[i].Home, $"Match {i + 1} home player mismatch");
-            match.AwayPlayer.Should().Be(expectedPairings[i].Away, $"Match {i + 1} away player mismatch");
+            match.HomeSeedPlaceholder.Should().Be(expectedPairings[i].Home, $"Match {i + 1} home player mismatch");
+            match.AwaySeedPlaceholder.Should().Be(expectedPairings[i].Away, $"Match {i + 1} away player mismatch");
         }
     }
 
@@ -214,17 +214,17 @@ public class MatchesGenerationTests
         roundOf32Matches.Should().HaveCount(16, "Round of 32 should have 16 matches");
         firstR32Match.Id.Should().Be(33, "First Round of 32 match should be M33");
         firstR32Match.PlayOrderNumber.Should().Be(33, "PlayOrderNumber should match Id");
-        firstR32Match.HomePlayer.Should().Be("Winner of match 1", "M33 should pair W1 vs W2");
-        firstR32Match.AwayPlayer.Should().Be("Winner of match 2");
+        firstR32Match.HomeSeedPlaceholder.Should().Be("Winner of match 1", "M33 should pair W1 vs W2");
+        firstR32Match.AwaySeedPlaceholder.Should().Be("Winner of match 2");
         secondR32Match.Id.Should().Be(34, "Second Round of 32 match should be M34");
-        secondR32Match.HomePlayer.Should().Be("Winner of match 3", "M34 should pair W3 vs W4");
-        secondR32Match.AwayPlayer.Should().Be("Winner of match 4");
+        secondR32Match.HomeSeedPlaceholder.Should().Be("Winner of match 3", "M34 should pair W3 vs W4");
+        secondR32Match.AwaySeedPlaceholder.Should().Be("Winner of match 4");
 
         roundOf16Matches.Should().HaveCount(8, "Round of 16 should have 8 matches");
         firstR16Match.Id.Should().Be(49, "First Round of 16 match should be M49");
         firstR16Match.PlayOrderNumber.Should().Be(49, "PlayOrderNumber should match Id");
-        firstR16Match.HomePlayer.Should().Be("Winner of match 33", "M49 should pair W33 vs W34");
-        firstR16Match.AwayPlayer.Should().Be("Winner of match 34");
+        firstR16Match.HomeSeedPlaceholder.Should().Be("Winner of match 33", "M49 should pair W33 vs W34");
+        firstR16Match.AwaySeedPlaceholder.Should().Be("Winner of match 34");
     }
 
     // Edge Case: 3 Seeds (Minimal Qualification + Main Draw)
@@ -243,13 +243,13 @@ public class MatchesGenerationTests
         matches.Should().HaveCount(2, "3 seeds should produce 2 total matches");
         qualMatch.Id.Should().Be(1, "Qualification match should be M1");
         qualMatch.PlayOrderNumber.Should().Be(1);
-        qualMatch.HomePlayer.Should().Be("Seed 2", "Qualification should pair Seed 2 vs Seed 3");
-        qualMatch.AwayPlayer.Should().Be("Seed 3");
+        qualMatch.HomeSeedPlaceholder.Should().Be("Seed 2", "Qualification should pair Seed 2 vs Seed 3");
+        qualMatch.AwaySeedPlaceholder.Should().Be("Seed 3");
 
         mainMatch.Id.Should().Be(2, "Main match should be M2");
         mainMatch.PlayOrderNumber.Should().Be(2);
-        mainMatch.HomePlayer.Should().Be("Seed 1", "Seed 1 should face qualifier");
-        mainMatch.AwayPlayer.Should().Be("Winner of match 1");
+        mainMatch.HomeSeedPlaceholder.Should().Be("Seed 1", "Seed 1 should face qualifier");
+        mainMatch.AwaySeedPlaceholder.Should().Be("Winner of match 1");
     }
     
     [Test]
@@ -293,8 +293,8 @@ public class MatchesGenerationTests
                 if (stage == firstRoundStage)
                 {
                     // First round: validate seed pairings
-                    match.HomePlayer.Should().Be(expectedPairings[i].Home, $"Match {expectedId} home player mismatch");
-                    match.AwayPlayer.Should().Be(expectedPairings[i].Away, $"Match {expectedId} away player mismatch");
+                    match.HomeSeedPlaceholder.Should().Be(expectedPairings[i].Home, $"Match {expectedId} home player mismatch");
+                    match.AwaySeedPlaceholder.Should().Be(expectedPairings[i].Away, $"Match {expectedId} away player mismatch");
                     match.HomePrevMatch.Should().BeNull($"Match {expectedId} should have no home previous match");
                     match.AwayPrevMatch.Should().BeNull($"Match {expectedId} should have no away previous match");
                 }
@@ -303,9 +303,9 @@ public class MatchesGenerationTests
                     // Subsequent rounds: validate winner progression
                     int homePrevId = matchIndex - matchCount + i * 2 + 1;
                     int awayPrevId = homePrevId + 1;
-                    match.HomePlayer.Should().Be($"Winner of match {homePrevId}",
+                    match.HomeSeedPlaceholder.Should().Be($"Winner of match {homePrevId}",
                         $"Match {expectedId} home player mismatch");
-                    match.AwayPlayer.Should().Be($"Winner of match {awayPrevId}",
+                    match.AwaySeedPlaceholder.Should().Be($"Winner of match {awayPrevId}",
                         $"Match {expectedId} away player mismatch");
                     match.HomePrevMatch.Should().Be(homePrevId,
                         $"Match {expectedId} should reference home prev match {homePrevId}");

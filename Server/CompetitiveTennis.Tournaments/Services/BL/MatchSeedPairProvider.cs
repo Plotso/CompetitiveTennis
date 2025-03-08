@@ -20,8 +20,8 @@ public static class MatchSeedPairProvider
         var awayPrevMatch = awayPlayer == null ? prevRoundMatchIds[unassignedPreviousRoundMatchIndex - 1] :(int?) null;
         var matchPair = new MatchSeedPair()
         {
-            HomePlayer = homePlayerName,
-            AwayPlayer = awayPlayerName,
+            HomeSeedPlaceholder = homePlayerName,
+            AwaySeedPlaceholder = awayPlayerName,
             HomeSeed = homePlayer,
             AwaySeed = awayPlayer,
             HomePrevMatch = homePrevMatch,
@@ -44,8 +44,8 @@ public static class MatchSeedPairProvider
             
             var matchPair = new MatchSeedPair()
             {
-                HomePlayer = homePlayerName,
-                AwayPlayer = awayPlayerName,
+                HomeSeedPlaceholder = homePlayerName,
+                AwaySeedPlaceholder = awayPlayerName,
                 HomeSeed = null,
                 AwaySeed = null,
                 HomePrevMatch = homePrevMatch,
