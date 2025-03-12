@@ -11,9 +11,9 @@
     showDoublesRating: Boolean,
   });
 
-  watchEffect(() => {
-    console.log(props.accounts);
-  })
+  // watchEffect(() => {
+  //   console.log(props.accounts);
+  // })
   </script>
 
 <template>

@@ -5,6 +5,8 @@ import { AccountQuery, SortOptions, SearchOutputModel, Result, AccountOutputMode
 const accounts = ref<AccountOutputModel[]>([]);
 const showLoadingModal = ref(true);
 
+const accountsCount = ref(0);
+
 const props = defineProps({
     keyword: {
         type: String,
@@ -30,6 +32,8 @@ const props = defineProps({
     showDoublesRating: Boolean,
 });
 
+const emit = defineEmits(['updateTotalAccounts']);
+
 
 const errorNotification = ref("")
 const showErrorNotification = ref(false)
@@ -40,13 +44,22 @@ const hideErrorNotification = () => {
 
 console.log(props.accountSortOptions);
 
-const query: AccountQuery = {    
-    keyword: props.keyword,
-    sortOptions: props.sortOptions,
-    additionalSortOptions: props.accountSortOptions,
-    page: props.page ? props.page : 1,
-    itemsPerPage: props.itemsPerPage ? props.itemsPerPage : 10
-};
+// const query: AccountQuery = {    
+//     keyword: props.keyword,
+//     sortOptions: props.sortOptions,
+//     additionalSortOptions: props.accountSortOptions,
+//     page: props.page ? props.page : 1,
+//     itemsPerPage: props.itemsPerPage ? props.itemsPerPage : 10
+// };
+
+//Using computed property here ensure that data is reactive and refetches it upon every update of any prop.
+const query = computed<AccountQuery>(() => ({
+  keyword: props.keyword,
+  sortOptions: props.sortOptions,
+  additionalSortOptions: props.accountSortOptions,
+  page: props.page || 1,
+  itemsPerPage: props.itemsPerPage || 10,
+}));
 const method = 'GET';
 const options = {
     query,
@@ -61,9 +74,24 @@ watchEffect(() => {
   }  
   if (apiResponse.data.value?.data.results) {
     accounts.value = apiResponse.data.value.data.results
+    accountsCount.value = apiResponse.data.value.data.total
+    console.log('Emitting:', accountsCount.value);
+
+
+    emit('updateTotalAccounts', apiResponse.data.value.data.total)
     showLoadingModal.value = false
   }
 })
+
+// // Ensure the event fires on client-side after hydration
+// onMounted(() => {
+//   if (apiResponse.data.value?.data.total) {
+//     console.log('Emitting:', accountsCount.value);
+
+
+//     emit('updateTotalAccounts', apiResponse.data.value.data.total);
+//   }
+// });
 </script>
 
 <template>
@@ -81,6 +109,10 @@ watchEffect(() => {
             :showSinglesRating="showSinglesRating"
             :showDoublesRating="showDoublesRating"
         />
+
+        <!--  This is a test button to emit an event to the parent component
+        <button @click="emit('updateTotalAccounts', 42)">Test Emit</button>
+         -->
     </div>
   </div>
 </template>

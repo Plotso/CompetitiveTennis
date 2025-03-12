@@ -54,6 +54,9 @@
 .custom-link {
     color: green !important;
 }
+.custom-link-light {
+    color: #00d1b2 !important;
+}
 
 .edit-button {
   color: rgb(0, 248, 45);
