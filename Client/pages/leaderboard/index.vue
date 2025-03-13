@@ -59,12 +59,11 @@ const handleSearch = (searchInput: string) => {
 <template>
   <div class="view-window">
     <Banner title="Player Leaderboard" background-img="/imgs/avenues-banner.png">
-      <!-- Toggle button placed inside the Banner -->
-      <button @click="toggleRating" class="toggle-rating-button">
-        Switch to {{ isSingles ? 'Doubles' : 'Singles' }} Rating
+      <!-- Toggle button placed inside the Banner -->      
+    <button @click="toggleRating" class="button toggle-rating-button is-rounded switch-rating-button">
+        <font-awesome-icon :icon="isSingles ? 'fa-solid fa-people-arrows' : 'fa-solid fa-person'" /> Switch to {{ isSingles ? 'Doubles' : 'Singles' }} Rating
       </button>
     </Banner>
-
     <BaseSearchBar placeholder="Search for an user..." @search="handleSearch" />
 
     <AccountQueryList
