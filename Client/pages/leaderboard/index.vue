@@ -13,6 +13,9 @@ const totalAccounts = ref(0);
 // Calculate total pages based on totalItems
 const totalPages = computed(() => Math.ceil(totalAccounts.value / itemsPerPage.value));
 
+
+const searchText = ref<string>('');
+
 const toggleRating = () => {
   isSingles.value = !isSingles.value;
   console.log('accountSortOption', accountSortOption.value);
@@ -37,6 +40,9 @@ const handlePageChange = (newPage: number) => {
 const handleItemsPerPageChange = (newItemsPerPage: number) => {
   itemsPerPage.value = newItemsPerPage;
 };
+const handleSearch = (searchInput: string) => {
+  searchText.value = searchInput;
+};
 
 // const refreshAccounts = () => {
 //   console.log('Refreshing accounts');
@@ -59,9 +65,12 @@ const handleItemsPerPageChange = (newItemsPerPage: number) => {
       </button>
     </Banner>
 
+    <BaseSearchBar placeholder="Search for an user..." @search="handleSearch" />
+
     <AccountQueryList
       :key="accountSortOption"
       :accountSortOptions="accountSortOption"
+      :keyword="searchText"
       :page="page"
       :itemsPerPage="itemsPerPage" 
       :showSinglesRating="isSingles" 
@@ -90,5 +99,10 @@ const handleItemsPerPageChange = (newItemsPerPage: number) => {
   color: white;
   border: none;
   cursor: pointer;
+}
+
+
+.search-bar {
+  margin-top: 1rem;
 }
 </style>
