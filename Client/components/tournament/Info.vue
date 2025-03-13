@@ -257,13 +257,13 @@ const generateDraw = async (tournamentId: number) => {
         
         <div class="box">
           <h2 class="subtitle has-text-centered"><font-awesome-icon icon="fa-solid fa-location-dot" /> Location</h2>
-          <p><strong><NuxtLink class="custom-link" :to="`/avenues/${tournament.avenue.id}`">{{ tournament.avenue.name }}</NuxtLink></strong> - {{ tournament.avenue.location }}</p>
+          <p><strong><NuxtLink class="custom-link-light" :to="`/avenues/${tournament.avenue.id}`">{{ tournament.avenue.name }}</NuxtLink></strong> - {{ tournament.avenue.location }}</p>
           <p>{{ tournament.avenue.city }}, {{ tournament.avenue.country }} </p>
         </div>
         
         <div class="box">
           <h2 class="subtitle has-text-centered">Organizer</h2>
-          <p><strong><NuxtLink class="custom-link" :to="`/users/profile/${tournament.organiser.username}`">{{ tournament.organiser.firstName }} {{ tournament.organiser.lastName }} ({{tournament.organiser.username}})</NuxtLink></strong></p>
+          <p><strong><NuxtLink class="custom-link-light" :to="`/users/profile/${tournament.organiser.username}`">{{ tournament.organiser.firstName }} {{ tournament.organiser.lastName }} ({{tournament.organiser.username}})</NuxtLink></strong></p>
           <p>{{ tournament.organiser.firstName }} {{ tournament.organiser.lastName }} ({{tournament.organiser.username}})</p>
         </div>
       </div>
@@ -418,9 +418,8 @@ const generateDraw = async (tournamentId: number) => {
   font-size: x-small;
 }
 
-.custom-link {
+.custom-link-light {
   text-decoration: underline;
-  color: #00d1b2 !important;
 }
 
 /* Winner styling */

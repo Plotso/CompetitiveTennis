@@ -67,6 +67,7 @@ function linkClicked() {
           <NuxtLink to="/" :class="[{'not-scrolled': !scrolled}, {'transparent': isActive || isTransparent}, 'navbar-item']" @click="linkClicked">Home</NuxtLink>          
           <NuxtLink to="/tournaments" :class="[{'not-scrolled': !scrolled}, {'transparent': isTransparent}, 'navbar-item']" @click="linkClicked">Tournaments</NuxtLink>
           <NuxtLink to="/avenues" :class="[{'not-scrolled': !scrolled}, {'transparent': isTransparent}, 'navbar-item']" @click="linkClicked">Avenues</NuxtLink>
+          <NuxtLink to="/leaderboard" :class="[{'not-scrolled': !scrolled}, {'transparent': isTransparent}, 'navbar-item']" @click="linkClicked">Leaderboard</NuxtLink>
           <NuxtLink to="/about" :class="[{'not-scrolled': !scrolled}, {'transparent': isTransparent}, 'navbar-item']" @click="linkClicked">About</NuxtLink>
 
           <div class="navbar-item has-dropdown is-hoverable" :class="[{ 'scrolled': scrolled }, {'transparent': isTransparent}]">

@@ -131,6 +131,13 @@ export namespace Auth {
     UpdatedDescending
   }
 
+  export enum AccountSortOptions {
+    SinglesRatingDescending,
+    SinglesRatingAscending,
+    DoublesRatingDescending,
+    DoublesRatingAscending
+  }
+
   export interface TournamentOLDOutputModel {
     id: number;
     title: string;
@@ -461,6 +468,11 @@ export namespace Auth {
     tournamentStage?: TournamentStage | null;
   }
   
+  export interface AccountQuery extends PageQuery {
+    keyword?: string;
+    sortOptions?: SortOptions;
+    additionalSortOptions?: AccountSortOptions;
+  }
 
   export interface MatchCustomConditionResultInputModel {
     outcomeCondition: OutcomeCondition;

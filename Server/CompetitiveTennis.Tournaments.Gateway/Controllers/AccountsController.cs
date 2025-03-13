@@ -1,6 +1,8 @@
 ﻿namespace CompetitiveTennis.Tournaments.Gateway.Controllers;
 
+using Contracts;
 using Contracts.Account;
+using Contracts.Tournament;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Tournaments;
@@ -12,6 +14,18 @@ public class AccountsController : BaseGatewayController
     public AccountsController(IAccountsService accounts, ILogger<AccountsController> logger) 
         : base(logger) 
         => _accounts = accounts;
+    
+    [HttpGet]
+    [Route(nameof(Search))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SearchOutputModel<AccountOutputModel>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Search([FromQuery] AccountQuery query)
+        => await SafeProcessRefitRequest(
+            async () =>
+            {
+                var accounts = await _accounts.Search(query);
+                return Ok(accounts);
+            }, $"An error occurred during accounts search with query: {query}");
 
     [HttpGet]
     [Route(nameof(All))]

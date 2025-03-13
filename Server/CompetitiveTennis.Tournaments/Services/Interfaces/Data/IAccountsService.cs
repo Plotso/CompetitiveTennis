@@ -9,6 +9,9 @@ using Models;
 public interface IAccountsService : IDataService<Account>
 {
     Task<IEnumerable<AccountOutputModel>> GetAll();
+    Task<IEnumerable<AccountOutputModel>> Query(AccountQuery query);
+
+    ValueTask<int> Total(AccountQuery query);
     Task<AccountOutputModel> GetById(int id);
     Task<AccountOutputModel> GetByUsername(string username);
     Task<AccountRatingInfo> GetRatingForUsername(string username);

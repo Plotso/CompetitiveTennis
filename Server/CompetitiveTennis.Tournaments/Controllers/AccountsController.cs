@@ -3,9 +3,11 @@
 using CompetitiveTennis.Controllers;
 using CompetitiveTennis.Models;
 using CompetitiveTennis.Services.Interfaces;
+using Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Contracts.Account;
+using Contracts.Tournament;
 using Services.Interfaces.BL;
 using Services.Interfaces.Data;
 
@@ -21,6 +23,18 @@ public class AccountsController : ApiController
         _currentUser = currentUser;
         _accountStatsProvider = accountStatsProvider;
     }
+
+    [HttpGet]
+    [Route(nameof(Search))]
+    public async Task<ActionResult<Result<SearchOutputModel<AccountOutputModel>>>> Search([FromQuery] AccountQuery query)
+        => await SafeHandle(async () =>
+            {
+                var accounts = await _accounts.Query(query);
+                var total = await _accounts.Total(query);
+                return Ok(Result<SearchOutputModel<AccountOutputModel>>.SuccessWith(
+                    new SearchOutputModel<AccountOutputModel>(accounts, query.Page, total)));
+            },
+            msgOnError: $"An error occurred during Search request with query: {query}");
 
     [HttpGet]
     [Route(nameof(All))]
