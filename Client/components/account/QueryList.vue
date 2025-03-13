@@ -44,14 +44,6 @@ const hideErrorNotification = () => {
 
 console.log(props.accountSortOptions);
 
-// const query: AccountQuery = {    
-//     keyword: props.keyword,
-//     sortOptions: props.sortOptions,
-//     additionalSortOptions: props.accountSortOptions,
-//     page: props.page ? props.page : 1,
-//     itemsPerPage: props.itemsPerPage ? props.itemsPerPage : 10
-// };
-
 //Using computed property here ensure that data is reactive and refetches it upon every update of any prop.
 const query = computed<AccountQuery>(() => ({
   keyword: props.keyword,
