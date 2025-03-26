@@ -5,6 +5,7 @@ import { TournamentQuery, TournamentOutputModel, Result, SearchOutputModel, Sort
 
 const tournaments = ref<TournamentOutputModel[]>([]);
 const showLoadingModal = ref(true);
+const tournamentsCount = ref(0);
 
 const props = defineProps({
     username: {
@@ -39,11 +40,17 @@ const props = defineProps({
         type: SortOptions,
         required: false
     },
+    showParticipationColumn: {
+        type: Boolean,
+        required: false
+    },
     showMoneyRelatedColumns: {
         type: Boolean,
         required: false
     }
 });
+
+const emit = defineEmits(['updateTotalTournaments']);
 
 
 const errorNotification = ref("")
@@ -53,16 +60,18 @@ const hideErrorNotification = () => {
     showErrorNotification.value = false;
 }
 
-const query: TournamentQuery = {    
+//Using computed property here ensure that data is reactive and refetches it upon every update of any prop.
+const query = computed<TournamentQuery>(() => ({
+    keyword: props.keyword,
+    sortOptions: props.sortOptions,
+    additionalSortOptions: props.accountSortOptions,
+    page: props.page || 1,
+    itemsPerPage: props.itemsPerPage || 10,
+    participantUsernames: props.username ? [props.username] : undefined,
     isOngoingAtDateTime: props.isOngoing ? new Date().toISOString() : undefined,
     dateRangeFrom: props.dateRangeFrom ? props.dateRangeFrom.toISOString() : undefined,
     dateRangeUntil: props.dateRangeUntil ? props.dateRangeUntil.toISOString() : undefined,
-    page: props.page ? props.page : 1,
-    itemsPerPage: props.itemsPerPage ? props.itemsPerPage : 10,
-    participantUsernames: props.username ? [props.username] : undefined,
-    keyword: props.keyword,
-    sortOptions: props.sortOptions
-};
+}));
 const method = 'GET';
 const options = {
     query,
@@ -70,7 +79,6 @@ const options = {
 }
 const apiResponse = await useTournamentsApi<Result<SearchOutputModel<TournamentOutputModel>>>('/Tournaments/Search', options);
 watchEffect(() => {
-    console.log(apiResponse)
     if (apiResponse.error.value) {
     errorNotification.value = "Error loading tournaments"
     showErrorNotification.value = true
@@ -78,6 +86,8 @@ watchEffect(() => {
   }  
   if (apiResponse.data.value?.data.results) {
     tournaments.value = apiResponse.data.value.data.results
+    tournamentsCount.value = apiResponse.data.value.data.total
+    emit('updateTotalTournaments', tournamentsCount.value);
     showLoadingModal.value = false
     showErrorNotification.value = false
   }
@@ -97,6 +107,7 @@ watchEffect(() => {
             </div>
         <TournamentTableList v-if="tournaments.length > 0"
             :tournaments="tournaments"
+            :show-participation-column="showParticipationColumn"
             :show-money-related-columns="showMoneyRelatedColumns"
         />
     </div>

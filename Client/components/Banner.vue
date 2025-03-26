@@ -3,7 +3,7 @@
 const props = defineProps({
   backgroundImg: {
     type: String,
-    required: true,
+    required: false,
     default: "https://cdn.pixabay.com/photo/2016/07/07/16/46/dice-1502706_1280.jpg"
   } , 
   title: {
@@ -12,7 +12,7 @@ const props = defineProps({
   },
   description: {
     type: String,
-    required: true
+    required: false
   }
 });
 </script>

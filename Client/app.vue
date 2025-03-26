@@ -21,9 +21,11 @@
       <NuxtWelcome />
       -->
   </div>
+  <NuxtLoadingIndicator />
+
   <NuxtLayout>
     
-    <SeoKit />
+    <!-- <SeoKit /> -->
     <NuxtPage/>
 
     <!--

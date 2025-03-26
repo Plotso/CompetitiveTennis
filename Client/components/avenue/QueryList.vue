@@ -44,7 +44,6 @@ const apiResponse = await useTournamentsApi<Result<SearchOutputModel<AvenueOutpu
 
 watchEffect(() => {
   if (apiResponse.error.value) {
-    apiResponse.refresh(); // Without this, the initial load of the page (when directly navigating to it via URL) results in no data for some reason
     errorNotification.value = "Error loading avenues";
     showErrorNotification.value = true;
     showLoadingModal.value = false;
