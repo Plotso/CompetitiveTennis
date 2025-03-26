@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { date } from 'zod';
 import { useTournamentsApi } from '~/composables/useTournamentsApi';
-import { TournamentQuery, TournamentOutputModel, Result, SearchOutputModel, SortOptions } from '~/types';
+import { TournamentQuery, TournamentOutputModel, TournamentType, Surface, Result, SearchOutputModel, SortOptions } from '~/types';
 
 const tournaments = ref<TournamentOutputModel[]>([]);
 const showLoadingModal = ref(true);
@@ -39,7 +39,11 @@ const props = defineProps({
     sortOptions: {
         type: SortOptions,
         required: false
-    },
+    },    
+    tournamentType: { type: Number as PropType<TournamentType | null>, required: false },
+    hasPrize: { type: Boolean as PropType<boolean | null>, required: false },
+    surface: { type: Number as PropType<Surface | null>, required: false },
+    isIndoor: { type: Boolean as PropType<boolean | null>, required: false },
     showParticipationColumn: {
         type: Boolean,
         required: false
@@ -71,12 +75,20 @@ const query = computed<TournamentQuery>(() => ({
     isOngoingAtDateTime: props.isOngoing ? new Date().toISOString() : undefined,
     dateRangeFrom: props.dateRangeFrom ? props.dateRangeFrom.toISOString() : undefined,
     dateRangeUntil: props.dateRangeUntil ? props.dateRangeUntil.toISOString() : undefined,
+    tournamentType: props.tournamentType ?? undefined,
+    hasPrize: props.hasPrize ?? undefined,
+    surface: props.surface ?? undefined,
+    isIndoor: props.isIndoor ?? undefined,
 }));
 const method = 'GET';
 const options = {
     query,
     method
 }
+
+watch(query, () => {
+    showLoadingModal.value = true
+});
 const apiResponse = await useTournamentsApi<Result<SearchOutputModel<TournamentOutputModel>>>('/Tournaments/Search', options);
 watchEffect(() => {
     if (apiResponse.error.value) {
