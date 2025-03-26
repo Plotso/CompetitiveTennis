@@ -20,6 +20,7 @@ const selectedSurface = ref<Surface | null>(null);
 const selectedDateFrom = ref<string | null>(null); // Date input as string
 const selectedDateUntil = ref<string | null>(null); // Date input as string
 const selectedIsIndoor = ref<boolean | null>(null);
+const selectedCity = ref<string | null>(null); 
 
 const selectedTypeInput = ref<TournamentType | null>(null);
 const selectedHasPrizeInput = ref<boolean | null>(null);
@@ -27,6 +28,7 @@ const selectedSurfaceInput = ref<Surface | null>(null);
 const selectedDateFromInput = ref<string | null>(null); 
 const selectedDateUntilInput = ref<string | null>(null);
 const selectedIsIndoorInput = ref<boolean | null>(null);
+const selectedCityInput = ref<string | null>(null); 
 
 const showFilters = ref(false);
 const toggleFilters = () => {
@@ -43,6 +45,17 @@ const applyFilters = () => {
   selectedDateFrom.value = selectedDateFromInput.value;
   selectedDateUntil.value = selectedDateUntilInput.value;
   selectedIsIndoor.value = selectedIsIndoorInput.value;
+  selectedCity.value = selectedCityInput.value;
+};
+
+const resetFilters = () => {
+  selectedTypeInput.value = null;
+  selectedHasPrizeInput.value = null;
+  selectedSurfaceInput.value = null;
+  selectedDateFromInput.value = null;
+  selectedDateUntilInput.value = null;
+  selectedIsIndoorInput.value = null;
+  selectedCityInput.value = null;
 };
 
 const surfaceValues = Object.values(Surface)
@@ -99,7 +112,7 @@ const handleSearch = (searchInput: string) => {
     <!-- Type Filter -->
     <div class="column is-3">
       <div class="field">
-        <label class="label has-text-centered">Type</label>
+        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-people-arrows" /> Type</label>
         <div class="control">
           <div class="select is-fullwidth is-rounded">
             <select v-model="selectedTypeInput">
@@ -112,26 +125,10 @@ const handleSearch = (searchInput: string) => {
       </div>
     </div>
 
-    <!-- HasPrize Filter -->
-    <div class="column is-3">
-      <div class="field">
-        <label class="label has-text-centered">Has Prize</label>
-        <div class="control">
-          <div class="select is-fullwidth is-rounded">
-            <select v-model="selectedHasPrizeInput">
-              <option :value="null">Any</option>
-              <option :value="true">Yes</option>
-              <option :value="false">No</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Surface Filter -->
     <div class="column is-3">
       <div class="field">
-        <label class="label has-text-centered">Surface</label>
+        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-arrow-up-from-ground-water" /> Surface</label>
         <div class="control">
           <div class="select is-fullwidth is-rounded">
             <select v-model="selectedSurfaceInput">
@@ -148,7 +145,7 @@ const handleSearch = (searchInput: string) => {
     <!-- Date Range Filter (From) -->
     <div class="column is-3">
       <div class="field">
-        <label class="label has-text-centered">Date From</label>
+        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-calendar-days" /> Date From</label>
         <div class="control">
           <input class="input is-rounded" type="date" v-model="selectedDateFromInput">
         </div>
@@ -158,20 +155,47 @@ const handleSearch = (searchInput: string) => {
     <!-- Date Range Filter (Until) -->
     <div class="column is-3">
       <div class="field">
-        <label class="label has-text-centered">Date Until</label>
+        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-calendar-days" /> Date Until</label>
         <div class="control">
           <input class="input  is-rounded" type="date" v-model="selectedDateUntilInput">
         </div>
       </div>
     </div>
 
+  <!--City Filter -->
+  <div class="column is-3">
+    <div class="field">
+      <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-location-dot" /> City</label>
+      <div class="control">
+        <input class="input  is-rounded" type="text" v-model="selectedCityInput" placeholder="Input desired city here...">
+      </div>
+    </div>
+  </div>
+
     <!-- IsIndoor Filter -->
     <div class="column is-3">
       <div class="field">
-        <label class="label has-text-centered">Is Indoor</label>
+        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-person-shelter" /> Is Indoor</label>
         <div class="control">
           <div class="select is-fullwidth is-rounded">
             <select v-model="selectedIsIndoorInput">
+              <option :value="null">Any</option>
+              <option :value="true">Yes</option>
+              <option :value="false">No</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- HasPrize Filter -->
+    <div class="column is-3">
+      <div class="field">
+        <label class="label has-text-centered"><font-awesome-icon icon="fa-regular fa-money-bill-1" />Has Prize</label>
+        <div class="control">
+          <div class="select is-fullwidth is-rounded">
+            <select v-model="selectedHasPrizeInput">
               <option :value="null">Any</option>
               <option :value="true">Yes</option>
               <option :value="false">No</option>
@@ -187,6 +211,9 @@ const handleSearch = (searchInput: string) => {
     <div class="control">
       <button class="button is-primary is-rounded" @click="applyFilters">Apply</button>
     </div>
+    <div class="control">
+      <button class="button is-light is-rounded" @click="resetFilters">Reset</button>
+    </div>
   </div>
 </div>
 
@@ -200,6 +227,7 @@ const handleSearch = (searchInput: string) => {
       :date-range-from="selectedDateFrom ? new Date(selectedDateFrom) : null"
       :date-range-until="selectedDateUntil ? new Date(selectedDateUntil) : null"
       :is-indoor="selectedIsIndoor"
+      :city="selectedCity"
       :show-participation-column="true"
       :show-money-related-columns="true"
       @update-total-tournaments="handleTotalTournamentsUpdate"

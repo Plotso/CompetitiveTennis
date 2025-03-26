@@ -44,6 +44,10 @@ const props = defineProps({
     hasPrize: { type: Boolean as PropType<boolean | null>, required: false },
     surface: { type: Number as PropType<Surface | null>, required: false },
     isIndoor: { type: Boolean as PropType<boolean | null>, required: false },
+    city: {
+        type: String,
+        required: false
+    },
     showParticipationColumn: {
         type: Boolean,
         required: false
@@ -79,6 +83,7 @@ const query = computed<TournamentQuery>(() => ({
     hasPrize: props.hasPrize ?? undefined,
     surface: props.surface ?? undefined,
     isIndoor: props.isIndoor ?? undefined,
+    city: props.city,
 }));
 const method = 'GET';
 const options = {

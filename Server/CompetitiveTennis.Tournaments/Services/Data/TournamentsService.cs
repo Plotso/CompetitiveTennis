@@ -249,6 +249,11 @@ public class TournamentsService : DeletableDataService<Tournament>, ITournaments
                 t.Description.Contains(query.Keyword));
         }
 
+        if (!string.IsNullOrWhiteSpace(query.City))
+        {
+            dataQuery = dataQuery.Where(t => t.Avenue.City.Contains(query.City));
+        }
+
         dataQuery = dataQuery.SortQuery(query.SortOptions);
 
         return dataQuery;
