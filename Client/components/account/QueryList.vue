@@ -67,7 +67,7 @@ watchEffect(() => {
   if (apiResponse.data.value?.data.results) {
     accounts.value = apiResponse.data.value.data.results
     accountsCount.value = apiResponse.data.value.data.total
-    console.log('Emitting:', accountsCount.value);
+    showErrorNotification.value = false
 
 
     emit('updateTotalAccounts', apiResponse.data.value.data.total)

@@ -433,6 +433,7 @@ export namespace Auth {
     keyword?: string;
     hasEntryFee?: boolean | null;
     hasPrize?: boolean | null;
+    city?: string;
     sortOptions?: SortOptions;
     surface?: Surface | null;
     tournamentType?: TournamentType | null;

@@ -1,86 +1,134 @@
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth';
+import { TournamentType, Surface } from '~/types';
+
 definePageMeta({
   layout: "default-transparent",
 });
-import { TournamentOutputModel, Result, SearchOutputModel, TournamentQuery, TournamentType, Surface, ParticipantInputModel, MultiParticipantInputModel, ParticipantShortOutputModel } from '@/types'; // Update the path as per your project setup
-import { storeToRefs } from 'pinia';
-import TournamentParticipateDoublesModal from '~/components/tournament/ParticipateDoublesModal.vue';
-import {useAuthStore} from "~/stores/auth"
-import { useTournamentsApi } from '~/composables/useTournamentsApi';
-const router = useRouter();
-const config = useRuntimeConfig();
+
 const authStore = useAuthStore();
 
-const { user } = storeToRefs(useAuthStore());
+const page = ref(1);
+const itemsPerPage = ref(10);
+const maxTournamentsPerPage = ref(50);
+const totalTournaments = ref(0);
+const keyword = ref('');
 
-const tournaments = ref<TournamentOutputModel[]>([]);
+const selectedType = ref<TournamentType | null>(null);
+const selectedHasPrize = ref<boolean | null>(null);
+const selectedSurface = ref<Surface | null>(null);
+const selectedDateFrom = ref<string | null>(null);
+const selectedDateUntil = ref<string | null>(null);
+const selectedIsIndoor = ref<boolean | null>(null);
+const selectedCity = ref<string | null>(null);
 
-const query: TournamentQuery = {
-    page: 1,
-    itemsPerPage: 20,
+const handleApplyFilters = (filters: {
+  selectedType: TournamentType | null;
+  selectedHasPrize: boolean | null;
+  selectedSurface: Surface | null;
+  selectedDateFrom: string | null;
+  selectedDateUntil: string | null;
+  selectedIsIndoor: boolean | null;
+  selectedCity: string | null;
+}) => {
+  page.value = 1; // Reset to first page
+  selectedType.value = filters.selectedType;
+  selectedHasPrize.value = filters.selectedHasPrize;
+  selectedSurface.value = filters.selectedSurface;
+  selectedDateFrom.value = filters.selectedDateFrom;
+  selectedDateUntil.value = filters.selectedDateUntil;
+  selectedIsIndoor.value = filters.selectedIsIndoor;
+  selectedCity.value = filters.selectedCity;
 };
-const method = 'GET';
-const options = {
-    query,
-    method
-}
 
-const { data, pending, refresh, error } = await useTournamentsApi<Result<SearchOutputModel<TournamentOutputModel>>>(`/Tournaments/Search`, options)
-if (error.value) {
-    console.log('data', data.value)
-    console.log('pending', pending.value)
-    console.log('error', error.value)
-    refresh()
-}
+const handleResetFilters = () => {
+  // Reset logic is handled in the child, but parent state could by synced here if needed
+};
 
-if (data?.value?.data) {
-    tournaments.value = data.value?.data.results
-}
-const showLoadingModal = ref(false)
-const errorNotification = ref("")
-const showErrorNotification = ref(false)
+// Compute total pages for pagination
+const totalPages = computed(() => Math.ceil(totalTournaments.value / itemsPerPage.value));
 
-const hideErrorNotification = () => {
-    showErrorNotification.value = false;
-}
+const handleTotalTournamentsUpdate = (total: number) => {
+  totalTournaments.value = total;
+};
 
+const handlePageChange = (newPage: number) => {
+  page.value = newPage;
+};
 
+const handleItemsPerPageChange = (newItemsPerPage: number) => {
+  itemsPerPage.value = newItemsPerPage;
+  page.value = 1; // Reset to first page
+};
+
+const handleSearch = (searchInput: string) => {
+  keyword.value = searchInput;
+  page.value = 1; // Reset to first page on search
+};
 </script>
 
 <template>
-    <div class="view-window">
-        <Banner title="All Tournaments" background-img="/imgs/ongoing-tournament-banner.png">            
-            <div>
-                <div v-if="user.username" class="buttons is-centered">
-                <hr>
-                    <NuxtLink to="/tournaments/create" class="button is-primary">Create Tournament</NuxtLink>
-                <hr>
-                </div>
-            </div>
-        </Banner>
-    <div v-if="pending">
-        <BaseLoading></BaseLoading>
-    </div>
-
-    <div class="container" v-else>
-        <div class="notification is-danger" v-if="showErrorNotification">
-            <button class="delete" @click="hideErrorNotification"></button>
-            {{errorNotification}}
+  <div class="view-window">
+    <Banner title="All Tournaments" background-img="/imgs/ongoing-tournament-banner.png">
+      <div>
+        <div v-if="authStore.user.username" class="buttons is-centered">
+          <hr>
+          <NuxtLink to="/tournaments/create" class="button is-primary">Create Tournament</NuxtLink>
+          <hr>
         </div>
-            <TournamentTableList
-                :tournaments="data?.data.results"
-                :showParticipationColumn="true"
-                :show-money-related-columns="true"
-            />
-    </div>
+      </div>
+    </Banner>
 
-    <!--MODALS-->
-    <ModalsLoadingModal
-      :isOpen="showLoadingModal"
+    <BaseSearchBar placeholder="Search for a tournament..." @search="handleSearch" />
+
+    <!-- Use the new Filters component -->
+    <TournamentFilters
+      :selected-type="selectedType"
+      :selected-has-prize="selectedHasPrize"
+      :selected-surface="selectedSurface"
+      :selected-date-from="selectedDateFrom"
+      :selected-date-until="selectedDateUntil"
+      :selected-is-indoor="selectedIsIndoor"
+      :selected-city="selectedCity"
+      @apply-filters="handleApplyFilters"
+      @reset-filters="handleResetFilters"
     />
-    </div>
 
-    
+    <TournamentQueryList
+      :keyword="keyword"
+      :page="page"
+      :itemsPerPage="itemsPerPage"
+      :tournament-type="selectedType"
+      :has-prize="selectedHasPrize"
+      :surface="selectedSurface"
+      :date-range-from="selectedDateFrom ? new Date(selectedDateFrom) : null"
+      :date-range-until="selectedDateUntil ? new Date(selectedDateUntil) : null"
+      :is-indoor="selectedIsIndoor"
+      :city="selectedCity"
+      :show-participation-column="true"
+      :show-money-related-columns="true"
+      @update-total-tournaments="handleTotalTournamentsUpdate"
+    />
+
+    <BasePagination
+      :current-page="page"
+      :total-pages="totalPages"
+      :items-per-page="itemsPerPage"
+      :items-per-page-options="[10, 20, 30, 50, 100]"
+      :max-items-per-page="maxTournamentsPerPage"
+      :total-items="totalTournaments"
+      @page-change="handlePageChange"
+      @items-per-page-change="handleItemsPerPageChange"
+    />
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.search-bar {
+  margin-top: 1rem;
+}
+
+.filters {
+  margin-bottom: 1rem;
+}
+</style>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, defineEmits, defineProps } from 'vue';
 
 const props = defineProps({
   currentPage: { type: Number, required: true },
@@ -7,6 +6,7 @@ const props = defineProps({
   itemsPerPage: { type: Number, default: null },
   itemsPerPageOptions: { type: Array as () => number[] | null, default: null },
   maxItemsPerPage: { type: Number, default: null },
+  totalItems: { type: Number, default: null },
 });
 
 const emit = defineEmits<{
@@ -67,9 +67,16 @@ const actualOptions = computed(() => {
     ? baseOptions.filter((opt) => opt <= props.maxItemsPerPage)
     : [...baseOptions];
 
+  let hasCustomValue = false;
+
   // Include current itemsPerPage if it's set and not in the options
   if (props.itemsPerPage && !options.includes(props.itemsPerPage)) {
     options.push(props.itemsPerPage);
+    hasCustomValue = true;
+  }
+
+  if (props.totalItems && props.totalItems <= props.itemsPerPage ){
+    return hasCustomValue ? [props.itemsPerPage] : [options.sort((a, b) => a - b)[0]];
   }
 
   // Sort options in ascending order

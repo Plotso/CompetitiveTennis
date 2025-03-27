@@ -83,6 +83,7 @@ const handleSearch = (searchInput: string) => {
       :items-per-page="itemsPerPage"
       :items-per-page-options="[10, 20, 30, 50, 100]"
       :max-items-per-page="25"
+      :total-items="totalAccounts"
       @page-change="handlePageChange"
       @items-per-page-change="handleItemsPerPageChange"
     />

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { date } from 'zod';
 import { useTournamentsApi } from '~/composables/useTournamentsApi';
-import { TournamentQuery, TournamentOutputModel, Result, SearchOutputModel, SortOptions } from '~/types';
+import { TournamentQuery, TournamentOutputModel, TournamentType, Surface, Result, SearchOutputModel, SortOptions } from '~/types';
 
 const tournaments = ref<TournamentOutputModel[]>([]);
 const showLoadingModal = ref(true);
+const tournamentsCount = ref(0);
 
 const props = defineProps({
     username: {
@@ -38,12 +39,26 @@ const props = defineProps({
     sortOptions: {
         type: SortOptions,
         required: false
+    },    
+    tournamentType: { type: Number as PropType<TournamentType | null>, required: false },
+    hasPrize: { type: Boolean as PropType<boolean | null>, required: false },
+    surface: { type: Number as PropType<Surface | null>, required: false },
+    isIndoor: { type: Boolean as PropType<boolean | null>, required: false },
+    city: {
+        type: String,
+        required: false
+    },
+    showParticipationColumn: {
+        type: Boolean,
+        required: false
     },
     showMoneyRelatedColumns: {
         type: Boolean,
         required: false
     }
 });
+
+const emit = defineEmits(['updateTotalTournaments']);
 
 
 const errorNotification = ref("")
@@ -53,24 +68,34 @@ const hideErrorNotification = () => {
     showErrorNotification.value = false;
 }
 
-const query: TournamentQuery = {    
+//Using computed property here ensure that data is reactive and refetches it upon every update of any prop.
+const query = computed<TournamentQuery>(() => ({
+    keyword: props.keyword,
+    sortOptions: props.sortOptions,
+    additionalSortOptions: props.accountSortOptions,
+    page: props.page || 1,
+    itemsPerPage: props.itemsPerPage || 10,
+    participantUsernames: props.username ? [props.username] : undefined,
     isOngoingAtDateTime: props.isOngoing ? new Date().toISOString() : undefined,
     dateRangeFrom: props.dateRangeFrom ? props.dateRangeFrom.toISOString() : undefined,
     dateRangeUntil: props.dateRangeUntil ? props.dateRangeUntil.toISOString() : undefined,
-    page: props.page ? props.page : 1,
-    itemsPerPage: props.itemsPerPage ? props.itemsPerPage : 10,
-    participantUsernames: props.username ? [props.username] : undefined,
-    keyword: props.keyword,
-    sortOptions: props.sortOptions
-};
+    tournamentType: props.tournamentType ?? undefined,
+    hasPrize: props.hasPrize ?? undefined,
+    surface: props.surface ?? undefined,
+    isIndoor: props.isIndoor ?? undefined,
+    city: props.city,
+}));
 const method = 'GET';
 const options = {
     query,
     method
 }
+
+watch(query, () => {
+    showLoadingModal.value = true
+});
 const apiResponse = await useTournamentsApi<Result<SearchOutputModel<TournamentOutputModel>>>('/Tournaments/Search', options);
 watchEffect(() => {
-    console.log(apiResponse)
     if (apiResponse.error.value) {
     errorNotification.value = "Error loading tournaments"
     showErrorNotification.value = true
@@ -78,6 +103,8 @@ watchEffect(() => {
   }  
   if (apiResponse.data.value?.data.results) {
     tournaments.value = apiResponse.data.value.data.results
+    tournamentsCount.value = apiResponse.data.value.data.total
+    emit('updateTotalTournaments', tournamentsCount.value);
     showLoadingModal.value = false
     showErrorNotification.value = false
   }
@@ -97,6 +124,7 @@ watchEffect(() => {
             </div>
         <TournamentTableList v-if="tournaments.length > 0"
             :tournaments="tournaments"
+            :show-participation-column="showParticipationColumn"
             :show-money-related-columns="showMoneyRelatedColumns"
         />
     </div>
