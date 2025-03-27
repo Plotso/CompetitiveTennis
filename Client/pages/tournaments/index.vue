@@ -10,6 +10,7 @@ const authStore = useAuthStore();
 
 const page = ref(1);
 const itemsPerPage = ref(10);
+const maxTournamentsPerPage = ref(50);
 const totalTournaments = ref(0);
 const keyword = ref('');
 
@@ -114,7 +115,7 @@ const handleSearch = (searchInput: string) => {
       :total-pages="totalPages"
       :items-per-page="itemsPerPage"
       :items-per-page-options="[10, 20, 30, 50, 100]"
-      :max-items-per-page="25"
+      :max-items-per-page="maxTournamentsPerPage"
       :total-items="totalTournaments"
       @page-change="handlePageChange"
       @items-per-page-change="handleItemsPerPageChange"
