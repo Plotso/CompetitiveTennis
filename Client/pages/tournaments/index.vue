@@ -13,53 +13,36 @@ const itemsPerPage = ref(10);
 const totalTournaments = ref(0);
 const keyword = ref('');
 
-// Filter states (all nullable with default null)
 const selectedType = ref<TournamentType | null>(null);
 const selectedHasPrize = ref<boolean | null>(null);
 const selectedSurface = ref<Surface | null>(null);
-const selectedDateFrom = ref<string | null>(null); // Date input as string
-const selectedDateUntil = ref<string | null>(null); // Date input as string
+const selectedDateFrom = ref<string | null>(null);
+const selectedDateUntil = ref<string | null>(null);
 const selectedIsIndoor = ref<boolean | null>(null);
-const selectedCity = ref<string | null>(null); 
+const selectedCity = ref<string | null>(null);
 
-const selectedTypeInput = ref<TournamentType | null>(null);
-const selectedHasPrizeInput = ref<boolean | null>(null);
-const selectedSurfaceInput = ref<Surface | null>(null);
-const selectedDateFromInput = ref<string | null>(null); 
-const selectedDateUntilInput = ref<string | null>(null);
-const selectedIsIndoorInput = ref<boolean | null>(null);
-const selectedCityInput = ref<string | null>(null); 
-
-const showFilters = ref(false);
-const toggleFilters = () => {
-  showFilters.value = !showFilters.value;
+const handleApplyFilters = (filters: {
+  selectedType: TournamentType | null;
+  selectedHasPrize: boolean | null;
+  selectedSurface: Surface | null;
+  selectedDateFrom: string | null;
+  selectedDateUntil: string | null;
+  selectedIsIndoor: boolean | null;
+  selectedCity: string | null;
+}) => {
+  page.value = 1; // Reset to first page
+  selectedType.value = filters.selectedType;
+  selectedHasPrize.value = filters.selectedHasPrize;
+  selectedSurface.value = filters.selectedSurface;
+  selectedDateFrom.value = filters.selectedDateFrom;
+  selectedDateUntil.value = filters.selectedDateUntil;
+  selectedIsIndoor.value = filters.selectedIsIndoor;
+  selectedCity.value = filters.selectedCity;
 };
 
-const applyFilters = () => {
-  page.value = 1; 
-  showFilters.value = false;
-
-  selectedType.value = selectedTypeInput.value;
-  selectedHasPrize.value = selectedHasPrizeInput.value;
-  selectedSurface.value = selectedSurfaceInput.value;
-  selectedDateFrom.value = selectedDateFromInput.value;
-  selectedDateUntil.value = selectedDateUntilInput.value;
-  selectedIsIndoor.value = selectedIsIndoorInput.value;
-  selectedCity.value = selectedCityInput.value;
+const handleResetFilters = () => {
+  // Reset logic is handled in the child, but parent state could by synced here if needed
 };
-
-const resetFilters = () => {
-  selectedTypeInput.value = null;
-  selectedHasPrizeInput.value = null;
-  selectedSurfaceInput.value = null;
-  selectedDateFromInput.value = null;
-  selectedDateUntilInput.value = null;
-  selectedIsIndoorInput.value = null;
-  selectedCityInput.value = null;
-};
-
-const surfaceValues = Object.values(Surface)
-  .filter(value => typeof value === 'number') as Surface[];
 
 // Compute total pages for pagination
 const totalPages = computed(() => Math.ceil(totalTournaments.value / itemsPerPage.value));
@@ -97,125 +80,18 @@ const handleSearch = (searchInput: string) => {
 
     <BaseSearchBar placeholder="Search for a tournament..." @search="handleSearch" />
 
-    <div class="field has-addons has-addons-centered">
-      <!-- Filters Button -->
-      <button class="button is-rounded is-primary" @click="toggleFilters">
-        <span class="icon is-small">
-          <font-awesome-icon icon="fa-solid fa-filter" />
-        </span>
-        <span>{{ showFilters ? 'Hide Filters' : 'Filters' }}</span>
-      </button>
-    </div>
-
-<div v-if="showFilters" class="box filters-panel">
-  <div class="columns is-multiline is-centered">
-    <!-- Type Filter -->
-    <div class="column is-3">
-      <div class="field">
-        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-people-arrows" /> Type</label>
-        <div class="control">
-          <div class="select is-fullwidth is-rounded">
-            <select v-model="selectedTypeInput">
-              <option :value="null">All Types</option>
-              <option :value="TournamentType.Singles">Singles</option>
-              <option :value="TournamentType.Doubles">Doubles</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Surface Filter -->
-    <div class="column is-3">
-      <div class="field">
-        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-arrow-up-from-ground-water" /> Surface</label>
-        <div class="control">
-          <div class="select is-fullwidth is-rounded">
-            <select v-model="selectedSurfaceInput">
-              <option :value="null">All Surfaces</option>
-              <option v-for="surface in surfaceValues" :key="surface" :value="surface">
-                {{ Surface[surface] }}
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Date Range Filter (From) -->
-    <div class="column is-3">
-      <div class="field">
-        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-calendar-days" /> Date From</label>
-        <div class="control">
-          <input class="input is-rounded" type="date" v-model="selectedDateFromInput">
-        </div>
-      </div>
-    </div>
-
-    <!-- Date Range Filter (Until) -->
-    <div class="column is-3">
-      <div class="field">
-        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-calendar-days" /> Date Until</label>
-        <div class="control">
-          <input class="input  is-rounded" type="date" v-model="selectedDateUntilInput">
-        </div>
-      </div>
-    </div>
-
-  <!--City Filter -->
-  <div class="column is-3">
-    <div class="field">
-      <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-location-dot" /> City</label>
-      <div class="control">
-        <input class="input  is-rounded" type="text" v-model="selectedCityInput" placeholder="Input desired city here...">
-      </div>
-    </div>
-  </div>
-
-    <!-- IsIndoor Filter -->
-    <div class="column is-3">
-      <div class="field">
-        <label class="label has-text-centered"><font-awesome-icon icon="fa-solid fa-person-shelter" /> Is Indoor</label>
-        <div class="control">
-          <div class="select is-fullwidth is-rounded">
-            <select v-model="selectedIsIndoorInput">
-              <option :value="null">Any</option>
-              <option :value="true">Yes</option>
-              <option :value="false">No</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-
-    <!-- HasPrize Filter -->
-    <div class="column is-3">
-      <div class="field">
-        <label class="label has-text-centered"><font-awesome-icon icon="fa-regular fa-money-bill-1" />Has Prize</label>
-        <div class="control">
-          <div class="select is-fullwidth is-rounded">
-            <select v-model="selectedHasPrizeInput">
-              <option :value="null">Any</option>
-              <option :value="true">Yes</option>
-              <option :value="false">No</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Apply Button -->
-  <div class="field is-grouped is-grouped-centered">
-    <div class="control">
-      <button class="button is-primary is-rounded" @click="applyFilters">Apply</button>
-    </div>
-    <div class="control">
-      <button class="button is-light is-rounded" @click="resetFilters">Reset</button>
-    </div>
-  </div>
-</div>
+    <!-- Use the new Filters component -->
+    <TournamentFilters
+      :selected-type="selectedType"
+      :selected-has-prize="selectedHasPrize"
+      :selected-surface="selectedSurface"
+      :selected-date-from="selectedDateFrom"
+      :selected-date-until="selectedDateUntil"
+      :selected-is-indoor="selectedIsIndoor"
+      :selected-city="selectedCity"
+      @apply-filters="handleApplyFilters"
+      @reset-filters="handleResetFilters"
+    />
 
     <TournamentQueryList
       :keyword="keyword"
@@ -247,17 +123,11 @@ const handleSearch = (searchInput: string) => {
 </template>
 
 <style scoped>
-
-label {
-  color: #00d1b2;
-}
-
 .search-bar {
   margin-top: 1rem;
 }
 
-.filters-panel {
-  margin-top: 1rem;
-  padding: 1rem;
+.filters {
+  margin-bottom: 1rem;
 }
 </style>
